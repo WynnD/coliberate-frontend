@@ -6,17 +6,20 @@
 </template>
 
 <script>
+/* global $ */
 export default {
   data () {
     return {
-      sampleData: 'API result will show up here',
-      clickCount: 0
+      sampleData: 'API result will show up here'
     }
   },
   methods: {
     getAPIData () {
-      this.clickCount++
-      this.sampleData = `You clicked the button ${this.clickCount} time(s)! Now just hook up the API call.`
+      this.sampleData = `Getting data. Please wait...`
+
+      $.get('/data')
+        .done(data => { this.sampleData = data })
+        .fail(err => { this.sampleData = err })
     }
   }
 }
