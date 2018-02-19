@@ -1,0 +1,26 @@
+<template>
+  <div
+    class="ui sidebar inverted vertical menu"
+    id="sidebar">
+    <router-link
+      class="item"
+      to="/">
+      Overview
+    </router-link>
+    <router-link
+      class="item"
+      to="/projects">
+      Projects
+    </router-link>
+    <router-link
+      class="item"
+      to="/members">
+      Members
+    </router-link>
+    <router-link
+      class="item"
+      to="/settings">
+      Settings
+    </router-link>
+  </div>
+</template>
