@@ -4,11 +4,7 @@
     class="pusher">
     <sidebar/>
     <navbar/>
-    <ul id="link-list">
-      <li><router-link to="/">Home</router-link></li>
-      <li><router-link to="/samplePage">API Test Page</router-link></li>
-    </ul>
-    <router-view/>
+    <router-view :project-data="projectData"/>
   </div>
 </template>
 
@@ -21,6 +17,32 @@ export default {
   components: {
     'navbar': TopNavbar,
     'sidebar': Sidebar
+  },
+  data () {
+    return {
+      projectData: {}
+    }
+  },
+  mounted () {
+    this.getProjectData()
+  },
+  methods: {
+    getProjectData () {
+      this.projectData = {
+        SampleProjectID: {
+          name: 'Sample Project',
+          description: 'Project Description. We need to figure out what data goes into projects'
+        },
+        SampleProjectID2: {
+          name: 'Sample Project # 2',
+          description: 'Project Description # 2. Should this be HTML, Markdown, plain text, or something else?'
+        },
+        SampleProjectID3: {
+          name: 'Sample Project # 3',
+          description: 'Project Description # 3. We need to figure out what data goes into projects'
+        }
+      }
+    }
   }
 }
 </script>
@@ -32,6 +54,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 2.95em;
+  margin-top: 2.85em;
 }
 </style>
