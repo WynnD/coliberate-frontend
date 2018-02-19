@@ -1,9 +1,19 @@
 <template>
   <div class="ui card">
     <div class="content">
-      <div class="header">Project Timeline</div>
+      <div class="header">{{ projectData.name }}</div>
     </div>
     <div class="content">
+      <h4 class="ui sub header">About</h4>
+      <div class="ui small feed">
+        <div class="event">
+          <div class="content">
+            <div class="summary">
+              {{ projectData.description }}
+            </div>
+          </div>
+        </div>
+      </div>
       <h4 class="ui sub header">Activity</h4>
       <div class="ui small feed">
         <div class="event">
@@ -30,7 +40,25 @@
       </div>
     </div>
     <div class="extra content">
-      <button class="ui button">Open Project</button>
+      <router-link
+        :to="routerLink"
+        class="ui button">Open Project</router-link>
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  props: {
+    projectData: {
+      type: Object,
+      required: true
+    }
+  },
+  computed: {
+    routerLink () {
+      return `/projects/${this.projectData.id}`
+    }
+  }
+}
+</script>

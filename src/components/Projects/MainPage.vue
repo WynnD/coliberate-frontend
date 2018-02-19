@@ -10,7 +10,8 @@
       class="ui three stackable cards">
       <project-card
         v-for="project in projectData"
-        :key="project.name"/>
+        :key="project.name"
+        :project-data="project"/>
     </div>
   </div>
 </template>
