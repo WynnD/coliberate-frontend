@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/components/Home'
 import SamplePage from '@/components/SamplePage'
-import ProjectPage from '@/components/Projects/MainPage'
+import ProjectListPage from '@/components/Projects/ProjectList'
 Vue.use(Router)
 
 export default new Router({
@@ -20,7 +20,7 @@ export default new Router({
     {
       path: '/projects',
       name: 'Projects',
-      component: ProjectPage
+      component: ProjectListPage
     }
   ]
 })
