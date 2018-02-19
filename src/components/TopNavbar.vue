@@ -4,7 +4,7 @@
       <button
         @click="toggleSidebar()"
         class="ui button item floated left">
-        Sidebar
+        <i class="sidebar icon"></i>
       </button>
     </div>
   </div>
