@@ -7,7 +7,7 @@
     </div>
     <div
       v-else
-      class="ui three stackable cards">
+      class="ui three stackable raised cards">
       <project-card
         v-for="project in projectData"
         :key="project.name"

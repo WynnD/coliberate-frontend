@@ -4,7 +4,7 @@
       <div class="header">{{ projectData.name }}</div>
     </div>
     <div class="content">
-      <h4 class="ui sub header">About</h4>
+      <h4 class="ui sub header"><b>About</b></h4>
       <div class="ui small feed">
         <div class="event">
           <div class="content">
@@ -14,7 +14,8 @@
           </div>
         </div>
       </div>
-      <h4 class="ui sub header">Activity</h4>
+      <div class="ui divider"/>
+      <h4 class="ui sub header"><b>Activity</b></h4>
       <div class="ui small feed">
         <div class="event">
           <div class="content">
