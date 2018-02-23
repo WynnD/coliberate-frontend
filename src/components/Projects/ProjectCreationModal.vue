@@ -12,6 +12,7 @@
                 <div class="ui label">Name:</div>
                 <input
                   type="text"
+                  v-model="project.name"
                   placeholder="Project Name">
               </div>
             </div>
@@ -19,7 +20,7 @@
               <div class="ui fluid labeled input">
                 <div class="ui label">ID:</div>
                 <div class="ui basic button disabled">
-                  Project ID is based off of project name?
+                  {{ project.id }}
                 </div>
               </div>
             </div>
@@ -28,6 +29,7 @@
                 <div class="ui label">Description:</div>
                 <input
                   type="text"
+                  v-model="project.description"
                   placeholder="Project Description">
               </div>
             </div>
@@ -47,6 +49,7 @@
                 <div class="ui label">Predicted Start Date:</div>
                 <input
                   type="date"
+                  v-model="project.startDate"
                   placeholder="Start Date">
               </div>
             </div>
@@ -55,7 +58,7 @@
                 <div class="ui label">Default Sprint Length:</div>
                 <input
                   type="number"
-                  value="14">
+                  v-model="project.sprintLength">
               </div>
             </div>
           </div>
@@ -63,8 +66,73 @@
       </div>
     </div>
     <div class="actions">
-      <div class="ui approve button">Add</div>
+      <div
+        @click="showData"
+        class="ui approve button">
+        Add
+      </div>
       <div class="ui cancel button">Cancel</div>
     </div>
   </div>
 </template>
+
+<script>
+export default {
+  data () {
+    return {
+      project: {
+        name: 'Project Name',
+        id: 'Project ID',
+        description: 'Project Description',
+        members: [],
+        startDate: '1970-12-31',
+        sprintLength: 14
+      }
+    }
+  },
+  computed: {
+    currentDate () {
+      const date = new Date()
+      let [year, month, day] = [
+        date.getFullYear(),
+        date.getMonth() + 1,
+        date.getDate()
+      ]
+
+      if (month < 10) {
+        month = `0${month}`
+      }
+
+      if (day < 10) {
+        day = `0${day}`
+      }
+
+      return `${year}-${month}-${day}`
+    },
+    defaultProject () {
+      return {
+        name: 'Project Name',
+        id: 'Project ID',
+        description: 'Project Description',
+        members: [],
+        startDate: '1970-12-31',
+        sprintLength: 14
+      }
+    }
+  },
+  watch: {
+    'project.name': function (newValue) {
+      this.project.id = newValue.replace(/ /g, '-')
+    }
+  },
+  mounted () {
+    this.project.startDate = this.currentDate
+  },
+  methods: {
+    showData () {
+      // eslint-disable-next-line
+      console.debug(this);
+    }
+  }
+}
+</script>
