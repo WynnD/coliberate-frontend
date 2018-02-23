@@ -55,7 +55,9 @@ export default {
     // eslint-disable-next-line
     console.log(this.projectData);
 
-    this.modal = $('#projects-page #project-creation-modal').modal('hide')
+    this.modal = $('#projects-page #project-creation-modal')
+      .modal('setting', 'closable', false)
+      .modal('hide')
   },
   methods: {
     showModal () {
