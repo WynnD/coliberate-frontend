@@ -4,10 +4,6 @@
     class="ui container">
     <creation-modal id="project-creation-modal"/>
     <div class="ui three stackable raised cards">
-      <project-card
-        v-for="project in this.$store.state.projectData"
-        :key="project.name"
-        :project-data="project"/>
       <div
         class="ui card"
         id="add-project-card">
@@ -20,48 +16,52 @@
           </button>
         </a>
       </div>
+      <project-card
+        v-for="project in this.$store.state.projectData"
+        :key="project.name"
+        :project-data="project"/>
     </div>
   </div>
 </template>
 
 <script>
-import ProjectCard from "@/components/Projects/ProjectCard";
-import CreationModal from "@/components/Projects/ProjectCreationModal";
+import ProjectCard from '@/components/Projects/ProjectCard'
+import CreationModal from '@/components/Projects/ProjectCreationModal'
 
 /* global $ */
 export default {
   components: {
-    "project-card": ProjectCard,
-    "creation-modal": CreationModal
+    'project-card': ProjectCard,
+    'creation-modal': CreationModal
   },
   props: {},
-  data() {
+  data () {
     return {
       modal: null
-    };
+    }
   },
   watch: {
-    projectData(newValue) {
+    projectData (newValue) {
       // eslint-disable-next-line
       console.log("projectData", newValue);
     }
   },
-  mounted() {
+  mounted () {
     // eslint-disable-next-line
     console.log(this.$store.projectData);
 
-    this.modal = $("#projects-page #project-creation-modal")
-      .modal("setting", "closable", false)
-      .modal("hide");
+    this.modal = $('#projects-page #project-creation-modal')
+      .modal('setting', 'closable', false)
+      .modal('hide')
   },
   methods: {
-    showModal() {
+    showModal () {
       if (this.modal) {
-        this.modal.modal("show");
+        this.modal.modal('show')
       }
     }
   }
-};
+}
 </script>
 
 <style scoped>
