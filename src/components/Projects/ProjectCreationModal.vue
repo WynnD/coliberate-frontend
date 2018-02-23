@@ -68,10 +68,10 @@
     <div class="actions">
       <div
         @click="showData"
-        class="ui approve button">
+        class="ui approve green button">
         Add
       </div>
-      <div class="ui cancel button">Cancel</div>
+      <div class="ui cancel red button">Cancel</div>
     </div>
   </div>
 </template>
