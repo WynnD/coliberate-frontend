@@ -45,8 +45,6 @@ export default {
   },
   methods: {
     hideSidebar () {
-      // eslint-disable-next-line
-      console.log("Hiding sidebar")
       this.sidebar.sidebar('hide')
     }
   }
