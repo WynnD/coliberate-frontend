@@ -9,11 +9,14 @@ import SingleProjectPage from '@/components/Projects/SingleProjectPage'
 import MemberListPage from '@/components/Members/MemberList'
 import SingleMemberPage from '@/components/Members/SingleMemberPage'
 import SettingsPage from '@/components/Settings/Settings'
+import NotFoundPage from '@/components/NotFoundPage'
 
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
   routes: [
+    { path: '*', component: NotFoundPage },
     {
       path: '/',
       name: 'Home',
