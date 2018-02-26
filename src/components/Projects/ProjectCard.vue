@@ -1,7 +1,7 @@
 <template>
   <div class="ui card">
     <div class="content">
-      <div class="header">{{ project.name }}</div>
+      <div class="header">{{ name }}</div>
     </div>
     <div class="content">
       <h4 class="ui sub header"><b>About</b></h4>
@@ -9,14 +9,14 @@
         <div class="event">
           <div class="content">
             <div class="summary">
-              {{ project.description }}
+              {{ description }}
             </div>
           </div>
         </div>
       </div>
       <div class="ui divider"/>
     </div>
-    <activity-list :activities="project.activities"/>
+    <activity-list :activities="activities"/>
     <div class="extra content">
       <router-link
         :to="routerLink"
@@ -26,11 +26,11 @@
 </template>
 
 <script>
-import ActivityList from '@/components/Projects/ActivityList'
+import ActivityList from "@/components/Projects/ActivityList";
 
 export default {
   components: {
-    'activity-list': ActivityList
+    "activity-list": ActivityList
   },
   props: {
     project: {
@@ -39,15 +39,24 @@ export default {
     }
   },
   computed: {
-    routerLink () {
-      return `/projects/${this.project.id}`
+    routerLink() {
+      return `/projects/${this.project.id}`;
     },
-    activitiesList () {
-      return this.project.activities
+    activitiesList() {
+      return this.project.activities;
+    },
+    name() {
+      return this.project.name;
+    },
+    description() {
+      return this.project.description;
+    },
+    activities() {
+      return this.project.activities;
     }
   },
-  created () {
-    console.debug(this.project.activities)
+  created() {
+    console.debug(this.project.activities);
   }
-}
+};
 </script>

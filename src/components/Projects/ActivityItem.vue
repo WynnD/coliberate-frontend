@@ -1,15 +1,15 @@
 <template>
   <div class="activity-item">
     <div class="content">
-      <div class="summary">
-        {{ activityData }}
+      <div 
+      v-html="activityData"
+      class="summary">
       </div>
     </div>
   </div>
 </template>
 
 <script>
-
 export default {
   props: {
     activityData: {
@@ -17,5 +17,5 @@ export default {
       required: true
     }
   }
-}
+};
 </script>

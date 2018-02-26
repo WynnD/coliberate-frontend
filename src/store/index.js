@@ -8,7 +8,7 @@ export default new Vuex.Store({
     projects: {
       0: {
         name: 'Sample Project',
-        desc: 'Project Description. We need to figure out what data goes into projects',
+        description: 'Project Description. We need to figure out what data goes into projects',
         activities: [
           '<a>Elliot Fu</a> added <a>Jenny Hess</a> to the project',
           '<a>Stevie Feliciano</a> was added as an <a>Administrator</a>',
