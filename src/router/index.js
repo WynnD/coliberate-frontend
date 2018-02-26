@@ -6,6 +6,7 @@ import SamplePage from '@/components/SamplePage'
 import Home from '@/components/Home'
 import ProjectListPage from '@/components/Projects/ProjectList'
 import SingleProjectPage from '@/components/Projects/SingleProjectPage'
+import LoginPage from '@/components/Members/Login'
 import MemberListPage from '@/components/Members/MemberList'
 import SingleMemberPage from '@/components/Members/SingleMemberPage'
 import SettingsPage from '@/components/Settings/Settings'
@@ -49,6 +50,11 @@ export default new Router({
       path: '/settings',
       name: 'Settings',
       component: SettingsPage
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      component: LoginPage
     }
   ]
 })
