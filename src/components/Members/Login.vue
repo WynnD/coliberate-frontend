@@ -1,31 +1,35 @@
 <template>
-  <form
+  <div
     id="login-form"
-    class="ui container form">
-    <div class="field">
-      <label>Email</label>
-      <input
-        type="text"
-        name="email"
-        v-model="username">
-    </div>
-    <div class="field">
-      <label>Password</label>
-      <input
-        type="password"
-        name="password"
-        v-model="password">
-    </div>
-    <div class="ui error message">
-      <div class="header">Error</div>
-      <p>An error has occurred</p>
-    </div>
-    <button
-      type="submit"
-      class="ui blue fluid button">
-      Login
-    </button>
-  </form>
+    class="ui container fluid">
+    <form class="ui container form left aligned">
+      <h1 class="ui header">Coliberate</h1>
+      <h2 class="ui header">Login</h2>
+      <div class="field">
+        <label>Email</label>
+        <input
+          type="text"
+          name="email"
+          v-model="username">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          v-model="password">
+      </div>
+      <div class="ui error message">
+        <div class="header">Error</div>
+        <p>An error has occurred</p>
+      </div>
+      <button
+        type="submit"
+        class="ui blue fluid button">
+        Login
+      </button>
+    </form>
+  </div>
 </template>
 
 <script>
@@ -39,7 +43,7 @@ export default {
     }
   },
   mounted () {
-    this.$form = $(this.$el)
+    this.$form = $(this.$el).find('.ui.form')
 
     this.$form.submit((e) => {
       e.preventDefault()
@@ -97,7 +101,8 @@ export default {
 
 <style>
 #login-form {
-  z-index: 102;
+  position: relative;
+  z-index: 102; /* one above top navbar */
   padding-top: 2.85em;
   margin-top: -2.85em;
   background-color: white;
