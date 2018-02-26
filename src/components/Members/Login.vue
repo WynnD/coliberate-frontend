@@ -1,32 +1,31 @@
 <template>
-  <div class="ui large modal">
-    <div class="header">Login to Coliberate</div>
-    <div class="content">
-      <form class="ui form">
-        <div class="field">
-          <label>Email</label>
-          <input
-            type="text"
-            name="email"
-            v-model="username">
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            v-model="password">
-        </div>
-        <div class="ui error message">
-          <div class="header">Error</div>
-          <p>An error has occurred</p>
-        </div>
-      </form>
+  <form
+    id="login-form"
+    class="ui container form">
+    <div class="field">
+      <label>Email</label>
+      <input
+        type="text"
+        name="email"
+        v-model="username">
     </div>
-    <div class="actions">
-      <div class="ui blue approve button">Login</div>
+    <div class="field">
+      <label>Password</label>
+      <input
+        type="password"
+        name="password"
+        v-model="password">
     </div>
-  </div>
+    <div class="ui error message">
+      <div class="header">Error</div>
+      <p>An error has occurred</p>
+    </div>
+    <button
+      type="submit"
+      class="ui blue button">
+      Login
+    </button>
+  </form>
 </template>
 
 <script>
@@ -40,15 +39,12 @@ export default {
     }
   },
   mounted () {
-    $(this.$el).modal({
-      closable: false,
-      onApprove: () => {
-        this.login()
-        return false
-      }
-    }).modal('show')
+    this.$form = $(this.$el)
 
-    this.$form = $(this.$el).find('.ui.form')
+    this.$form.submit((e) => {
+      e.preventDefault()
+      this.login()
+    })
   },
   methods: {
     async login () {
@@ -61,8 +57,7 @@ export default {
         if (result.status !== 200) {
           this.notifyError(result.error)
         } else {
-          $(this.$el).modal('hide')
-          this.$router.push({ path: '/projects' })
+          this.$router.replace({ path: '/projects' })
         }
       } catch (err) {
         this.notifyError(err)
@@ -86,3 +81,13 @@ export default {
   }
 }
 </script>
+
+<style>
+#login-form {
+  z-index: 102;
+  padding-top: 2.85em;
+  margin-top: -2.85em;
+  background-color: white;
+  width: 100%;
+}
+</style>
