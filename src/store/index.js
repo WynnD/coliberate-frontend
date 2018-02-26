@@ -21,8 +21,15 @@ export default new Vuex.Store({
         id: 'SampleProjectID3',
         description: 'Project Description # 3. We need to figure out what data goes into projects'
       }
-    }
+    },
+    accountData: null
+  },
+  getters: {
+    isLoggedIn: state => !!state.accountData
   },
   mutations: {
+    login (state, accountData) {
+      state.accountData = accountData
+    }
   }
 })

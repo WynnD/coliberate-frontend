@@ -22,7 +22,7 @@
     </div>
     <button
       type="submit"
-      class="ui blue button">
+      class="ui blue fluid button">
       Login
     </button>
   </form>
@@ -55,11 +55,17 @@ export default {
         const result = await this.sendLoginData(this.username, this.password)
 
         if (result.status !== 200) {
+          // eslint-disable-next-line
+          console.debug("Login failed!", result);
           this.notifyError(result.error)
         } else {
+          const accountData = result.data
+          this.$store.commit('login', accountData)
           this.$router.replace({ path: '/projects' })
         }
       } catch (err) {
+        // eslint-disable-next-line
+        console.debug("Login failed!", err);
         this.notifyError(err)
       }
     },
@@ -71,7 +77,14 @@ export default {
             return { error: 'Invalid login' }
           }
 
-          return { status: 200 }
+          return {
+            status: 200,
+            data: {
+              id: 1,
+              name: 'John Smith',
+              email: 'johnsmith@company.com'
+            }
+          }
         })
     },
     notifyError (message = 'An error occurred while trying to login') {
