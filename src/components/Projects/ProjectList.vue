@@ -17,14 +17,15 @@
         </a>
       </div>
       <project-card
-        v-for="project in this.$store.state.projectData"
-        :key="project.name"
-        :project-data="project"/>
+        v-for="project in projects"
+        :key="project.id"
+        :project="project"/>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import ProjectCard from '@/components/Projects/ProjectCard'
 import CreationModal from '@/components/Projects/ProjectCreationModal'
 
@@ -34,21 +35,23 @@ export default {
     'project-card': ProjectCard,
     'creation-modal': CreationModal
   },
-  props: {},
   data () {
     return {
       modal: null
     }
   },
+  computed: mapState([
+    'projects'
+  ]),
   watch: {
-    projectData (newValue) {
+    projects (newValue) {
       // eslint-disable-next-line
-      console.log("projectData", newValue);
+      console.log("projects", newValue);
     }
   },
   mounted () {
     // eslint-disable-next-line
-    console.log(this.$store.projectData);
+    console.log(this.projects);
 
     this.modal = $('#projects-page #project-creation-modal')
       .modal('setting', 'closable', false)

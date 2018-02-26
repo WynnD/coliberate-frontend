@@ -29,7 +29,7 @@
                 <div class="ui label">Description:</div>
                 <input
                   type="text"
-                  v-model="project.description"
+                  v-model="project.desc"
                   placeholder="Project Description">
               </div>
             </div>
@@ -49,7 +49,7 @@
                 <div class="ui label">Predicted Start Date:</div>
                 <input
                   type="date"
-                  v-model="project.startDate"
+                  v-model="project.start_date"
                   placeholder="Start Date">
               </div>
             </div>
@@ -58,7 +58,7 @@
                 <div class="ui label">Default Sprint Length:</div>
                 <input
                   type="number"
-                  v-model="project.sprintLength">
+                  v-model="project.sprint_length_days">
               </div>
             </div>
           </div>
@@ -112,8 +112,8 @@ export default {
     defaultProject () {
       return {
         name: 'Project Name',
-        id: 'Project ID',
-        description: 'Project Description',
+        id: 0,
+        desc: 'Project Description',
         members: [],
         startDate: '1970-12-31',
         sprintLength: 14

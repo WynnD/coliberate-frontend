@@ -1,10 +1,9 @@
 <template>
-  <div class="wrapper">
-    <sidebar/>
+  <div id="app">
     <navbar/>
+    <sidebar/>
     <div
-      id="app"
-      class="pusher">
+    class="pusher">
       <router-view/>
     </div>
   </div>
@@ -19,14 +18,7 @@ export default {
   components: {
     'navbar': TopNavbar,
     'sidebar': Sidebar
-  },
-  data () {
-    return {}
-  },
-  mounted () {
-
-  },
-  methods: {}
+  }
 }
 </script>
 

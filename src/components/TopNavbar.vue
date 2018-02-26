@@ -3,7 +3,7 @@
     <div class="ui menu top fixed">
       <button
         @click="toggleSidebar()"
-        class="ui button item floated left">
+        class="ui button item big floated left">
         <i class="sidebar icon"/>
       </button>
     </div>
