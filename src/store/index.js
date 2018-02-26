@@ -5,8 +5,9 @@ Vue.use(Vuex) // enable use of Vuex store
 
 export default new Vuex.Store({
   state: {
-    projects: {
-      0: {
+    projects: [
+      {
+        id: 0,
         name: 'Sample Project',
         description: 'Project Description. We need to figure out what data goes into projects',
         activities: [
@@ -14,22 +15,47 @@ export default new Vuex.Store({
           '<a>Stevie Feliciano</a> was added as an <a>Administrator</a>',
           '<a>Helen Troy</a> added two pictures'
         ],
-        start_date: new Date(),
+        stories: [],
+        team_members: [0, 1],
+        start_date: '2018-02-20',
         sprint_length_days: 14
       }
-      /*
-      1: {
-        name: 'Sample Project # 2',
-        desc: 'Project Description # 2. Should this be HTML, Markdown, plain text, or something else?',
-        start_date: new Date()
+    ],
+    projectList: [0],
+    users: [
+      {
+        id: 0,
+        name: 'Big Jeffrey',
+        description: `I'm big, and I'm Jeffrey. Get used to it.`,
+        join_date: '2018-02-25',
+        projects: [0]
       },
-      2: {
-        name: 'Sample Project # 3',
-        desc: 'Project Description # 3. We need to figure out what data goes into projects'
+      {
+        id: 1,
+        name: 'Little Wendy',
+        description: `I'm little, and I'm Wendy. Get used to it.`,
+        join_date: '2018-02-26',
+        projects: [0]
       }
-      */
-    }
+    ],
+    userList: [0, 1],
+    stories: []
   },
   mutations: {
+    addProject (state, project) {
+      state.projects.push(project)
+      state.projectList.push(project.id)
+    },
+    deleteProject (state, id) {
+      state.projects = state.projects.filter(project => project.id !== id)
+    }
+  },
+  getters: {
+    projectIds (state) {
+      return state.projectList
+    },
+    newProjectId (state, getters) {
+      return Math.max(getters.projectIds) + 1
+    }
   }
 })

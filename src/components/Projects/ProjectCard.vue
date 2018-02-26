@@ -26,11 +26,11 @@
 </template>
 
 <script>
-import ActivityList from "@/components/Projects/ActivityList";
+import ActivityList from '@/components/Projects/ActivityList'
 
 export default {
   components: {
-    "activity-list": ActivityList
+    'activity-list': ActivityList
   },
   props: {
     project: {
@@ -39,24 +39,24 @@ export default {
     }
   },
   computed: {
-    routerLink() {
-      return `/projects/${this.project.id}`;
+    routerLink () {
+      return `/projects/${this.project.id}`
     },
-    activitiesList() {
-      return this.project.activities;
+    activitiesList () {
+      return this.project.activities
     },
-    name() {
-      return this.project.name;
+    name () {
+      return this.project.name
     },
-    description() {
-      return this.project.description;
+    description () {
+      return this.project.description
     },
-    activities() {
-      return this.project.activities;
+    activities () {
+      return this.project.activities
     }
   },
-  created() {
-    console.debug(this.project.activities);
+  created () {
+    console.debug(this.project.activities)
   }
-};
+}
 </script>

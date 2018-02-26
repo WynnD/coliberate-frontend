@@ -67,7 +67,7 @@
     </div>
     <div class="actions">
       <div
-        @click="showData"
+        @click="submit"
         class="ui approve green button">
         Add
       </div>
@@ -77,16 +77,18 @@
 </template>
 
 <script>
+import { mapMutations, mapGetters } from 'vuex'
+
 export default {
   data () {
     return {
       project: {
         name: 'Project Name',
-        id: 'Project ID',
+        id: 0,
         description: 'Project Description',
         members: [],
-        startDate: '1970-12-31',
-        sprintLength: 14
+        start_date: '1970-12-31',
+        sprint_length: 14
       }
     }
   },
@@ -109,16 +111,7 @@ export default {
 
       return `${year}-${month}-${day}`
     },
-    defaultProject () {
-      return {
-        name: 'Project Name',
-        id: 0,
-        desc: 'Project Description',
-        members: [],
-        startDate: '1970-12-31',
-        sprintLength: 14
-      }
-    }
+    ...mapGetters(['newProjectId'])
   },
   watch: {
     'project.name': function (newValue) {
@@ -126,13 +119,17 @@ export default {
     }
   },
   mounted () {
-    this.project.startDate = this.currentDate
+    this.project.start_date = this.currentDate
+    this.project.id = this.newProjectId
   },
   methods: {
     showData () {
-      // eslint-disable-next-line
-      console.debug(this);
-    }
+      console.debug(this)
+    },
+    submit (project) {
+
+    },
+    ...mapMutations(['addProject'])
   }
 }
 </script>
