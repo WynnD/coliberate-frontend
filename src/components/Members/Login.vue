@@ -72,10 +72,19 @@ export default {
         console.debug("Login failed!", err);
         this.notifyError(err)
       }
+      this.$form.removeClass('loading')
     },
     sendLoginData (username, password) {
       // TODO: Replace with actual login code
-      return Promise.resolve()
+
+      const simulateDelay = (msDelay) => {
+        return new Promise((resolve, reject) => {
+          setTimeout(resolve, msDelay)
+        })
+      }
+
+      this.$form.addClass('loading')
+      return simulateDelay(1500)
         .then(() => {
           if (username !== 'johnsmith@company.com' || password !== 'password') {
             return { error: 'Invalid login' }
