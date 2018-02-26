@@ -6,6 +6,7 @@
         class="activity-item"
         v-for="activity in activities"
         :key="activity"
+        :activity-data="activity"
       />
     </div>
   </div>
@@ -23,5 +24,9 @@ export default {
       type: Array,
       required: true
     }
+  },
+  mounted () {
+    console.debug(this.activities)
   }
 }
+</script>

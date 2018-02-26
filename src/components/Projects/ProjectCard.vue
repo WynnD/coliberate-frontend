@@ -38,13 +38,16 @@ export default {
       required: true
     }
   },
-  mount () {
-    console.log(this.project.activities)
-  },
   computed: {
     routerLink () {
       return `/projects/${this.project.id}`
+    },
+    activitiesList () {
+      return this.project.activities
     }
+  },
+  created () {
+    console.debug(this.project.activities)
   }
 }
 </script>

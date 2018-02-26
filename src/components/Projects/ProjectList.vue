@@ -46,12 +46,12 @@ export default {
   watch: {
     projects (newValue) {
       // eslint-disable-next-line
-      console.log("projects", newValue);
+      console.debug("projects", newValue);
     }
   },
   mounted () {
     // eslint-disable-next-line
-    console.log(this.projects);
+    console.debug(this.projects);
 
     this.modal = $('#projects-page #project-creation-modal')
       .modal('setting', 'closable', false)
