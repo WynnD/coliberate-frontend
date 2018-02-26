@@ -30,6 +30,9 @@ export default new Vuex.Store({
   mutations: {
     login (state, accountData) {
       state.accountData = accountData
+    },
+    logout (state) {
+      state.accountData = null
     }
   }
 })

@@ -37,6 +37,14 @@
       to="/settings">
       Settings
     </router-link>
+    <router-link
+      @click.native="logout"
+      class="item"
+      to="/login">
+      <button class="ui basic fluid red button">
+        Logout
+      </button>
+    </router-link>
   </div>
 </template>
 
@@ -57,6 +65,10 @@ export default {
   methods: {
     hideSidebar () {
       this.sidebar.sidebar('hide')
+    },
+    logout () {
+      this.$store.commit('logout')
+      this.hideSidebar()
     }
   }
 }
