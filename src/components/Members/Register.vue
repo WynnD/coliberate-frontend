@@ -4,7 +4,14 @@
     class="ui container fluid">
     <form class="ui container form left aligned">
       <h1 class="ui header">Coliberate</h1>
-      <h2 class="ui header">Login</h2>
+      <h2 class="ui header">Register</h2>
+      <div class="field">
+        <label>Name</label>
+        <input
+          type="text"
+          name="name"
+          v-model="name">
+      </div>
       <div class="field">
         <label>Email</label>
         <input
@@ -26,7 +33,7 @@
       <button
         type="submit"
         class="ui blue fluid button">
-        Login
+        Register
       </button>
     </form>
   </div>
@@ -37,8 +44,10 @@
 export default {
   data () {
     return {
-      username: 'johnsmith@company.com',
-      password: 'password',
+      username: '',
+      password: '',
+      name: '',
+      id: this.generateRandomID(),
       $form: undefined
     }
   },
@@ -51,16 +60,27 @@ export default {
     })
   },
   methods: {
-    async login () {
+    generateRandomID () {
       // eslint-disable-next-line
-      console.debug("Sending login info:", this.username, this.password)
+      console.warn('TODO: check if ID exists before returning')
+      return Math.floor(Math.random() * 10000)
+    },
+    async login () {
+      const accountData = {
+        email: this.username.trim(),
+        password: this.password,
+        name: this.name.trim(),
+        id: this.id
+      }
+      // eslint-disable-next-line
+      console.debug("Sending register info:", accountData)
 
       try {
-        const result = await this.sendLoginData(this.username, this.password)
+        const result = await this.sendRegisterData(accountData)
 
         if (result.status !== 200) {
           // eslint-disable-next-line
-          console.debug("Login failed!", result);
+          console.debug("Register failed!", result);
           this.notifyError(result.error)
         } else {
           const accountData = result.data
@@ -74,7 +94,7 @@ export default {
       }
       this.$form.removeClass('loading')
     },
-    sendLoginData (username, password) {
+    sendRegisterData (accountData = {}) {
       // TODO: Replace with actual login code
 
       const simulateDelay = (msDelay) => {
@@ -86,21 +106,25 @@ export default {
       this.$form.addClass('loading')
       return simulateDelay(1500)
         .then(() => {
-          if (username !== 'johnsmith@company.com' || password !== 'password') {
-            return { error: 'Invalid login' }
+          if (!accountData.name || accountData.name.trim().length === 0) {
+            return { error: 'Name field is empty' }
+          } else if (!accountData.email || accountData.email.trim().length === 0) {
+            return { error: 'Email field is empty' }
+          } else if (!accountData.password || accountData.password.trim().length === 0) {
+            return { error: 'Password field is empty' }
           }
 
           return {
             status: 200,
-            data: {
-              id: 1,
-              name: 'John Smith',
-              email: 'johnsmith@company.com'
+            data: { // create new object to avoid unnecessary fields
+              id: accountData.id,
+              name: accountData.name,
+              email: accountData.email
             }
           }
         })
     },
-    notifyError (message = 'An error occurred while trying to login') {
+    notifyError (message = 'An error occurred while trying to register') {
       this.$form.find('.ui.message p').text(message)
       this.$form.addClass('error')
     }
