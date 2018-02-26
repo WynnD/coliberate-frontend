@@ -22,12 +22,17 @@ export default new Vuex.Store({
         description: 'Project Description # 3. We need to figure out what data goes into projects'
       }
     },
-    accountData: null
+    accountData: null,
+    developmentMode: false
   },
   getters: {
-    isLoggedIn: state => !!state.accountData
+    isLoggedIn: state => !!state.accountData,
+    isDevelopmentMode: state => !!state.developmentMode
   },
   mutations: {
+    setDevelopmentMode (state, newData) {
+      state.developmentMode = newData === true
+    },
     login (state, accountData) {
       state.accountData = accountData
     },

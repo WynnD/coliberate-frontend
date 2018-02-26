@@ -53,21 +53,21 @@ export default {
 
     this.$form.submit((e) => {
       e.preventDefault()
-      this.login()
+      this.loginHandler()
     })
   },
   methods: {
-    async login () {
+    async loginHandler () {
       // eslint-disable-next-line
       console.debug("Sending login info:", this.username, this.password)
 
       try {
-        const result = await this.sendLoginData(this.username, this.password)
+        const result = await this.login(this.username, this.password)
 
         if (result.status !== 200) {
           // eslint-disable-next-line
           console.debug("Login failed!", result);
-          this.notifyError(result.error)
+          this.notifyError(result.responseJSON.error || result.statusText || result.error)
         } else {
           const accountData = result.data
           this.$store.commit('login', accountData)
@@ -76,35 +76,47 @@ export default {
       } catch (err) {
         // eslint-disable-next-line
         console.debug("Login failed!", err);
-        this.notifyError(err)
+        const message = `${err.status}: ${err.statusText}`
+        this.notifyError(err.responseJSON.error || err.statusText || message)
       }
       this.$form.removeClass('loading')
     },
     sendLoginData (username, password) {
+      return new Promise((resolve, reject) => {
+        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
+        $.post(`${url}/api/login`, { username, password })
+          .done(resolve).fail(reject)
+      })
+    },
+    async login (username, password) {
       // TODO: Replace with actual login code
 
-      const simulateDelay = (msDelay) => {
-        return new Promise((resolve, reject) => {
-          setTimeout(resolve, msDelay)
-        })
-      }
-
       this.$form.addClass('loading')
-      return simulateDelay(1500)
-        .then(() => {
-          if (username !== 'johnsmith@company.com' || password !== 'password') {
-            return { error: 'Invalid login' }
-          }
+      const data = await this.sendLoginData(username, password)
+      // eslint-disable-next-line
+      console.debug('login', {data})
+      return data
 
-          return {
-            status: 200,
-            data: {
-              id: 1,
-              name: 'John Smith',
-              email: 'johnsmith@company.com'
-            }
-          }
-        })
+      // const simulateDelay = (msDelay) => {
+      //   return new Promise((resolve, reject) => {
+      //     setTimeout(resolve, msDelay)
+      //   })
+      // }
+      // return simulateDelay(1500)
+      //   .then(() => {
+      //     if (username !== 'johnsmith@company.com' || password !== 'password') {
+      //       return { error: 'Invalid login' }
+      //     }
+
+      //     return {
+      //       status: 200,
+      //       data: {
+      //         id: 1,
+      //         name: 'John Smith',
+      //         email: 'johnsmith@company.com'
+      //       }
+      //     }
+      //   })
     },
     notifyError (message = 'An error occurred while trying to login') {
       this.$form.find('.ui.message p').text(message)
