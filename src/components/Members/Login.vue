@@ -23,9 +23,15 @@
         <div class="header">Error</div>
         <p>An error has occurred</p>
       </div>
+      <router-link
+        to="/register"
+        class="ui basic orange left floated button">
+        Not a member yet? Register here.
+      </router-link>
+      <div class="or"></div>
       <button
         type="submit"
-        class="ui blue fluid button">
+        class="ui blue right floated button">
         Login
       </button>
     </form>
