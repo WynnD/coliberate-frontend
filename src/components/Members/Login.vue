@@ -28,7 +28,7 @@
         class="ui basic orange left floated button">
         Not a member yet? Register here.
       </router-link>
-      <div class="or"></div>
+      <div class="or"/>
       <button
         type="submit"
         class="ui blue right floated button">

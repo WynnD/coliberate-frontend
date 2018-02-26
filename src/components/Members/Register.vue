@@ -36,10 +36,10 @@
         Register
       </button>
       <router-link
-          to="/login"
-          class="ui basic blue left floated button">
-          Already a member? Log in here.
-        </router-link>
+        to="/login"
+        class="ui basic blue left floated button">
+        Already a member? Log in here.
+      </router-link>
     </form>
   </div>
 </template>
