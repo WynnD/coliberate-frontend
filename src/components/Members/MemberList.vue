@@ -4,7 +4,7 @@
     class="ui container">
     <div
       v-if="$store.getters.isLoggedIn"
-      class="ui cards">
+      class="ui centered cards">
       <member-card :account-data="$store.state.accountData"/>
       <member-card
         v-for="member in $store.state.memberData"

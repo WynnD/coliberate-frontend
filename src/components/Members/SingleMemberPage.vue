@@ -20,7 +20,7 @@
           </div>
           <div
             v-else
-            class="ui cards">
+            class="ui centered cards">
             <project-card
               v-for="project in sharedProjects"
               :key="project.name"

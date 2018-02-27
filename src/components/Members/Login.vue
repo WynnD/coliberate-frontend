@@ -35,6 +35,12 @@
         class="ui blue right floated button">
         Login
       </button>
+      <button
+        v-if="$store.getters.isDevelopmentMode"
+        @click="debugLoginHandler"
+        class="ui black fluid button">
+        Developer Auto-Login
+      </button>
     </form>
   </div>
 </template>
@@ -68,7 +74,7 @@ export default {
         if (result.status !== 200) {
           // eslint-disable-next-line
           console.debug("Login failed!", result);
-          this.notifyError(result.responseJSON.error || result.statusText || result.error)
+          this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
         } else {
           const accountData = result.data
           this.$store.commit('login', accountData)
@@ -78,7 +84,7 @@ export default {
         // eslint-disable-next-line
         console.debug("Login failed!", err);
         const message = `${err.status}: ${err.statusText}`
-        this.notifyError(err.responseJSON.error || err.statusText || message)
+        this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
       }
       this.$form.removeClass('loading')
     },
@@ -90,38 +96,62 @@ export default {
       })
     },
     async login (username, password) {
-      // TODO: Replace with actual login code
-
       this.$form.addClass('loading')
       const data = await this.sendLoginData(username, password)
       // eslint-disable-next-line
       console.debug('login', {data})
       return data
-
-      // const simulateDelay = (msDelay) => {
-      //   return new Promise((resolve, reject) => {
-      //     setTimeout(resolve, msDelay)
-      //   })
-      // }
-      // return simulateDelay(1500)
-      //   .then(() => {
-      //     if (username !== 'johnsmith@company.com' || password !== 'password') {
-      //       return { error: 'Invalid login' }
-      //     }
-
-      //     return {
-      //       status: 200,
-      //       data: {
-      //         id: 1,
-      //         name: 'John Smith',
-      //         email: 'johnsmith@company.com'
-      //       }
-      //     }
-      //   })
     },
     notifyError (message = 'An error occurred while trying to login') {
       this.$form.find('.ui.message p').text(message)
       this.$form.addClass('error')
+    },
+    // used for "logging in" when server is unavailable
+    async debugLoginHandler () {
+      try {
+        const result = await this.debugLogin(this.username, this.password)
+
+        if (result.status !== 200) {
+          // eslint-disable-next-line
+          console.debug("Login failed!", result);
+          this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
+        } else {
+          const accountData = result.data
+          this.$store.commit('login', accountData)
+          this.$router.push({ path: '/projects' })
+        }
+      } catch (err) {
+        // eslint-disable-next-line
+        console.debug("Login failed!", err);
+        const message = `${err.status}: ${err.statusText}`
+        this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
+      }
+      this.$form.removeClass('loading')
+    },
+    async debugLogin (username, password) {
+      this.$form.addClass('loading')
+      const simulateDelay = (msDelay) => {
+        return new Promise((resolve, reject) => {
+          setTimeout(resolve, msDelay)
+        })
+      }
+      return simulateDelay(1500)
+        .then(() => {
+          if (username !== 'johnsmith@company.com' || password !== 'password') {
+            return { error: 'Invalid login' }
+          }
+
+          return {
+            status: 200,
+            data: {
+              id: 1,
+              name: 'John Smith',
+              email: 'johnsmith@company.com',
+              password: 'password',
+              username: 'johnsmith@company.com'
+            }
+          }
+        })
     }
   }
 }
