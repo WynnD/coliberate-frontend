@@ -38,7 +38,23 @@
 
         <div class="ui segment">
           <div class="ui header">Group Members</div>
-          Group and Role Selectors go here
+          <div class="meta">
+            Group and Role Selectors still in development
+          </div>
+          <ul>
+            <li
+              v-for="member in project.members"
+              :key="member.id">
+              <b v-if="member.id === $store.state.accountData.id">
+                {{ $store.state.accountData.name }}
+              </b>
+              <b v-else-if="$store.state.memberData[member.id]">
+                {{ $store.state.memberData[member.id].name }}
+              </b>
+              <b v-else> {{ member.id }}</b> -
+              {{ member.role }}
+            </li>
+          </ul>
         </div>
 
         <div class="ui segment">
@@ -58,7 +74,7 @@
                 <div class="ui label">Default Sprint Length:</div>
                 <input
                   type="number"
-                  v-model="project.sprint_length_days">
+                  v-model="project.sprintLength">
               </div>
             </div>
           </div>
@@ -77,6 +93,7 @@
 </template>
 
 <script>
+/* global $ */
 export default {
   data () {
     return {
@@ -85,8 +102,11 @@ export default {
         id: 'Project ID',
         description: 'Project Description',
         members: [],
-        startDate: '1970-12-31',
-        sprintLength: 14
+        startdate: '1970-12-31',
+        sprintLength: 14,
+        releases: [],
+        sprints: [],
+        tasks: []
       }
     }
   },
@@ -127,11 +147,36 @@ export default {
   },
   mounted () {
     this.project.startDate = this.currentDate
+    this.project.members.push({
+      id: this.$store.state.accountData.id,
+      role: 'Scrum Master'
+    })
+
+    this.getMembers()
   },
   methods: {
     showData () {
       // eslint-disable-next-line
       console.debug(this);
+    },
+    getMembers () {
+      return new Promise((resolve, reject) => {
+        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
+        $.get(`${url}/api/members`)
+          .done(response => {
+            const userID = this.$store.state.accountData.id
+            const members = response.data.filter(m => m.id !== userID)
+
+            const memberObject = {}
+            members.forEach(m => {
+              memberObject[m.id.toString()] = m
+            })
+            console.debug('Got member data', memberObject)
+
+            this.$store.commit('updateMemberData', memberObject)
+            resolve()
+          }).fail(reject)
+      })
     }
   }
 }
