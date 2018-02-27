@@ -43,14 +43,14 @@
           <ul>
             <li
               v-for="member in project.members"
-              :key="member.id">
-              <b v-if="member.id === $store.state.accountData.id">
+              :key="member.memberID">
+              <b v-if="member.memberID === $store.state.accountData.id">
                 {{ $store.state.accountData.name }}
               </b>
-              <b v-else-if="$store.state.memberData[member.id]">
-                {{ $store.state.memberData[member.id].name }}
+              <b v-else-if="$store.state.memberData[member.memberID]">
+                {{ $store.state.memberData[member.memberID].name }}
               </b>
-              <b v-else> {{ member.id }}</b> -
+              <b v-else> {{ member.memberID }}</b> -
               {{ member.role }}
             </li>
           </ul>
