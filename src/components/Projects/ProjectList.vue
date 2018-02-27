@@ -3,7 +3,9 @@
     id="projects-page"
     class="ui container">
     <creation-modal id="project-creation-modal"/>
-    <div class="ui three stackable raised cards">
+    <div
+      v-if="$store.getters.isLoggedIn"
+      class="ui three stackable raised cards">
       <div
         class="ui card"
         id="add-project-card">
@@ -49,19 +51,39 @@ export default {
       console.debug("projects", newValue);
     }
   },
-  mounted () {
+  async mounted () {
     // eslint-disable-next-line
     console.debug(this.projects);
 
     this.modal = $('#projects-page #project-creation-modal')
       .modal('setting', 'closable', false)
       .modal('hide')
+
+    try {
+      const memberID = this.$store.state.accountData.id
+      const projectList = await this.getProjectList(memberID)
+      this.$store.commit('updateProjectList', projectList)
+    } catch (err) {
+      console.error('Error getting project data', err)
+    }
   },
   methods: {
     showModal () {
       if (this.modal) {
         this.modal.modal('show')
       }
+    },
+    getProjectList (id) {
+      return new Promise((resolve, reject) => {
+        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
+        $.get(`${url}/api/projects?member_id=${id}`)
+          .done(response => {
+            const list = response
+
+            console.debug('got project response', response, list)
+            resolve(list)
+          }).fail(reject)
+      })
     }
   }
 }

@@ -6,9 +6,9 @@ Vue.use(Vuex) // enable use of Vuex store
 export default new Vuex.Store({
   state: {
     projects: {
-      0: {
+      TestProject1: {
         name: 'Sample Project',
-        desc: 'Project Description. We need to figure out what data goes into projects',
+        description: 'Project Description. We need to figure out what data goes into projects',
         activities: [
           '<a>Elliot Fu</a> added <a>Jenny Hess</a> to the project',
           '<a>Stevie Feliciano</a> was added as an <a>Administrator</a>',
@@ -48,6 +48,9 @@ export default new Vuex.Store({
     },
     updateMemberData (state, newData) {
       state.memberData = newData
+    },
+    updateProjectList (state, newData) {
+      state.projects = newData
     }
   }
 })

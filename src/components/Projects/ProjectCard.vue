@@ -16,7 +16,21 @@
       </div>
       <div class="ui divider"/>
     </div>
-    <activity-list :activities="project.activities"/>
+    <activity-list
+      v-if="project.activities"
+      :activities="project.activities"/>
+    <div v-else>
+      <h4 class="ui sub header"><b>Activity</b></h4>
+      <div class="ui small feed">
+        <div class="activity-item">
+          <div class="content">
+            <div class="summary">
+              No activity data found.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="extra content">
       <router-link
         :to="routerLink"
