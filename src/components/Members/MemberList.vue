@@ -31,10 +31,16 @@ export default {
         const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
         $.get(`${url}/api/members`)
           .done(response => {
-            const members = response.data
-            console.debug('Got member data', members)
             const userID = this.$store.state.accountData.id
-            this.$store.commit('updateMemberData', members.filter(m => m.id !== userID))
+            const members = response.data.filter(m => m.id !== userID)
+
+            const memberObject = {}
+            members.forEach(m => {
+              memberObject[m.id.toString()] = m
+            })
+            console.debug('Got member data', memberObject)
+
+            this.$store.commit('updateMemberData', memberObject)
             resolve()
           }).fail(reject)
       })
