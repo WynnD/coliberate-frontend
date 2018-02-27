@@ -24,7 +24,7 @@
             <project-card
               v-for="project in sharedProjects"
               :key="project.name"
-              :project-data="project"/>
+              :project="project"/>
           </div>
         </div>
       </div>
