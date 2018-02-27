@@ -13,11 +13,18 @@
           v-model="name">
       </div>
       <div class="field">
+        <label>Username</label>
+        <input
+          type="text"
+          name="username"
+          v-model="username">
+      </div>
+      <div class="field">
         <label>Email</label>
         <input
           type="text"
           name="email"
-          v-model="username">
+          v-model="email">
       </div>
       <div class="field">
         <label>Password</label>
@@ -52,6 +59,7 @@ export default {
       username: '',
       password: '',
       name: '',
+      email: '',
       id: this.generateRandomID(),
       $form: undefined
     }
@@ -61,7 +69,7 @@ export default {
 
     this.$form.submit((e) => {
       e.preventDefault()
-      this.login()
+      this.registerHandler()
     })
   },
   methods: {
@@ -70,23 +78,24 @@ export default {
       console.warn('TODO: check if ID exists before returning')
       return Math.floor(Math.random() * 10000)
     },
-    async login () {
+    async registerHandler () {
       const accountData = {
-        email: this.username.trim(),
+        email: this.email.trim(),
         password: this.password,
         name: this.name.trim(),
+        username: this.username.trim(),
         id: this.id
       }
       // eslint-disable-next-line
       console.debug("Sending register info:", accountData)
 
       try {
-        const result = await this.sendRegisterData(accountData)
+        const result = await this.register(accountData)
 
         if (result.status !== 200) {
           // eslint-disable-next-line
           console.debug("Register failed!", result);
-          this.notifyError(result.error)
+          this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
         } else {
           const accountData = result.data
           this.$store.commit('login', accountData)
@@ -95,39 +104,60 @@ export default {
       } catch (err) {
         // eslint-disable-next-line
         console.debug("Login failed!", err);
-        this.notifyError(err)
+        const message = `${err.status}: ${err.statusText}`
+        this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
       }
       this.$form.removeClass('loading')
     },
-    sendRegisterData (accountData = {}) {
+    sendRegisterData (accountData) {
+      return new Promise((resolve, reject) => {
+        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
+        $.post(`${url}/api/register`, { accountData })
+          .done(resolve).fail(reject)
+      })
+    },
+    async register (accountData = {}) {
       // TODO: Replace with actual login code
-
-      const simulateDelay = (msDelay) => {
-        return new Promise((resolve, reject) => {
-          setTimeout(resolve, msDelay)
-        })
+      if (!accountData.name || accountData.name.trim().length === 0) {
+        return { responseJSON: { error: 'Name field is empty' } }
+      } else if (!accountData.username || accountData.username.trim().length === 0) {
+        return { responseJSON: { error: 'Username field is empty' } }
+      } else if (!accountData.email || accountData.email.trim().length === 0) {
+        return { responseJSON: { error: 'Email field is empty' } }
+      } else if (!accountData.password || accountData.password.trim().length === 0) {
+        return { responseJSON: { error: 'Password field is empty' } }
       }
 
       this.$form.addClass('loading')
-      return simulateDelay(1500)
-        .then(() => {
-          if (!accountData.name || accountData.name.trim().length === 0) {
-            return { error: 'Name field is empty' }
-          } else if (!accountData.email || accountData.email.trim().length === 0) {
-            return { error: 'Email field is empty' }
-          } else if (!accountData.password || accountData.password.trim().length === 0) {
-            return { error: 'Password field is empty' }
-          }
+      const data = await this.sendRegisterData(accountData)
+      // eslint-disable-next-line
+      console.debug('login', {data})
+      return data
 
-          return {
-            status: 200,
-            data: { // create new object to avoid unnecessary fields
-              id: accountData.id,
-              name: accountData.name,
-              email: accountData.email
-            }
-          }
-        })
+    //   const simulateDelay = (msDelay) => {
+    //     return new Promise((resolve, reject) => {
+    //       setTimeout(resolve, msDelay)
+    //     })
+    //   }
+    //   return simulateDelay(1500)
+    //     .then(() => {
+    //       if (!accountData.name || accountData.name.trim().length === 0) {
+    //         return { error: 'Name field is empty' }
+    //       } else if (!accountData.email || accountData.email.trim().length === 0) {
+    //         return { error: 'Email field is empty' }
+    //       } else if (!accountData.password || accountData.password.trim().length === 0) {
+    //         return { error: 'Password field is empty' }
+    //       }
+
+    //       return {
+    //         status: 200,
+    //         data: { // create new object to avoid unnecessary fields
+    //           id: accountData.id,
+    //           name: accountData.name,
+    //           email: accountData.email
+    //         }
+    //       }
+    //     })
     },
     notifyError (message = 'An error occurred while trying to register') {
       this.$form.find('.ui.message p').text(message)

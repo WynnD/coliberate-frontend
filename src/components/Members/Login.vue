@@ -6,10 +6,11 @@
       <h1 class="ui header">Coliberate</h1>
       <h2 class="ui header">Login</h2>
       <div class="field">
-        <label>Email</label>
+        <label>Username</label>
         <input
           type="text"
-          name="email"
+          name="username"
+          placeholder="Username"
           v-model="username">
       </div>
       <div class="field">
