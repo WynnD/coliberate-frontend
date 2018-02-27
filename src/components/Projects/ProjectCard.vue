@@ -56,7 +56,6 @@ export default {
     }
   },
   created () {
-    console.debug(this.project.activities)
   }
 }
 </script>

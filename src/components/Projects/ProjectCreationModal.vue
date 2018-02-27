@@ -9,7 +9,7 @@
           <div class="ui stackable grid">
             <div class="eight wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">Name:</div>
+                <div class="ui label">Name</div>
                 <input
                   type="text"
                   v-model="project.name"
@@ -18,7 +18,7 @@
             </div>
             <div class="eight wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">ID:</div>
+                <div class="ui label">ID</div>
                 <div class="ui basic button disabled">
                   {{ project.id }}
                 </div>
@@ -26,7 +26,7 @@
             </div>
             <div class="sixteen wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">Description:</div>
+                <div class="ui label">Description</div>
                 <input
                   type="text"
                   v-model="project.desc"
@@ -46,7 +46,7 @@
           <div class="ui stackable grid">
             <div class="eight wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">Predicted Start Date:</div>
+                <div class="ui label">Predicted Start Date</div>
                 <input
                   type="date"
                   v-model="project.start_date"
@@ -55,7 +55,7 @@
             </div>
             <div class="eight wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">Default Sprint Length:</div>
+                <div class="ui label">Sprint Length (days)</div>
                 <input
                   type="number"
                   v-model="project.sprint_length_days">
@@ -83,12 +83,14 @@ export default {
   data () {
     return {
       project: {
-        name: 'Project Name',
         id: 0,
+        name: 'Project Name',
         description: 'Project Description',
-        members: [],
+        activities: [],
+        stories: [],
+        team_members: [],
         start_date: '1970-12-31',
-        sprint_length: 14
+        sprint_length_days: 14
       }
     }
   },
@@ -114,9 +116,6 @@ export default {
     ...mapGetters(['newProjectId'])
   },
   watch: {
-    'project.name': function (newValue) {
-      this.project.id = newValue.replace(/ /g, '-')
-    }
   },
   mounted () {
     this.project.start_date = this.currentDate
@@ -126,8 +125,8 @@ export default {
     showData () {
       console.debug(this)
     },
-    submit (project) {
-
+    submit () {
+      this.addProject(this.project)
     },
     ...mapMutations(['addProject'])
   }

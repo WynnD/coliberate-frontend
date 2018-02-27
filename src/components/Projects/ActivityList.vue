@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <h4 class="ui sub header"><b>Activity</b></h4>
+  <div class="content">
+    <span class="ui sub header">Recent Activity</span>
     <div class="ui small feed">
       <activity-item
         class="activity-item"

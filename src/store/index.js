@@ -66,6 +66,9 @@ export default new Vuex.Store({
     newProjectId (state, getters) {
       return Math.max(getters.projectIds) + 1
     },
+    projectById: state => id => {
+      return state.projects.find(project => project.id === id)
+    },
     isLoggedIn: state => !!state.accountData
   }
 })

@@ -51,7 +51,7 @@ export default {
   },
   mounted () {
     // eslint-disable-next-line
-    console.debug(this.projects);
+    //console.debug(this.projects);
 
     this.modal = $('#projects-page #project-creation-modal')
       .modal('setting', 'closable', false)
