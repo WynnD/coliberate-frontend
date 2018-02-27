@@ -7,6 +7,14 @@ import store from './store'
 
 Vue.config.productionTip = false
 
+router.beforeEach((to, from, next) => {
+  if (to.path !== '/login' && to.path !== '/register' && !store.getters.isLoggedIn) {
+    next('/login')
+  } else {
+    next()
+  }
+})
+
 router.afterEach(() => {
   window.scrollTo(0, 0)
 })

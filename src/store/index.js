@@ -26,10 +26,28 @@ export default new Vuex.Store({
       2: {
         name: 'Sample Project # 3',
         desc: 'Project Description # 3. We need to figure out what data goes into projects'
-      }
-      */
-    }
+      } */
+    },
+    accountData: null,
+    developmentMode: false,
+    memberData: {}
+  },
+  getters: {
+    isLoggedIn: state => !!state.accountData,
+    isDevelopmentMode: state => !!state.developmentMode
   },
   mutations: {
+    setDevelopmentMode (state, newData) {
+      state.developmentMode = newData === true
+    },
+    login (state, accountData) {
+      state.accountData = accountData
+    },
+    logout (state) {
+      state.accountData = null
+    },
+    updateMemberData (state, newData) {
+      state.memberData = newData
+    }
   }
 })
