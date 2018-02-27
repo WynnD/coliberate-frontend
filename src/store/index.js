@@ -38,9 +38,11 @@ export default new Vuex.Store({
         projects: [0]
       }
     ],
+    accountData: null,
     userList: [0, 1],
     stories: []
   },
+
   mutations: {
     addProject (state, project) {
       state.projects.push(project)
@@ -48,14 +50,22 @@ export default new Vuex.Store({
     },
     deleteProject (state, id) {
       state.projects = state.projects.filter(project => project.id !== id)
+    },
+    login (state, accountData) {
+      state.accountData = accountData
+    },
+    logout (state) {
+      state.accountData = null
     }
   },
+
   getters: {
     projectIds (state) {
       return state.projectList
     },
     newProjectId (state, getters) {
       return Math.max(getters.projectIds) + 1
-    }
+    },
+    isLoggedIn: state => !!state.accountData
   }
 })
