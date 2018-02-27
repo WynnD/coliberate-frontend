@@ -23,7 +23,8 @@ export default new Vuex.Store({
       }
     },
     accountData: null,
-    developmentMode: false
+    developmentMode: false,
+    memberData: {}
   },
   getters: {
     isLoggedIn: state => !!state.accountData,
@@ -38,6 +39,9 @@ export default new Vuex.Store({
     },
     logout (state) {
       state.accountData = null
+    },
+    updateMemberData (state, newData) {
+      state.memberData = newData
     }
   }
 })
