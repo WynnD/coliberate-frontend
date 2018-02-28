@@ -18,7 +18,19 @@ export default {
   components: {
     'navbar': TopNavbar,
     'sidebar': Sidebar
-  }
+  },
+  data () {
+    return {}
+  },
+  mounted () {
+    try {
+      this.$store.commit('setDevelopmentMode', process.env.NODE_ENV === 'development')
+      setTimeout(() => {
+        console.debug('developmentMode', this.$store.getters.isDevelopmentMode)
+      }, 1000)
+    } catch (err) {}
+  },
+  methods: {}
 }
 </script>
 

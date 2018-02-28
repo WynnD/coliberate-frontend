@@ -3,7 +3,7 @@
     id="project-page"
     class="ui container">
     <div
-      class="ui text one column grid"
+      class="ui text grid raised"
       id="project-summary">
       <div class="column">
         <h2 class="header" id="project-name">{{ name }}</h2>
@@ -12,22 +12,7 @@
     </div>
     <div class="ui divider"/>
     <div class="ui three stackable raised cards">
-      <div class="ui card">
-        <div class="content">
-          <span class="header">Overview</span>
-        </div>
-        <div class="content">
-          <span class="ui sub header">Status</span>
-          <div class="ui small feed">
-            <div class="content">
-              <div class="summary">
-                Text goes here
-              </div>
-            </div>
-          </div>
-        </div>
-        <activity-list :activities="activities"/>
-      </div>
+      <overview-card :project="project"/>
     </div>
   </div>
 </template>
@@ -35,10 +20,12 @@
 <script>
 import { mapGetters } from 'vuex'
 import ActivityList from '@/components/Projects/ActivityList'
+import OverviewCard from '@/components/Projects/Cards/OverviewCard'
 
 export default {
   components: {
-    'activity-list': ActivityList
+    'activity-list': ActivityList,
+    'overview-card': OverviewCard
   },
   data () {
     return {

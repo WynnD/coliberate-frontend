@@ -16,9 +16,9 @@ export default new Vuex.Store({
           '<a>Helen Troy</a> added two pictures'
         ],
         stories: [],
-        team_members: [0, 1],
-        start_date: '2018-02-20',
-        sprint_length_days: 14
+        members: [0, 1],
+        startDate: '2018-02-20',
+        sprintLength: 14
       }
     ],
     projectList: [0],
@@ -40,25 +40,10 @@ export default new Vuex.Store({
     ],
     accountData: null,
     userList: [0, 1],
-    stories: []
+    stories: [],
+    developmentMode: false,
+    memberData: {}
   },
-
-  mutations: {
-    addProject (state, project) {
-      state.projects.push(project)
-      state.projectList.push(project.id)
-    },
-    deleteProject (state, id) {
-      state.projects = state.projects.filter(project => project.id !== id)
-    },
-    login (state, accountData) {
-      state.accountData = accountData
-    },
-    logout (state) {
-      state.accountData = null
-    }
-  },
-
   getters: {
     projectIds (state) {
       return state.projectList
@@ -69,6 +54,32 @@ export default new Vuex.Store({
     projectById: state => id => {
       return state.projects.find(project => project.id === id)
     },
-    isLoggedIn: state => !!state.accountData
+    isLoggedIn: state => !!state.accountData,
+    isDevelopmentMode: state => !!state.developmentMode
+  },
+
+  mutations: {
+    addProject (state, project) {
+      state.projects.push(project)
+      state.projectList.push(project.id)
+    },
+    deleteProject (state, id) {
+      state.projects = state.projects.filter(project => project.id !== id)
+    },
+    setDevelopmentMode (state, newData) {
+      state.developmentMode = newData === true
+    },
+    login (state, accountData) {
+      state.accountData = accountData
+    },
+    logout (state) {
+      state.accountData = null
+    },
+    updateMemberData (state, newData) {
+      state.memberData = newData
+    },
+    updateProjectList (state, newData) {
+      state.projects = newData
+    }
   }
 })
