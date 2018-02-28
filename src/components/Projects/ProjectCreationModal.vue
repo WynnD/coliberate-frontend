@@ -247,6 +247,10 @@ export default {
       console.debug('register', { data })
       return data
     },
+    notifyError (message = 'An error occurred while trying to register') {
+      this.$form.find('.ui.message p').text(message)
+      this.$form.addClass('error')
+    },
     ...mapMutations(['addProject'])
   }
 }
