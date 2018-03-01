@@ -43,14 +43,14 @@
           <ul>
             <li
               v-for="member in project.members"
-              :key="member.id">
-              <b v-if="member.id === currentUser.id">
+              :key="member.memberID">
+              <b v-if="member.memberID === currentUser.id || +member.memberID === currentUser.id">
                 {{ currentUser.name }}
               </b>
-              <b v-else-if="memberById(member.id)">
-                {{ memberById(member.id).name }}
+              <b v-else-if="memberById(member.memberID)">
+                {{ memberById(member.memberID).name }}
               </b>
-              <b v-else> {{ member.id }}</b> - {{ member.role }}
+              <b v-else> {{ member.memberID }}</b> - {{ member.role }}
             </li>
           </ul>
         </div>
@@ -144,7 +144,7 @@ export default {
     this.project.id = this.newProjectId
     this.project.startDate = this.currentDate
     this.project.members.push({
-      memberID: this.$store.state.accountData.id,
+      memberID: this.currentUser.id,
       role: 'Scrum Master'
     })
 

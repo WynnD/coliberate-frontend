@@ -2,8 +2,7 @@
   <div id="app">
     <navbar/>
     <sidebar/>
-    <div
-      class="pusher">
+    <div class="pusher">
       <router-view/>
     </div>
   </div>
