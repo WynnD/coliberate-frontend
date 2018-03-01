@@ -33,7 +33,7 @@ export default {
   },
   computed: {
     projectId () {
-      return Number(this.$route.params.id)
+      return this.$route.params.id
     },
     name () {
       return this.project.name
@@ -47,6 +47,11 @@ export default {
   },
   mounted () {
     this.project = this.projectById()(this.projectId)
+
+    // case when project ID is a number
+    if (!isNaN(this.projectId) && !this.project) {
+      this.project = this.projectById()(+this.projectId)
+    }
   },
   methods: {
     ...mapGetters(['projectById'])
