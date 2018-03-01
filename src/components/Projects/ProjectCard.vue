@@ -14,7 +14,6 @@
           </div>
         </div>
       </div>
-      <div class="ui divider"/>
     </div>
     <activity-list :activities="activities"/>
     <div class="extra content">

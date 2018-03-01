@@ -22,7 +22,8 @@ export default {
   props: {
     activities: {
       type: Array,
-      required: true
+      required: true,
+      default: []
     }
   },
   mounted () {

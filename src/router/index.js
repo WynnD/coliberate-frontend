@@ -1,8 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import SamplePage from '@/components/SamplePage'
-
 import Home from '@/components/Home'
 import ProjectListPage from '@/components/Projects/ProjectList'
 import SingleProjectPage from '@/components/Projects/SingleProjectPage'
@@ -23,11 +21,6 @@ export default new Router({
       path: '/',
       name: 'Home',
       component: Home
-    },
-    {
-      path: '/SamplePage',
-      name: 'Sample Page',
-      component: SamplePage
     },
     {
       path: '/projects',
