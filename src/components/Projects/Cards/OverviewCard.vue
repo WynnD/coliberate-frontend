@@ -9,13 +9,13 @@
 </template>
 
 <script>
-import ActivityList from "@/components/Projects/ActivityList";
-import ProjectSummary from "@/components/Projects/ProjectSummary"
+import ActivityList from '@/components/Projects/ActivityList'
+import ProjectSummary from '@/components/Projects/ProjectSummary'
 
 export default {
   components: {
-    "activity-list": ActivityList,
-    "project-summary": ProjectSummary
+    'activity-list': ActivityList,
+    'project-summary': ProjectSummary
   },
   props: {
     project: {
@@ -25,7 +25,7 @@ export default {
   },
   computed: {
     activities () {
-      return this.project.activities;
+      return this.project.activities
     }
   }
 }

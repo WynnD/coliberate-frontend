@@ -6,8 +6,16 @@
       class="ui text segment grid raised"
       id="project-summary">
       <div class="column">
-        <h2 class="header" id="project-name">{{ name }}</h2>
-        <span class="header" id="project-description">{{ description }}</span>
+        <h2
+          class="header"
+          id="project-name">
+          {{ name }}
+        </h2>
+        <span
+          class="header"
+          id="project-description">
+          {{ description }}
+        </span>
       </div>
     </div>
     <div class="ui three stackable raised cards">
