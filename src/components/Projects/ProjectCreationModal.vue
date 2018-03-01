@@ -43,15 +43,14 @@
           <ul>
             <li
               v-for="member in project.members"
-              :key="member.memberID">
-              <b v-if="member.memberID === $store.state.accountData.id">
-                {{ $store.state.accountData.name }}
+              :key="member.id">
+              <b v-if="member.id === currentUser.id">
+                {{ currentUser.name }}
               </b>
-              <b v-else-if="$store.state.memberData[member.memberID]">
-                {{ $store.state.memberData[member.memberID].name }}
+              <b v-else-if="memberById(member.id)">
+                {{ memberById(member.id).name }}
               </b>
-              <b v-else> {{ member.memberID }}</b> -
-              {{ member.role }}
+              <b v-else> {{ member.id }}</b> - {{ member.role }}
             </li>
           </ul>
         </div>
@@ -138,15 +137,14 @@ export default {
 
       return `${year}-${month}-${day}`
     },
-    ...mapGetters(['newProjectId'])
+    ...mapGetters(['newProjectId', 'currentUser'])
   },
-  watch: {
-  },
+
   mounted () {
     this.project.id = this.newProjectId
     this.project.startDate = this.currentDate
     this.project.members.push({
-      memberID: this.$store.state.accountData.id,
+      id: this.$store.state.accountData.id,
       role: 'Scrum Master'
     })
 
@@ -165,11 +163,13 @@ export default {
       }
     })
   },
+
   methods: {
     showData () {
       // eslint-disable-next-line
       console.debug(this);
     },
+
     getMembers () {
       return new Promise((resolve, reject) => {
         const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
@@ -189,6 +189,7 @@ export default {
           }).fail(reject)
       })
     },
+
     async registerHandler () {
       const projectData = {
         name: this.project.name.trim(),
@@ -220,6 +221,7 @@ export default {
       }
       this.$form.removeClass('loading')
     },
+
     sendRegisterData (projectData) {
       return new Promise((resolve, reject) => {
         const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
@@ -227,6 +229,7 @@ export default {
           .done(resolve).fail(reject)
       })
     },
+
     async register (projectData = {}) {
       const textFields = ['name', 'id', 'description', 'startdate']
       let errorMessage
@@ -247,11 +250,13 @@ export default {
       console.debug('register', { data })
       return data
     },
+
     notifyError (message = 'An error occurred while trying to register') {
       this.$form.find('.ui.message p').text(message)
       this.$form.addClass('error')
     },
-    ...mapMutations(['addProject'])
+    ...mapMutations(['addProject']),
+    ...mapGetters(['memberById'])
   }
 }
 </script>

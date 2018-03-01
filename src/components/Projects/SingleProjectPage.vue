@@ -10,7 +10,6 @@
         <span class="header" id="project-description">{{ description }}</span>
       </div>
     </div>
-    <div class="ui divider"/>
     <div class="ui three stackable raised cards">
       <overview-card :project="project"/>
     </div>
