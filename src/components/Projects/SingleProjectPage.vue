@@ -3,7 +3,7 @@
     id="project-page"
     class="ui container">
     <div
-      class="ui text grid raised"
+      class="ui text segment grid raised"
       id="project-summary">
       <div class="column">
         <h2 class="header" id="project-name">{{ name }}</h2>
