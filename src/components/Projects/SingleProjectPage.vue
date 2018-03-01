@@ -29,6 +29,7 @@ import { mapGetters } from 'vuex'
 import ActivityList from '@/components/Projects/ActivityList'
 import OverviewCard from '@/components/Projects/Cards/OverviewCard'
 
+/* global $ */
 export default {
   components: {
     'activity-list': ActivityList,
@@ -53,16 +54,30 @@ export default {
       return this.project.activities
     }
   },
-  mounted () {
-    this.project = this.projectById()(this.projectId)
+  async mounted () {
+    this.project = this.projectById()(this.projectId) || {}
 
     // case when project ID is a number
-    if (!isNaN(this.projectId) && !this.project) {
-      this.project = this.projectById()(+this.projectId)
+    if (!isNaN(this.projectId) && Object.keys(this.project).length === 0) {
+      this.project = this.projectById()(+this.projectId) || {}
     }
+
+    this.project = await this.getProjectData(this.currentUser().id)
   },
   methods: {
-    ...mapGetters(['projectById'])
+    getProjectData (id) {
+      return new Promise((resolve, reject) => {
+        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
+        $.get(`${url}/api/projects/${this.projectId}?member_id=${id}`)
+          .done(response => {
+            const list = response
+
+            console.debug('got project response', response, list)
+            resolve(list[0])
+          }).fail(reject)
+      })
+    },
+    ...mapGetters(['projectById', 'currentUser'])
   }
 }
 </script>

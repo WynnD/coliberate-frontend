@@ -53,8 +53,6 @@ export default {
     activities () {
       return this.project.activities
     }
-  },
-  created () {
   }
 }
 </script>

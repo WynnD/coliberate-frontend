@@ -144,7 +144,7 @@ export default {
     this.project.id = this.newProjectId
     this.project.startDate = this.currentDate
     this.project.members.push({
-      id: this.$store.state.accountData.id,
+      memberID: this.$store.state.accountData.id,
       role: 'Scrum Master'
     })
 
@@ -235,7 +235,7 @@ export default {
       let errorMessage
       console.debug('checking project data', { projectData })
       textFields.forEach(f => {
-        if (!errorMessage && (!projectData[f] || projectData[f].trim().length === 0)) {
+        if (!errorMessage && (!projectData[f] || projectData[f].toString().trim().length === 0)) {
           errorMessage = { responseJSON: { error: `${f} field is empty` } }
         }
       })
