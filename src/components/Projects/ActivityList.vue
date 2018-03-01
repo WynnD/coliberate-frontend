@@ -3,10 +3,10 @@
     <span class="ui sub header">Recent Activity</span>
     <div class="ui small feed">
       <activity-item
-        class="activity-item"
         v-for="activity in activities"
         :key="activity"
         :activity-data="activity"
+        class="activity-item"
       />
     </div>
   </div>
@@ -23,7 +23,7 @@ export default {
     activities: {
       type: Array,
       required: true,
-      default: () => []
+      default: () => ['No activity for this project']
     }
   },
   mounted () {

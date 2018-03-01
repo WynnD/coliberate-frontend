@@ -3,20 +3,18 @@
     id="project-page"
     class="ui container">
     <div
-      class="ui text segment grid raised"
-      id="project-summary">
-      <div class="column">
-        <h2
-          class="header"
-          id="project-name">
-          {{ name }}
-        </h2>
-        <span
-          class="header"
-          id="project-description">
-          {{ description }}
-        </span>
-      </div>
+      id="project-summary"
+      class="ui text segment raised">
+      <h2
+        id="project-name"
+        class="header">
+        {{ name }}
+      </h2>
+      <span
+        id="project-description"
+        class="header">
+        {{ description }}
+      </span>
     </div>
     <div class="ui three stackable raised cards">
       <overview-card :project="project"/>

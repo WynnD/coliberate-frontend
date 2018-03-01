@@ -10,8 +10,8 @@
               <div class="ui fluid labeled input">
                 <div class="ui label">Name</div>
                 <input
-                  type="text"
                   v-model="project.name"
+                  type="text"
                   placeholder="Project Name">
               </div>
             </div>
@@ -27,8 +27,8 @@
               <div class="ui fluid labeled input">
                 <div class="ui label">Description</div>
                 <input
-                  type="text"
                   v-model="project.description"
+                  type="text"
                   placeholder="Project Description">
               </div>
             </div>
@@ -62,8 +62,8 @@
               <div class="ui fluid labeled input">
                 <div class="ui label">Predicted Start Date</div>
                 <input
-                  type="date"
                   v-model="project.startdate"
+                  type="date"
                   placeholder="Start Date">
               </div>
             </div>
@@ -71,8 +71,8 @@
               <div class="ui fluid labeled input">
                 <div class="ui label">Sprint Length (days)</div>
                 <input
-                  type="number"
-                  v-model="project.sprintLength">
+                  v-model="project.sprintLength"
+                  type="number">
               </div>
             </div>
             <div class="sixteen wide column">
@@ -88,8 +88,8 @@
     <div class="actions">
       <button
         type="submit"
-        @click="registerHandler"
-        class="ui green button">
+        class="ui green button"
+        @click="registerHandler">
         Add
       </button>
       <div class="ui cancel red button">Cancel</div>

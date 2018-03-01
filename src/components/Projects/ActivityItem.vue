@@ -2,8 +2,8 @@
   <div class="activity-item">
     <div class="content">
       <div
-        v-html="activityData"
         class="summary"
+        v-html="activityData"
       />
     </div>
   </div>

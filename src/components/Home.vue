@@ -1,10 +1,9 @@
 <template>
-  <div id="home">
+  <div
+    id="home"
+    class="ui container">
     <div class="ui segment">
-      <h2 class="ui header">Welcome to Coliberate</h2>
-    </div>
-
-    <div class="ui left aligned container">
+      <h2 class="ui header">Welcome to Coliberate!</h2>
       <div class="ui segments">
         <div class="ui black inverted segment">Project Information</div>
         <div class="ui segment">

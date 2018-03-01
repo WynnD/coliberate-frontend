@@ -8,17 +8,17 @@
       <div class="field">
         <label>Username</label>
         <input
+          v-model="username"
           type="text"
           name="username"
-          placeholder="Username"
-          v-model="username">
+          placeholder="Username">
       </div>
       <div class="field">
         <label>Password</label>
         <input
+          v-model="password"
           type="password"
-          name="password"
-          v-model="password">
+          name="password">
       </div>
       <div class="ui error message">
         <div class="header">Error</div>
@@ -37,8 +37,8 @@
       </button>
       <button
         v-if="$store.getters.isDevelopmentMode"
-        @click="debugLoginHandler"
-        class="ui black fluid button">
+        class="ui black fluid button"
+        @click="debugLoginHandler">
         Developer Auto-Login
       </button>
     </form>

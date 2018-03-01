@@ -3,7 +3,7 @@
     <navbar/>
     <sidebar/>
     <div
-    class="pusher">
+      class="pusher">
       <router-view/>
     </div>
   </div>

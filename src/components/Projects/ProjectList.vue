@@ -7,8 +7,8 @@
       v-if="$store.getters.isLoggedIn"
       class="ui three stackable raised cards">
       <div
-        class="ui card"
-        id="add-project-card">
+        id="add-project-card"
+        class="ui card">
         <a
           class="image"
           @click="showModal">

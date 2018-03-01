@@ -2,8 +2,8 @@
   <div id="navbar-container">
     <div class="ui menu top fixed">
       <button
-        @click="toggleSidebar()"
-        class="ui button item big floated left">
+        class="ui button item big floated left"
+        @click="toggleSidebar()">
         <i class="sidebar icon"/>
       </button>
     </div>

@@ -8,30 +8,30 @@
       <div class="field">
         <label>Name</label>
         <input
+          v-model="name"
           type="text"
-          name="name"
-          v-model="name">
+          name="name">
       </div>
       <div class="field">
         <label>Username</label>
         <input
+          v-model="username"
           type="text"
-          name="username"
-          v-model="username">
+          name="username">
       </div>
       <div class="field">
         <label>Email</label>
         <input
+          v-model="email"
           type="text"
-          name="email"
-          v-model="email">
+          name="email">
       </div>
       <div class="field">
         <label>Password</label>
         <input
+          v-model="password"
           type="password"
-          name="password"
-          v-model="password">
+          name="password">
       </div>
       <div class="ui error message">
         <div class="header">Error</div>
