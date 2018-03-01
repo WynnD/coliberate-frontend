@@ -4,8 +4,9 @@ import Vuex from 'vuex'
 Vue.use(Vuex) // enable use of Vuex store
 
 export const state = {
-  projects: {
-    TestProject1: {
+  projects: [
+    {
+      id: 0,
       name: 'Sample Project',
       description: 'Project Description. We need to figure out what data goes into projects',
       activities: [
@@ -13,26 +14,34 @@ export const state = {
         '<a>Stevie Feliciano</a> was added as an <a>Administrator</a>',
         '<a>Helen Troy</a> added two pictures'
       ],
-      start_date: new Date(),
-      sprint_length_days: 14
+      stories: [],
+      members: [0, 1],
+      startDate: '2018-02-20',
+      sprintLength: 14
     }
-    /*
-    1: {
-      name: 'Sample Project # 2',
-      desc: 'Project Description # 2. Should this be HTML, Markdown, plain text, or something else?',
-      start_date: new Date()
+  ],
+  projectList: [0],
+  users: [
+    {
+      id: 0,
+      name: 'Big Jeffrey',
+      description: `I'm big, and I'm Jeffrey. Get used to it.`,
+      joinDate: '2018-02-25',
+      projects: [0]
     },
-    2: {
-      name: 'Sample Project # 3',
-      desc: 'Project Description # 3. We need to figure out what data goes into projects'
-    } */
-  },
+    {
+      id: 1,
+      name: 'Little Wendy',
+      description: `I'm little, and I'm Wendy. Get used to it.`,
+      joinDate: '2018-02-26',
+      projects: [0]
+    }
+  ],
   accountData: null,
+  userList: [0, 1],
+  stories: [],
   developmentMode: false,
-  memberData: {},
-  stories: [{
-  }],
-  tasks: []
+  memberData: {}
 }
 
 export const getters = {

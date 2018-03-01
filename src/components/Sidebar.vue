@@ -1,7 +1,7 @@
 <template>
   <div
-    class="ui sidebar inverted vertical menu"
-    id="sidebar">
+    id="sidebar"
+    class="ui sidebar inverted vertical menu">
     <div
       v-if="this.$store.getters.isLoggedIn"
       class="item">
@@ -14,33 +14,33 @@
       </span>
     </div>
     <router-link
-      @click.native="hideSidebar"
+      to="/"
       class="item"
-      to="/">
+      @click.native="hideSidebar">
       Overview
     </router-link>
     <router-link
-      @click.native="hideSidebar"
+      to="/projects"
       class="item"
-      to="/projects">
+      @click.native="hideSidebar">
       Projects
     </router-link>
     <router-link
-      @click.native="hideSidebar"
+      to="/members"
       class="item"
-      to="/members">
+      @click.native="hideSidebar">
       Members
     </router-link>
     <router-link
-      @click.native="hideSidebar"
+      to="/settings"
       class="item"
-      to="/settings">
+      @click.native="hideSidebar">
       Settings
     </router-link>
     <router-link
-      @click.native="logout"
+      to="/login"
       class="item"
-      to="/login">
+      @click.native="logout">
       <button class="ui basic fluid red button">
         Logout
       </button>

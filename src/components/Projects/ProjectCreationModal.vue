@@ -8,16 +8,16 @@
           <div class="ui stackable grid">
             <div class="eight wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">Name:</div>
+                <div class="ui label">Name</div>
                 <input
-                  type="text"
                   v-model="project.name"
+                  type="text"
                   placeholder="Project Name">
               </div>
             </div>
             <div class="eight wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">ID:</div>
+                <div class="ui label">ID</div>
                 <div class="ui basic button disabled">
                   {{ project.id }}
                 </div>
@@ -25,10 +25,10 @@
             </div>
             <div class="sixteen wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">Description:</div>
+                <div class="ui label">Description</div>
                 <input
-                  type="text"
                   v-model="project.description"
+                  type="text"
                   placeholder="Project Description">
               </div>
             </div>
@@ -44,14 +44,13 @@
             <li
               v-for="member in project.members"
               :key="member.memberID">
-              <b v-if="member.memberID === $store.state.accountData.id">
-                {{ $store.state.accountData.name }}
+              <b v-if="member.memberID === currentUser.id || +member.memberID === currentUser.id">
+                {{ currentUser.name }}
               </b>
-              <b v-else-if="$store.state.memberData[member.memberID]">
-                {{ $store.state.memberData[member.memberID].name }}
+              <b v-else-if="memberById(member.memberID)">
+                {{ memberById(member.memberID).name }}
               </b>
-              <b v-else> {{ member.memberID }}</b> -
-              {{ member.role }}
+              <b v-else> {{ member.memberID }}</b> - {{ member.role }}
             </li>
           </ul>
         </div>
@@ -61,19 +60,19 @@
           <div class="ui stackable grid">
             <div class="eight wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">Predicted Start Date:</div>
+                <div class="ui label">Predicted Start Date</div>
                 <input
-                  type="date"
                   v-model="project.startdate"
+                  type="date"
                   placeholder="Start Date">
               </div>
             </div>
             <div class="eight wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">Default Sprint Length:</div>
+                <div class="ui label">Sprint Length (days)</div>
                 <input
-                  type="number"
-                  v-model="project.sprintLength">
+                  v-model="project.sprintLength"
+                  type="number">
               </div>
             </div>
             <div class="sixteen wide column">
@@ -89,8 +88,8 @@
     <div class="actions">
       <button
         type="submit"
-        @click="registerHandler"
-        class="ui green button">
+        class="ui green button"
+        @click="registerHandler">
         Add
       </button>
       <div class="ui cancel red button">Cancel</div>
@@ -99,14 +98,19 @@
 </template>
 
 <script>
+
+import { mapMutations, mapGetters } from 'vuex'
+
 /* global $ */
 export default {
   data () {
     return {
       project: {
+        id: 0,
         name: '',
-        id: 'Project ID',
         description: '',
+        activities: [],
+        stories: [],
         members: [],
         startdate: '1970-12-31',
         sprintLength: 14
@@ -133,26 +137,14 @@ export default {
 
       return `${year}-${month}-${day}`
     },
-    defaultProject () {
-      return {
-        name: 'Project Name',
-        id: 0,
-        desc: 'Project Description',
-        members: [],
-        startDate: '1970-12-31',
-        sprintLength: 14
-      }
-    }
+    ...mapGetters(['newProjectId', 'currentUser'])
   },
-  watch: {
-    'project.name': function (newValue) {
-      this.project.id = newValue.replace(/ /g, '-')
-    }
-  },
+
   mounted () {
+    this.project.id = this.newProjectId
     this.project.startDate = this.currentDate
     this.project.members.push({
-      memberID: this.$store.state.accountData.id,
+      memberID: this.currentUser.id,
       role: 'Scrum Master'
     })
 
@@ -171,11 +163,13 @@ export default {
       }
     })
   },
+
   methods: {
     showData () {
       // eslint-disable-next-line
       console.debug(this);
     },
+
     getMembers () {
       return new Promise((resolve, reject) => {
         const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
@@ -195,6 +189,7 @@ export default {
           }).fail(reject)
       })
     },
+
     async registerHandler () {
       const projectData = {
         name: this.project.name.trim(),
@@ -226,6 +221,7 @@ export default {
       }
       this.$form.removeClass('loading')
     },
+
     sendRegisterData (projectData) {
       return new Promise((resolve, reject) => {
         const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
@@ -233,12 +229,13 @@ export default {
           .done(resolve).fail(reject)
       })
     },
+
     async register (projectData = {}) {
       const textFields = ['name', 'id', 'description', 'startdate']
       let errorMessage
       console.debug('checking project data', { projectData })
       textFields.forEach(f => {
-        if (!errorMessage && (!projectData[f] || projectData[f].trim().length === 0)) {
+        if (!errorMessage && (!projectData[f] || projectData[f].toString().trim().length === 0)) {
           errorMessage = { responseJSON: { error: `${f} field is empty` } }
         }
       })
@@ -253,10 +250,13 @@ export default {
       console.debug('register', { data })
       return data
     },
+
     notifyError (message = 'An error occurred while trying to register') {
       this.$form.find('.ui.message p').text(message)
       this.$form.addClass('error')
-    }
+    },
+    ...mapMutations(['addProject']),
+    ...mapGetters(['memberById'])
   }
 }
 </script>

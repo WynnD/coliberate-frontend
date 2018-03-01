@@ -7,8 +7,8 @@
       v-if="$store.getters.isLoggedIn"
       class="ui three stackable raised cards">
       <div
-        class="ui card"
-        id="add-project-card">
+        id="add-project-card"
+        class="ui card">
         <a
           class="image"
           @click="showModal">
@@ -53,7 +53,7 @@ export default {
   },
   async mounted () {
     // eslint-disable-next-line
-    console.debug(this.projects);
+    //console.debug(this.projects);
 
     this.modal = $('#projects-page #project-creation-modal')
       .modal('setting', 'closable', false)

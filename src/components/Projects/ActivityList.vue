@@ -1,12 +1,12 @@
 <template>
-  <div>
-    <h4 class="ui sub header"><b>Activity</b></h4>
+  <div class="content">
+    <span class="ui sub header">Recent Activity</span>
     <div class="ui small feed">
       <activity-item
-        class="activity-item"
         v-for="activity in activities"
         :key="activity"
         :activity-data="activity"
+        class="activity-item"
       />
     </div>
   </div>
@@ -22,7 +22,8 @@ export default {
   props: {
     activities: {
       type: Array,
-      required: true
+      required: true,
+      default: () => ['No activity for this project']
     }
   },
   mounted () {
