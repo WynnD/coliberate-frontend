@@ -5,16 +5,12 @@
     <div
       id="project-summary"
       class="ui text segment raised">
-      <h2
+      <h1
         id="project-name"
-        class="header">
+        class="ui header">
         {{ name }}
-      </h2>
-      <span
-        id="project-description"
-        class="header">
-        {{ description }}
-      </span>
+        <div class="sub header">{{ description }}</div>
+      </h1>
     </div>
     <div class="ui three stackable raised cards">
       <overview-card :project="project"/>
