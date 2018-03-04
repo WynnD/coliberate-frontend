@@ -4,30 +4,35 @@
     class="ui container">
     <div
       id="project-summary"
-      class="ui text segment raised">
+      class="ui text segment clearing raised">
       <h1
         id="project-name"
-        class="ui header">
+        class="ui header floated left">
         {{ name }}
         <div class="sub header">{{ description }}</div>
       </h1>
+      <h3 class="ui header right floated aligned">
+        Start Date: {{ startDate }}
+      </h3>
     </div>
     <div class="ui three stackable raised cards">
       <overview-card :project="project"/>
+      <team-card :project="project"/>
+      <!-- TODO: Cards for stories, tasks, sprints -->
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import ActivityList from '@/components/Projects/ActivityList'
+import TeamCard from '@/components/Projects/Cards/TeamCard'
 import OverviewCard from '@/components/Projects/Cards/OverviewCard'
 
 /* global $ */
 export default {
   components: {
-    'activity-list': ActivityList,
-    'overview-card': OverviewCard
+    'overview-card': OverviewCard,
+    'team-card': TeamCard
   },
   data () {
     return {
@@ -46,6 +51,9 @@ export default {
     },
     activities () {
       return this.project.activities
+    },
+    startDate () {
+      return this.project.startDate
     }
   },
   async mounted () {
