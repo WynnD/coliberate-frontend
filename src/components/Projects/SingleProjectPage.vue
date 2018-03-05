@@ -17,6 +17,7 @@
     </div>
     <div class="ui three stackable raised cards">
       <overview-card :project="project"/>
+      <sprint-card :project="project"/>
       <team-card :project="project"/>
       <!-- TODO: Cards for stories, tasks, sprints -->
     </div>
@@ -27,12 +28,14 @@
 import { mapGetters } from 'vuex'
 import TeamCard from '@/components/Projects/Cards/TeamCard'
 import OverviewCard from '@/components/Projects/Cards/OverviewCard'
+import SprintCard from '@/components/Projects/Cards/SprintCard'
 
 /* global $ */
 export default {
   components: {
     'overview-card': OverviewCard,
-    'team-card': TeamCard
+    'team-card': TeamCard,
+    'sprint-card': SprintCard
   },
   data () {
     return {

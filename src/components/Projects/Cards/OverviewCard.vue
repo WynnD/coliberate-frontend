@@ -11,7 +11,7 @@
         <div class="bar finished"/>
       </div>
       <p class="ui sub header aligned right">
-        {{ tasks_finished }}/{{ num_tasks }} Completed
+        {{ tasksFinished }}/{{ numTasks }} Completed
       </p>
     </div>
     <div
@@ -22,7 +22,7 @@
         <div class="bar finished"/>
       </div>
       <p class="ui sub header aligned right">
-        {{ stories_finished }}/{{ num_stories }} Completed
+        {{ storiesFinished }}/{{ numStories }} Completed
       </p>
     </div>
     <div
@@ -55,10 +55,10 @@ export default {
   },
   data () {
     return {
-      num_tasks: 0,
-      tasks_finished: 0,
-      num_stories: 0,
-      stories_finished: 0,
+      numTasks: 0,
+      tasksFinished: 0,
+      numStories: 0,
+      storiesFinished: 0,
       features: {
         'Homepage': 80,
         'User Support': 53,
@@ -67,16 +67,16 @@ export default {
     }
   },
   watch: {
-    num_tasks () {
+    numTasks () {
       this.updateTasksProgress()
     },
-    tasks_finished () {
+    tasksFinished () {
       this.updateTasksProgress()
     },
-    num_stories () {
+    numStories () {
       this.updateStoriesProgress()
     },
-    stories_finished () {
+    storiesFinished () {
       this.updateStoriesProgress()
     }
   },
@@ -85,23 +85,23 @@ export default {
   },
   methods: {
     updateProgress () {
-      this.num_tasks = 20
-      this.tasks_finished = 17
-      this.num_stories = 7
-      this.stories_finished = 5
+      this.numTasks = 20
+      this.tasksFinished = 17
+      this.numStories = 7
+      this.storiesFinished = 5
     },
     updateTasksProgress () {
       let tasksProgress = $('#tasks-progress .progress')
       tasksProgress.progress({
-        total: this.num_tasks /* tasks.length */,
-        value: this.tasks_finished /* numFinished() */,
+        total: this.numTasks /* tasks.length */,
+        value: this.tasksFinished /* numFinished() */,
         showActivity: false})
     },
     updateStoriesProgress () {
       let storiesProgress = $('#stories-progress .progress')
       storiesProgress.progress({
-        total: this.num_stories,
-        value: this.stories_finished,
+        total: this.numStories,
+        value: this.storiesFinished,
         showActivity: false
       })
     }
