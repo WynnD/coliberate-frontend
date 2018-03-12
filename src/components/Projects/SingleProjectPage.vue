@@ -56,7 +56,7 @@ export default {
       return this.project.activities
     },
     startDate () {
-      return this.project.startDate
+      return new Date(this.project.auditLog[this.project.auditLog.length - 1].date).toDateString()
     }
   },
   async mounted () {
@@ -67,7 +67,11 @@ export default {
       this.project = this.projectById()(+this.projectId) || {}
     }
 
-    this.project = await this.getProjectData(this.currentUser().id)
+    try {
+      this.project = await this.getProjectData(this.currentUser().id)
+    } catch (err) {
+      console.error(err)
+    }
   },
   methods: {
     getProjectData (id) {

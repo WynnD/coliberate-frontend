@@ -7,7 +7,7 @@
       class="ui centered cards">
       <member-card :account-data="$store.state.accountData"/>
       <member-card
-        v-for="member in $store.state.memberData"
+        v-for="member in $store.state.members"
         :key="member.id"
         :account-data="member"/>
     </div>
@@ -39,7 +39,7 @@ export default {
               memberObject[m.id.toString()] = m
             })
             console.debug('Got member data', memberObject)
-
+            console.warn('TODO: Properly add updated member data')
             this.$store.commit('updateMemberData', memberObject)
             resolve()
           }).fail(reject)

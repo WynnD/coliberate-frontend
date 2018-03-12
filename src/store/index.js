@@ -3,64 +3,145 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex) // enable use of Vuex store
 
+// 1 week in ms = 7 days * 24 hr/day * 60 min/hr * 60 sec/min * 1000 ms/sec
+const oneDay = 24 * 60 * 60 * 1000
+const oneWeek = 7 * oneDay
+const currentDate = new Date()
+
 export const state = {
-  projects: [
-    {
-      id: 0,
+  projects: {
+    'sampleproject-0': {
+      id: 'sampleproject-0',
       name: 'Sample Project',
       description: 'Project Description. We need to figure out what data goes into projects',
-      activities: [
-        '<a>Elliot Fu</a> added <a>Jenny Hess</a> to the project',
-        '<a>Stevie Feliciano</a> was added as an <a>Administrator</a>',
-        '<a>Helen Troy</a> added two pictures'
+      members: {
+        'member-0': {
+          id: 'member-0',
+          role: 'Scrum Master'
+        },
+        'member-1': {
+          id: 'member-1',
+          role: 'Product Owner'
+        }
+      },
+      releases: {
+        'release-0': {
+          id: 'release-0',
+          name: 'Release 0',
+          description: 'Our very first release. :)',
+          startDate: new Date(currentDate.valueOf() - oneWeek).toDateString(), // e.g. Mon Mar 12 2018
+          endDate: new Date(new Date().valueOf() + 3 * oneWeek).toDateString(),
+          features: [], // array of feature IDs
+          sprints: [] // array of sprint IDs
+        }
+      },
+      sprints: {
+        'sprint-0': {
+          // goals are defined by associated tasks and stories
+          id: 'sprint-0',
+          name: 'Sprint 1',
+          startDate: new Date(currentDate.valueOf() - oneWeek).toDateString(), // can't be earlier than associated release
+          endDate: new Date(new Date().valueOf() + oneWeek).toDateString(), // can't be later than associated release
+          stories: [], // array of story IDs
+          tasks: [] // array of tasks
+        }
+      },
+      features: {
+        'feature-0': {
+          id: 'feature-0',
+          name: 'Feature Management',
+          description: 'Our project will feature the management of features',
+          stories: [], // array of associated story IDs
+          tasks: [] // array of associated task IDs (not associated with stories)
+        }
+      },
+      stories: {
+        'story-0': {
+          id: 'story-0',
+          status: 'todo',
+          // progress can be 100%, but doesn't necessarily mean that story is completed
+          // for example, didn't generate/assign every task associated with this story
+          name: 'Add Feature',
+          description: 'Users will be able to add features to our application',
+          businessValue: 8,
+          // represents urgency/importance to project
+          // effort value defined by tasks
+          tasks: [] // array of associated task IDs
+        }
+      },
+      tasks: {
+        'task-0': {
+          id: 'task-0',
+          status: 'todo',
+          name: 'Create UI for adding features',
+          description: 'See title',
+          points: 5,
+          takenBy: [] // array of member IDs
+        }
+      },
+      pointHistory: {},
+      auditLog: [
+        {
+          date: new Date(currentDate.valueOf() - oneWeek + oneDay).toGMTString(),
+          members: ['member-0', 'member-1'], // array of member IDs involved in logged action
+          description: '<b>Big Jeffrey</b> added <b>Little Wendy</b> as a <b>Product Owner</b>' // probably generated server side based on what's changed
+        },
+        {
+          date: new Date(currentDate.valueOf() - oneWeek).toGMTString(),
+          members: ['member-0'], // array of member IDs involved in logged action
+          description: 'Project Created by <b>Big Jeffrey</b>' // probably generated server side based on what's changed
+        }
       ],
-      stories: [],
-      members: [0, 1],
-      startDate: '2018-02-20',
       sprintLength: 14
     }
-  ],
-  projectList: [0],
-  users: [
-    {
-      id: 0,
+  },
+  members: {
+    'member-0': {
+      id: 'member-0',
       name: 'Big Jeffrey',
       description: `I'm big, and I'm Jeffrey. Get used to it.`,
       joinDate: '2018-02-25',
-      projects: [0]
+      skills: {
+        name: 'Java',
+        interested: true, // boolean indicating whether or not the user is interested in learning with this
+        experience: 0 // 0 - no experience, 1 - some experience, 2 - high level experience
+      }
     },
-    {
-      id: 1,
+    'member-1': {
+      id: 'member-1',
       name: 'Little Wendy',
       description: `I'm little, and I'm Wendy. Get used to it.`,
       joinDate: '2018-02-26',
-      projects: [0]
+      skills: {
+        name: 'C++',
+        interested: true, // boolean indicating whether or not the user is interested in learning with this
+        experience: 2 // 0 - no experience, 1 - some experience, 2 - high level experience
+      }
     }
-  ],
+  },
   accountData: null,
-  userList: [0, 1],
-  stories: [],
-  developmentMode: false,
-  memberData: {}
+  developmentMode: false
 }
 
 export const getters = {
-  projectIds: state => state.projectList,
-  newProjectId: state => Math.max(state.projectList) + 1,
-  projectById: state => id => state.projects.find(project => project.id === id),
+  projectIds: state => Object.keys(state.projects),
+  newProjectId: state => Math.floor(Math.random() * 10000).toString().padStart(4, '0'),
+  projectById: state => id => state.projects[id],
   isLoggedIn: state => !!state.accountData,
   isDevelopmentMode: state => !!state.developmentMode,
   currentUser: state => state.accountData,
-  memberById: state => id => state.memberData[id]
+  memberById: state => id => state.members[id]
 }
 
 export const mutations = {
   addProject (state, project) {
-    state.projects.push(project)
-    state.projectList.push(project.id)
+    if (state.projects[project.id]) {
+      throw Error(`Project ID ${project.id} already exists.`)
+    }
+    state.projects[project.id] = project
   },
   deleteProject (state, id) {
-    state.projects = state.projects.filter(project => project.id !== id)
+    delete state.projects[id]
   },
   setDevelopmentMode (state, newData) {
     state.developmentMode = newData === true
@@ -72,7 +153,7 @@ export const mutations = {
     state.accountData = null
   },
   updateMemberData (state, newData) {
-    state.memberData = newData
+    state.members = newData
   },
   updateProjectList (state, newData) {
     state.projects = newData
