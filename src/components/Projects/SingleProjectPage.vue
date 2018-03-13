@@ -19,6 +19,7 @@
       <overview-card :project="project"/>
       <sprint-card :project="project"/>
       <team-card :project="project"/>
+      <feature-card :project="project"/>
       <!-- TODO: Cards for stories, tasks, sprints -->
     </div>
   </div>
@@ -29,13 +30,15 @@ import { mapGetters } from 'vuex'
 import TeamCard from '@/components/Projects/Cards/TeamCard'
 import OverviewCard from '@/components/Projects/Cards/OverviewCard'
 import SprintCard from '@/components/Projects/Cards/SprintCard'
+import FeatureCard from '@/components/Projects/Cards/FeatureCard'
 
 /* global $ */
 export default {
   components: {
     'overview-card': OverviewCard,
     'team-card': TeamCard,
-    'sprint-card': SprintCard
+    'sprint-card': SprintCard,
+    'feature-card': FeatureCard
   },
   data () {
     return {
