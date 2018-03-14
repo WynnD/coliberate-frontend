@@ -4,34 +4,38 @@
     class="ui container">
     <div
       id="project-summary"
-      class="ui text segment raised">
-      <h2
+      class="ui text segment clearing raised">
+      <h1
         id="project-name"
-        class="header">
+        class="ui header floated left">
         {{ name }}
-      </h2>
-      <span
-        id="project-description"
-        class="header">
-        {{ description }}
-      </span>
+        <div class="sub header">{{ description }}</div>
+      </h1>
+      <h3 class="ui header right floated aligned">
+        Start Date: {{ startDate }}
+      </h3>
     </div>
     <div class="ui three stackable raised cards">
       <overview-card :project="project"/>
+      <sprint-card :project="project"/>
+      <team-card :project="project"/>
+      <!-- TODO: Cards for stories, tasks, sprints -->
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import ActivityList from '@/components/Projects/ActivityList'
+import TeamCard from '@/components/Projects/Cards/TeamCard'
 import OverviewCard from '@/components/Projects/Cards/OverviewCard'
+import SprintCard from '@/components/Projects/Cards/SprintCard'
 
 /* global $ */
 export default {
   components: {
-    'activity-list': ActivityList,
-    'overview-card': OverviewCard
+    'overview-card': OverviewCard,
+    'team-card': TeamCard,
+    'sprint-card': SprintCard
   },
   data () {
     return {
@@ -50,6 +54,9 @@ export default {
     },
     activities () {
       return this.project.activities
+    },
+    startDate () {
+      return new Date(this.project.auditLog[this.project.auditLog.length - 1].date).toDateString()
     }
   },
   async mounted () {
@@ -60,7 +67,11 @@ export default {
       this.project = this.projectById()(+this.projectId) || {}
     }
 
-    this.project = await this.getProjectData(this.currentUser().id)
+    try {
+      this.project = await this.getProjectData(this.currentUser().id)
+    } catch (err) {
+      console.error(err)
+    }
   },
   methods: {
     getProjectData (id) {
