@@ -1,9 +1,21 @@
 <template>
-  <div class="ui card">
+  <div
+    id="feature-card"
+    class="ui card">
+    <creation-modal id="feature-creation-modal"/>
     <div class="content">
-      <div class="header">Features</div>
+      <div class="header">
+        <span>Features</span>
+        <a
+          @click="showModal"
+          class="ui right floated animated fade compact button">
+          <div class="hidden content">Add</div>
+          <div class="visible content">
+            <i class="plus icon"/>
+          </div>
+        </a>
+      </div>
     </div>
-
     <div class="content">
       <div
         v-if="Object.keys(project.features).length > 0"
@@ -46,8 +58,12 @@
 </template>
 
 <script>
+import FeatureCreationModal from '@/components/Projects/FeatureCreationModal'
 /* global $ */
 export default {
+  components: {
+    'creation-modal': FeatureCreationModal
+  },
   props: {
     project: {
       required: true,
@@ -56,15 +72,25 @@ export default {
   },
   data () {
     return {
-      progressBar: null
+      progressBar: null,
+      modal: null
     }
   },
   mounted () {
     this.progressBar = $(this.$el).find('.extra .ui.progress').progress()
+    this.modal = $('#feature-card #feature-creation-modal')
+      .modal('setting', 'closable', false)
+      .modal('hide')
   },
   methods: {
     getProgressOfFeature (feature) {
+      // TODO: dependent on progress of relates stories and features
       return Math.floor(Math.random() * 100)
+    },
+    showModal () {
+      if (this.modal) {
+        this.modal.modal('show')
+      }
     }
   }
 }
