@@ -2,7 +2,12 @@
   <div
     id="feature-card"
     class="ui card">
-    <creation-modal id="feature-creation-modal"/>
+    <creation-modal
+      id="feature-creation-modal"
+      :stories="project.stories"
+      :tasks="project.tasks"
+      :features="project.features"
+    />
     <div class="content">
       <div class="header">
         <span>Features</span>

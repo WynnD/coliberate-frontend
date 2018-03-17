@@ -1,7 +1,9 @@
 <template>
   <div class="ui modal form">
     <div class="header">Add a Feature</div>
-    <div class="scrolling content">
+    <div
+      id="feature-modal-content"
+      class="scrolling content">
       <div class="ui segments">
         <div class="ui segment">
           <div class="ui header">General Info</div>
@@ -35,34 +37,56 @@
           </div>
         </div>
 
-        <div class="ui segment">
+        <div
+          id="selection-section"
+          class="ui segment">
           <div class="ui header">Story/Task Selection</div>
           <div class="meta">
-            Story/Task Selection
-          </div>
-          <!-- <ul>
-            <li
-              v-for="member in project.members"
-              :key="member.memberID">
-              <b v-if="member.memberID === currentUser.id || +member.memberID === currentUser.id">
-                {{ currentUser.name }}
-              </b>
-              <b v-else-if="memberById(member.memberID)">
-                {{ memberById(member.memberID).name }}
-              </b>
-              <b v-else> {{ member.memberID }}</b> - {{ member.role }}
-            </li>
-          </ul> -->
-        </div>
-
-        <div class="ui segment">
-          <div class="ui stackable grid">
-            <div class="sixteen wide column">
-              <div class="ui error message">
-                <div class="header">Error</div>
-                <p>An error has occurred</p>
+            <h4 class="header">Stories</h4>
+            <div class="ui three column grid">
+              <div
+                v-for="story in stories"
+                :key="story.id"
+                class="column">
+                <story-card :story="story">
+                  <div
+                    id="toggle-btn"
+                    @click="toggleStory(story.id)"
+                    class="ui fluid button checkbox">
+                    <input
+                      type="checkbox"
+                      :value="story.id"
+                      v-model="selectedStories[story.id]">
+                    <label>Add to feature</label>
+                  </div>
+                </story-card>
               </div>
             </div>
+          </div>
+          <hr>
+          <h4 class="header">Tasks</h4>
+          <div class="ui three column grid">
+            <div
+              v-for="task in tasks"
+              :key="task.id"
+              class="column">
+              <task-card :task="task">
+                <div
+                  id="toggle-btn"
+                  @click="toggleTask(task.id)"
+                  class="ui fluid button checkbox">
+                  <input
+                    type="checkbox"
+                    :value="task.id"
+                    v-model="selectedTasks[task.id]">
+                  <label>Add to feature</label>
+                </div>
+              </task-card>
+            </div>
+          </div>
+          <div class="ui error message">
+            <div class="header">Error</div>
+            <p>An error has occurred</p>
           </div>
         </div>
       </div>
@@ -80,11 +104,30 @@
 </template>
 
 <script>
-
+import SingleStoryCard from '@/components/Projects/Cards/SingleStoryCard'
+import SingleTaskCard from '@/components/Projects/Cards/SingleTaskCard'
 import { mapMutations, mapGetters } from 'vuex'
 
 /* global $ */
 export default {
+  components: {
+    'story-card': SingleStoryCard,
+    'task-card': SingleTaskCard
+  },
+  props: {
+    features: {
+      required: true,
+      type: Object
+    },
+    stories: {
+      required: true,
+      type: Object
+    },
+    tasks: {
+      required: true,
+      type: Object
+    }
+  },
   data () {
     return {
       feature: {
@@ -95,17 +138,25 @@ export default {
         tasks: [],
         associatedReleases: []
       },
+      selectedStories: {},
+      selectedTasks: {},
       $form: null
     }
   },
   computed: {
     ...mapGetters(['newProjectId', 'currentUser'])
   },
+  watch: {
+    selectedStories (newValue) {
+      console.debug(newValue)
+    },
+    selectedTasks (newValue) {
+      console.debug(newValue)
+    }
+  },
   mounted () {
     // TODO: better way to generate id
-    this.feature.id = Math.floor(Math.random() * 1000)
-      .toString()
-      .padStart(4, '0')
+    this.feature.id = this.generateRandomId()
 
     this.$form = $(this.$el)
     this.$form.submit((e) => {
@@ -119,8 +170,53 @@ export default {
         this.registerHandler()
       }
     })
+
+    this.initCheckboxes()
+    this.updateButtons()
   },
   methods: {
+    initCheckboxes () {
+      $(this.$el).find('.ui.checkbox').checkbox()
+    },
+    updateButtons () {
+      $(this.$el).find('#selection-section #toggle-btn')
+        .each(function () {
+          const button = $(this)
+          const label = button.find('label')
+
+          if (button.hasClass('checked')) {
+            button.addClass('red inverted')
+            label.text('Remove from feature')
+          } else {
+            button.removeClass('red inverted')
+            label.text('Add to feature')
+          }
+        })
+    },
+    toggleStory (id) {
+      this.selectedStories[id] = !this.selectedStories[id]
+      setTimeout(() => {
+        this.updateButtons()
+      }, 50)
+    },
+    toggleTask (id) {
+      this.selectedTasks[id] = !this.selectedTasks[id]
+      setTimeout(() => {
+        this.updateButtons()
+      }, 50)
+    },
+    generateRandomId () {
+      const createID = (prefix, number) => `${prefix}${number.toString().padStart(4, '0')}`
+      const prefix = 'feature-'
+      let numberId = Math.floor(Math.random() * 1000)
+      let numIterations = 0
+      while (this.features[createID(prefix, numberId)] && numIterations < 1000) {
+        numberId = Math.floor(Math.random() * 1000)
+        numIterations++
+      }
+
+      return createID(prefix, numberId)
+    },
     showData () {
       // eslint-disable-next-line
       console.debug(this);
@@ -193,3 +289,10 @@ export default {
   }
 }
 </script>
+
+<style>
+#feature-modal-content #selection-section .grid {
+  max-height: 20rem;
+  overflow-y: auto;
+}
+</style>
