@@ -31,6 +31,15 @@ export const state = {
           description: 'Our very first release. :)',
           startDate: new Date(currentDate.valueOf() - oneWeek).toDateString(), // e.g. Mon Mar 12 2018
           endDate: new Date(new Date().valueOf() + 3 * oneWeek).toDateString(),
+          features: ['feature-0'], // array of feature IDs
+          sprints: ['sprint-0'] // array of sprint IDs
+        },
+        'release-1': {
+          id: 'release-1',
+          name: 'Release 2.0',
+          description: 'It keeps getting better and better',
+          startDate: new Date(currentDate.valueOf() + 4 * oneWeek).toDateString(), // e.g. Mon Mar 12 2018
+          endDate: new Date(new Date().valueOf() + 7 * oneWeek).toDateString(),
           features: [], // array of feature IDs
           sprints: [] // array of sprint IDs
         }
@@ -42,7 +51,7 @@ export const state = {
           name: 'Sprint 1',
           startDate: new Date(currentDate.valueOf() - oneWeek).toDateString(), // can't be earlier than associated release
           endDate: new Date(new Date().valueOf() + oneWeek).toDateString(), // can't be later than associated release
-          stories: [], // array of story IDs
+          stories: ['story-0'], // array of story IDs
           tasks: [] // array of tasks
         }
       },
@@ -51,14 +60,14 @@ export const state = {
           id: 'feature-0',
           name: 'Feature Management',
           description: 'Our project will feature the management of features',
-          stories: [], // array of associated story IDs
+          stories: ['story-0'], // array of associated story IDs
           tasks: [] // array of associated task IDs (not associated with stories)
         },
         'feature-1': {
           id: 'feature-1',
           name: 'Task Management',
           description: 'Our project will feature the management of tasks',
-          stories: [], // array of associated story IDs
+          stories: ['story-1'], // array of associated story IDs
           tasks: [] // array of associated task IDs (not associated with stories)
         }
       },
@@ -74,6 +83,18 @@ export const state = {
           // represents urgency/importance to project
           // effort value defined by tasks
           tasks: [] // array of associated task IDs
+        },
+        'story-1': {
+          id: 'story-1',
+          status: 'todo',
+          // progress can be 100%, but doesn't necessarily mean that story is completed
+          // for example, didn't generate/assign every task associated with this story
+          name: 'Add Task',
+          description: 'Users will be able to add tasks to our application',
+          businessValue: 8,
+          // represents urgency/importance to project
+          // effort value defined by tasks
+          tasks: ['task-1'] // array of associated task IDs
         }
       },
       tasks: {
@@ -81,6 +102,14 @@ export const state = {
           id: 'task-0',
           status: 'todo',
           name: 'Create UI for adding features',
+          description: 'See title',
+          points: 5,
+          takenBy: [] // array of member IDs
+        },
+        'task-1': {
+          id: 'task-1',
+          status: 'todo',
+          name: 'Create UI for adding tasks',
           description: 'See title',
           points: 5,
           takenBy: [] // array of member IDs

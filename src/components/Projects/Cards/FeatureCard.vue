@@ -31,10 +31,10 @@
               <span>{{ feature.description }}</span>
               <div class="ui horizontal segments">
                 <div class="ui segment">
-                  {{ feature.stories.length }} stories
+                  {{ feature.stories.length }} {{ feature.stories.length === 1 ? 'story' : 'stories' }}
                 </div>
                 <div class="ui segment">
-                  {{ feature.tasks.length }} tasks
+                  {{ feature.tasks.length }} {{ feature.tasks.length === 1 ? 'task' : 'tasks' }}
                 </div>
               </div>
             </div>
