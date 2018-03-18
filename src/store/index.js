@@ -113,6 +113,22 @@ export const state = {
           description: 'See title',
           points: 5,
           takenBy: [] // array of member IDs
+        },
+        'task-2': {
+          id: 'task-2',
+          status: 'in-progress',
+          name: 'Generate more tasks for stories',
+          description: 'We need more tasks',
+          points: 8,
+          takenBy: ['member-1']
+        },
+        'task-3': {
+          id: 'task-3',
+          status: 'done',
+          name: 'create tasks 0 and 1',
+          description: 'create tasks for adding UI to features and tasks',
+          points: 3,
+          takenBy: ['member-0']
         }
       },
       pointHistory: {},

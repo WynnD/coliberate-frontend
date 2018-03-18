@@ -42,7 +42,9 @@
           class="ui segment">
           <div class="ui header">Story/Task Selection</div>
           <div class="meta">
-            <h4 class="header">Stories</h4>
+            <h4 class="header">
+              Stories ({{ numSelectedStories }} added)
+            </h4>
             <div class="ui three column grid">
               <div
                 v-for="story in stories"
@@ -63,8 +65,9 @@
               </div>
             </div>
           </div>
-          <hr>
-          <h4 class="header">Tasks</h4>
+          <h4 class="header">
+            Tasks ({{ numSelectedTasks }} added)
+          </h4>
           <div class="ui three column grid">
             <div
               v-for="task in tasks"
@@ -140,19 +143,13 @@ export default {
       },
       selectedStories: {},
       selectedTasks: {},
+      numSelectedStories: 0,
+      numSelectedTasks: 0,
       $form: null
     }
   },
   computed: {
     ...mapGetters(['newProjectId', 'currentUser'])
-  },
-  watch: {
-    selectedStories (newValue) {
-      console.debug(newValue)
-    },
-    selectedTasks (newValue) {
-      console.debug(newValue)
-    }
   },
   mounted () {
     // TODO: better way to generate id
@@ -195,12 +192,19 @@ export default {
     },
     toggleStory (id) {
       this.selectedStories[id] = !this.selectedStories[id]
+      this.numSelectedStories = Object.keys(this.selectedStories)
+        .filter(s => this.selectedStories[s])
+        .length
       setTimeout(() => {
         this.updateButtons()
       }, 50)
     },
     toggleTask (id) {
       this.selectedTasks[id] = !this.selectedTasks[id]
+      this.numSelectedTasks = Object.keys(this.selectedTasks)
+        .filter(t => this.selectedTasks[t])
+        .length
+
       setTimeout(() => {
         this.updateButtons()
       }, 50)
@@ -294,5 +298,6 @@ export default {
 #feature-modal-content #selection-section .grid {
   max-height: 20rem;
   overflow-y: auto;
+  border-top: 1px solid gray;
 }
 </style>
