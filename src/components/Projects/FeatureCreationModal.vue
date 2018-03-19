@@ -45,7 +45,7 @@
             <h4 class="header">
               Stories ({{ numSelectedStories }} added)
             </h4>
-            <div class="ui three column grid">
+            <div class="ui three column stackable grid">
               <div
                 v-for="story in stories"
                 :key="story.id"
@@ -68,7 +68,7 @@
           <h4 class="header">
             Tasks ({{ numSelectedTasks }} added)
           </h4>
-          <div class="ui three column grid">
+          <div class="ui three column stackable grid">
             <div
               v-for="task in tasks"
               :key="task.id"

@@ -1,12 +1,16 @@
 <template>
-  <div class="ui fluid card">
+  <div
+    id="single-task-card"
+    class="ui fluid card">
     <div class="content">
       <div class="header">{{ task.name }}</div>
       <div class="header">
-        ({{ task.points }} points)
+        <div :class="ribbonClass">{{ task.status.toUpperCase() }}</div>
+        <span class="left floated">
+          ({{ task.points }} points)
+        </span>
       </div>
       <div class="description">
-        <div :class="ribbonClass">{{ task.status.toUpperCase() }}</div>
         <p><b>Description:</b></p>
         <p>
           {{ task.description }}
@@ -43,7 +47,7 @@ export default {
     ribbonClass () {
       const status = this.task.status.toLowerCase()
       return {
-        'ui ribbon label': true,
+        'ui right ribbon label': true,
         red: status === 'todo',
         yellow: status === 'in-progress',
         green: status === 'done'
@@ -57,3 +61,9 @@ export default {
   }
 }
 </script>
+
+<style>
+#single-task-card .header .left.floated {
+  margin-right: -20rem;
+}
+</style>
