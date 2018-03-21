@@ -34,6 +34,25 @@
                   placeholder="Feature Description">
               </div>
             </div>
+            <div class="sixteen wide column">
+              <div class="ui fluid labeled input">
+                <div class="ui label">Associated Releases</div>
+                <select
+                  name="releases"
+                  multiple=""
+                  v-model="feature.associatedReleases"
+                  class="ui fluid dropdown">
+                  <option value="">Releases</option>
+                  <option
+                    v-for="release in releases"
+                    :key="release.id"
+                    :value="release.id"
+                  >
+                    {{ release.name }} ({{ getDateRange(release) }})
+                  </option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -118,6 +137,10 @@ export default {
     'task-card': SingleTaskCard
   },
   props: {
+    releases: {
+      required: true,
+      type: Object
+    },
     features: {
       required: true,
       type: Object
@@ -174,6 +197,7 @@ export default {
       }
     })
 
+    $(this.$el).find('.ui.dropdown').dropdown()
     this.initCheckboxes()
     this.updateButtons()
   },
@@ -226,6 +250,11 @@ export default {
       }
 
       return createID(prefix, numberId)
+    },
+    getDateRange (release) {
+      const startDate = new Date(release.startDate)
+      const endDate = new Date(release.endDate)
+      return `${startDate.toDateString()} to ${endDate.toDateString()}`
     },
     async registerHandler () {
       console.debug(this.feature)
