@@ -43,7 +43,7 @@
           <div class="ui header">Story/Task Selection</div>
           <div class="meta">
             <h4 class="header">
-              Stories ({{ numSelectedStories }} added)
+              Stories ({{ numSelectedStories }}/{{ numStories }} added)
             </h4>
             <div class="ui three column stackable grid">
               <div
@@ -66,7 +66,7 @@
             </div>
           </div>
           <h4 class="header">
-            Tasks ({{ numSelectedTasks }} added)
+            Tasks ({{ numSelectedTasks }}/{{ numTasks }} added)
           </h4>
           <div class="ui three column stackable grid">
             <div
@@ -149,6 +149,12 @@ export default {
     }
   },
   computed: {
+    numStories () {
+      return Object.keys(this.stories).length
+    },
+    numTasks () {
+      return Object.keys(this.tasks).length
+    },
     ...mapGetters(['newProjectId', 'currentUser'])
   },
   mounted () {
@@ -221,40 +227,37 @@ export default {
 
       return createID(prefix, numberId)
     },
-    showData () {
-      // eslint-disable-next-line
-      console.debug(this);
-    },
     async registerHandler () {
-      const projectData = {
-        name: this.project.name.trim(),
-        id: this.project.id,
-        description: this.project.description.trim(),
-        members: this.project.members,
-        startdate: this.project.startdate,
-        sprintLength: this.project.sprintLength
-      }
-      // eslint-disable-next-line
-      console.debug("Sending register info:", projectData)
+      console.debug(this.feature)
+      // const projectData = {
+      //   name: this.project.name.trim(),
+      //   id: this.project.id,
+      //   description: this.project.description.trim(),
+      //   members: this.project.members,
+      //   startdate: this.project.startdate,
+      //   sprintLength: this.project.sprintLength
+      // }
+      // // eslint-disable-next-line
+      // console.debug("Sending register info:", projectData)
 
-      try {
-        const result = await this.register(projectData)
+      // try {
+      //   const result = await this.register(projectData)
 
-        if (result.status !== 200) {
-          // eslint-disable-next-line
-          console.debug("Register failed!", result);
-          this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
-        } else {
-          this.$form.modal('hide')
-          this.$router.push({ path: `/projects/${projectData.id}` })
-        }
-      } catch (err) {
-        // eslint-disable-next-line
-        console.debug("Register failed!", err);
-        const message = `${err.status}: ${err.statusText}`
-        this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
-      }
-      this.$form.removeClass('loading')
+      //   if (result.status !== 200) {
+      //     // eslint-disable-next-line
+      //     console.debug("Register failed!", result);
+      //     this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
+      //   } else {
+      //     this.$form.modal('hide')
+      //     this.$router.push({ path: `/projects/${projectData.id}` })
+      //   }
+      // } catch (err) {
+      //   // eslint-disable-next-line
+      //   console.debug("Register failed!", err);
+      //   const message = `${err.status}: ${err.statusText}`
+      //   this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
+      // }
+      // this.$form.removeClass('loading')
     },
     sendRegisterData (projectData) {
       return new Promise((resolve, reject) => {
