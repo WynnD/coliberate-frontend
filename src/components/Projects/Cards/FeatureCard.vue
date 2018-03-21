@@ -7,6 +7,7 @@
       :stories="project.stories"
       :tasks="project.tasks"
       :features="project.features"
+      :releases="project.releases"
     />
     <div class="content">
       <div class="header">
