@@ -52,6 +52,18 @@
             <span>({{ getDateDifference(currentDate, new Date(currentSprint.endDate)) }})</span>
           </div>
         </div>
+        <div class="ui segment">
+          <div class="ui horizontal segments">
+            <div class="ui segment">
+              <span>{{ currentSprint.stories.length }}</span>
+              <span>{{ currentSprint.stories.length === 1 ? 'story' : 'stories' }}</span>
+            </div>
+            <div class="ui segment">
+              <span>{{ currentSprint.tasks.length }}</span>
+              <span>{{ currentSprint.tasks.length === 1 ? 'task' : 'tasks' }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -101,7 +113,7 @@ export default {
 
       return `${year}-${month}-${day}`
     },
-    getDateDifference (older, newer) {
+    getDateDifference (older, newer, valuesOnly = false) {
       const difference = new Date(Math.abs(newer - older))
       const attributes = {
         day: 0,
@@ -147,7 +159,7 @@ export default {
           return `${value} ${value === 1 ? attr : `${attr}s`}`
         }).join(', ')
 
-      return `${msg} ${newer - older < 0 ? 'ago' : 'from now'}`
+      return !valuesOnly ? `${msg} ${newer - older < 0 ? 'ago' : 'from now'}` : attributes
     },
     showModal () {
       if (this.modal) {
@@ -164,6 +176,7 @@ export default {
 #sprint-card #sprint-card-header {
   max-height: 3.5rem;
   margin-bottom: 0.1rem;
+  margin-right: 0.5rem;
 }
 
 #sprint-card #sprint-card-header .dropdown {

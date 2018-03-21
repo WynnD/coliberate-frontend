@@ -60,7 +60,7 @@ export const state = {
           name: 'Sprint 2',
           startDate: new Date(currentDate.valueOf() + oneWeek).toDateString(), // can't be earlier than associated release
           endDate: new Date(new Date().valueOf() + 2 * oneWeek).toDateString(), // can't be later than associated release
-          stories: ['story-1'], // array of story IDs
+          stories: [], // array of story IDs
           tasks: [] // array of tasks
         }
       },
