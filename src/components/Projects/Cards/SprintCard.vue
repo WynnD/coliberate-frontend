@@ -12,7 +12,7 @@
     <div
       id="sprint-card-header"
       class="content">
-      <span class="header">
+      <div class="header ui grid">
         <select
           v-model="currentSprintId"
           class="ui inline selection dropdown">
@@ -33,14 +33,14 @@
             <i class="plus icon"/>
           </div>
         </a>
-      </span>
+      </div>
     </div>
 
     <div class="content">
-      <div class="ui segments">
-        <div
-          v-if="currentSprint"
-          class="ui segment">
+      <div
+        v-if="currentSprint"
+        class="ui segments">
+        <div class="ui segment">
           <div>
             <b>Start Date:</b>
             <span>{{ getFormattedDate(new Date(currentSprint.startDate)) }}</span>
@@ -163,6 +163,7 @@ export default {
 <style>
 #sprint-card #sprint-card-header {
   max-height: 3.5rem;
+  margin-bottom: 0.1rem;
 }
 
 #sprint-card #sprint-card-header .dropdown {
