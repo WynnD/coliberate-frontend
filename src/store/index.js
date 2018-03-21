@@ -53,6 +53,15 @@ export const state = {
           endDate: new Date(new Date().valueOf() + oneWeek).toDateString(), // can't be later than associated release
           stories: ['story-0'], // array of story IDs
           tasks: [] // array of tasks
+        },
+        'sprint-1': {
+          // goals are defined by associated tasks and stories
+          id: 'sprint-1',
+          name: 'Sprint 2',
+          startDate: new Date(currentDate.valueOf() + oneWeek).toDateString(), // can't be earlier than associated release
+          endDate: new Date(new Date().valueOf() + 2 * oneWeek).toDateString(), // can't be later than associated release
+          stories: ['story-1'], // array of story IDs
+          tasks: [] // array of tasks
         }
       },
       features: {
