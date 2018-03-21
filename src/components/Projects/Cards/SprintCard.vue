@@ -1,7 +1,26 @@
 <template>
-  <div class="ui card">
+  <div
+    id="sprint-card"
+    class="ui card">
+    <creation-modal
+      id="sprint-creation-modal"
+      :releases="project.releases"
+      :sprints="project.sprints"
+      :stories="project.stories"
+      :tasks="project.tasks"
+    />
     <div class="content">
-      <span class="header">Current Sprint</span>
+      <span class="header">
+        <span>Current Sprint</span>
+        <a
+          @click="showModal"
+          class="ui right floated animated fade compact button">
+          <div class="hidden content">Add</div>
+          <div class="visible content">
+            <i class="plus icon"/>
+          </div>
+        </a>
+      </span>
     </div>
 
     <div class="content">
@@ -15,8 +34,13 @@
 </template>
 
 <script>
+import SprintCreationModal from '@/components/Projects/SprintCreationModal'
 
+/* global $ */
 export default {
+  components: {
+    'creation-modal': SprintCreationModal
+  },
   props: {
     project: {
       type: Object,
@@ -32,12 +56,18 @@ export default {
         stories: {},
         tasks: {}
       },
-      sprints: {}
+      sprints: {},
+      modal: null
     }
   },
   computed: {
     formattedStartDate: () => this.formatDate(this.startDate),
     formattedEndDate: () => this.formatDate(this.endDate)
+  },
+  mounted () {
+    this.modal = $('#sprint-card #sprint-creation-modal')
+      .modal('setting', 'closable', false)
+      .modal('hide')
   },
   methods: {
     formatDate (date) {
@@ -56,6 +86,11 @@ export default {
       }
 
       return `${year}-${month}-${day}`
+    },
+    showModal () {
+      if (this.modal) {
+        this.modal.modal('show')
+      }
     }
   }
 
