@@ -22,6 +22,7 @@
 
     <div class="ui two stackable raised cards">
       <team-card :project="project"/>
+      <activity-card :project="project"/>
     </div>
   </div>
 </template>
@@ -29,11 +30,13 @@
 <script>
 import TeamCard from '@/components/Projects/Cards/TeamCard'
 import OverviewCard from '@/components/Projects/Cards/OverviewCard'
+import ActivityCard from '@/components/Projects/Cards/ActivityCard'
 
 export default {
   components: {
     'overview-card': OverviewCard,
-    'team-card': TeamCard
+    'team-card': TeamCard,
+    'activity-card': ActivityCard
   },
   props: {
     project: {

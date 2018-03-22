@@ -20,18 +20,11 @@
         </tbody>
       </table>
     </div>
-
-    <activity-list :activities="project.activities"/>
   </div>
 </template>
 
 <script>
-import ActivityList from '@/components/Projects/ActivityList'
-
 export default {
-  components: {
-    'activity-list': ActivityList
-  },
   props: {
     project: {
       type: Object,
