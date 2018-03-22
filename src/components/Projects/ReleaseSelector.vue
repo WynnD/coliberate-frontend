@@ -14,11 +14,12 @@
           {{ release.name }}
         </option>
       </select>
-      <span :class="{
-       'ui left pointing label': true,
-       blue: isReleaseActive,
-       orange: !isReleaseActive
-      }">
+      <span
+        :class="{
+          'ui left pointing label': true,
+          blue: isReleaseActive
+        }"
+      >
         <b>{{ isReleaseActive ? 'ACTIVE' : 'INACTIVE' }}</b>
       </span>
       <a class="ui right floated compact white inverted icon button">
