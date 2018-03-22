@@ -32,10 +32,6 @@
     <details-tab
       v-else-if="view === 'details'"
       :project="project"/>
-
-    <div v-if="view === 'details'">
-      Details
-    </div>
   </div>
 </template>
 
