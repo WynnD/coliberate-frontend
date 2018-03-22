@@ -52,7 +52,7 @@ export const state = {
           startDate: new Date(currentDate.valueOf() - oneWeek).toDateString(), // can't be earlier than associated release
           endDate: new Date(new Date().valueOf() + oneWeek).toDateString(), // can't be later than associated release
           stories: ['story-0'], // array of story IDs
-          tasks: [] // array of tasks
+          tasks: ['task-3', 'task-2'] // array of tasks
         },
         'sprint-1': {
           // goals are defined by associated tasks and stories

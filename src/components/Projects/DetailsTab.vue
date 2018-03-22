@@ -13,18 +13,29 @@
         :features="project.features"
       />
     </div>
-    {{ currentRelease }}
+    <div
+      v-if="currentRelease"
+      class="column sixteen wide">
+      <sprint-viewer
+        :release="currentRelease"
+        :sprints="project.sprints"
+        :stories="project.stories"
+        :tasks="project.tasks"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 import ReleaseSelector from '@/components/Projects/ReleaseSelector'
 import FeatureListing from '@/components/Projects/FeatureListing'
+import SprintViewer from '@/components/Projects/SprintViewer'
 
 export default {
   components: {
     'release-selector': ReleaseSelector,
-    'feature-listing': FeatureListing
+    'feature-listing': FeatureListing,
+    'sprint-viewer': SprintViewer
   },
   props: {
     project: {

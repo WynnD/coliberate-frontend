@@ -63,9 +63,6 @@ export default {
     currentRelease () {
       return this.releases[this.currentReleaseId]
     },
-    isCurrentReleaseActive () {
-      return false
-    },
     currentDate () {
       return new Date()
     },
