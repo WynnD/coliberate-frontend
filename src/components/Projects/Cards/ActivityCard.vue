@@ -6,8 +6,8 @@
         v-if="project.auditLog.length > 0"
         class="ui small feed">
         <activity-item
-          v-for="activity in project.auditLog"
-          :key="activity"
+          v-for="(activity, index) in project.auditLog"
+          :key="index"
           :activity-data="activity.description"
         />
       </div>
