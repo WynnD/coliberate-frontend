@@ -31,7 +31,7 @@ export const state = {
           description: 'Our very first release. :)',
           startDate: new Date(currentDate.valueOf() - oneWeek).toDateString(), // e.g. Mon Mar 12 2018
           endDate: new Date(new Date().valueOf() + 3 * oneWeek).toDateString(),
-          features: ['feature-0'], // array of feature IDs
+          features: ['feature-0', 'feature-1'], // array of feature IDs
           sprints: ['sprint-0'] // array of sprint IDs
         },
         'release-1': {
@@ -77,6 +77,13 @@ export const state = {
           name: 'Task Management',
           description: 'Our project will feature the management of tasks',
           stories: ['story-1'], // array of associated story IDs
+          tasks: [] // array of associated task IDs (not associated with stories)
+        },
+        'feature-3': {
+          id: 'feature-3',
+          name: 'Sprint Management',
+          description: 'Our project will feature the management of sprints',
+          stories: [], // array of associated story IDs
           tasks: [] // array of associated task IDs (not associated with stories)
         }
       },

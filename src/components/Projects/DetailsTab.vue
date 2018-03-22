@@ -5,16 +5,26 @@
         :releases="project.releases"
         @changerelease="handleReleaseChange"/>
     </div>
+    <div
+      v-if="currentRelease"
+      class="column sixteen wide">
+      <feature-listing
+        :release="currentRelease"
+        :features="project.features"
+      />
+    </div>
     {{ currentRelease }}
   </div>
 </template>
 
 <script>
 import ReleaseSelector from '@/components/Projects/ReleaseSelector'
+import FeatureListing from '@/components/Projects/FeatureListing'
 
 export default {
   components: {
-    'release-selector': ReleaseSelector
+    'release-selector': ReleaseSelector,
+    'feature-listing': FeatureListing
   },
   props: {
     project: {
