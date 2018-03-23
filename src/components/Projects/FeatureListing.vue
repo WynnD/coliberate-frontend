@@ -195,6 +195,12 @@ export default {
       return this.release.features.length
     }
   },
+  watch: {
+    release () {
+      this.activeAccordion = ''
+      this.activeSubAccordion = ''
+    }
+  },
   methods: {
     toggleAccordionState (field) {
       if (this.activeAccordion === field) {

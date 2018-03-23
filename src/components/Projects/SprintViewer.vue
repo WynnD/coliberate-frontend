@@ -250,7 +250,11 @@ export default {
   watch: {
     currentSprint (newValue) {
       // reset accordion states on new sprint selection
-      this.accordionStates = newValue ? {} : this.accordionStates
+      this.activeAccordion = ''
+    },
+    release () {
+      this.currentSprintId = ''
+      $(this.$el).find('.ui.dropdown').dropdown('restore defaults')
     }
   },
   mounted () {
@@ -275,7 +279,7 @@ export default {
 </script>
 
 <style>
-#sprint-viewer #task-story-listing>.header {
+#task-story-listing>.header {
   margin-bottom: 1rem;
 }
 </style>
