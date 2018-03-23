@@ -1,5 +1,8 @@
 <template>
   <div class="ui stackable grid">
+    <release-creation-modal
+      id="release-creation-modal"
+      :releases="project.releases"/>
     <feature-creation-modal
       id="feature-creation-modal"
       :stories="project.stories"
@@ -18,6 +21,7 @@
     />
     <div class="column sixteen wide">
       <release-selector
+        @showmodal="showModal"
         :releases="project.releases"
         @changerelease="handleReleaseChange"/>
     </div>
@@ -47,6 +51,7 @@
 </template>
 
 <script>
+import ReleaseCreationModal from '@/components/Projects/ReleaseCreationModal'
 import ReleaseSelector from '@/components/Projects/ReleaseSelector'
 import FeatureCreationModal from '@/components/Projects/FeatureCreationModal'
 import FeatureListing from '@/components/Projects/FeatureListing'
@@ -56,6 +61,7 @@ import SprintViewer from '@/components/Projects/SprintViewer'
 /* global $ */
 export default {
   components: {
+    'release-creation-modal': ReleaseCreationModal,
     'release-selector': ReleaseSelector,
     'feature-creation-modal': FeatureCreationModal,
     'feature-listing': FeatureListing,
@@ -85,6 +91,10 @@ export default {
       .modal('hide')
 
     this.modals['feature-create'] = $(this.$el).find('#feature-creation-modal')
+      .modal('setting', 'closable', false)
+      .modal('hide')
+
+    this.modals['release-create'] = $(this.$el).find('#release-creation-modal')
       .modal('setting', 'closable', false)
       .modal('hide')
   },

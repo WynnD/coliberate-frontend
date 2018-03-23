@@ -29,7 +29,9 @@
           {{ numReleases }} {{ numReleases === 1 ? 'Release' : 'Releases' }} found
         </b>
       </span>
-      <a class="ui right floated compact white inverted icon button">
+      <a
+        @click="$emit('showmodal', 'release-create')"
+        class="ui right floated compact white inverted icon button">
         <i class="plus icon"/>
       </a>
     </div>
