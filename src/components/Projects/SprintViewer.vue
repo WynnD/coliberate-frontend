@@ -265,21 +265,4 @@ export default {
 #sprint-viewer #task-story-listing>.header {
   margin-bottom: 1rem;
 }
-
-#sprint-viewer .accord-title:hover {
-  cursor: pointer;
-  background-color: gainsboro;
-}
-
-#sprint-viewer .accord-title .icon.dropdown {
-  transform: rotate(-90deg);
-}
-
-#sprint-viewer .accord-title.accord-active {
-  background-color: lightgray;
-}
-
-#sprint-viewer .accord-title.accord-active .icon.dropdown {
-  transform: rotate(0deg);
-}
 </style>
