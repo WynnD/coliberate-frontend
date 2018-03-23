@@ -49,7 +49,11 @@
           class="ui segments">
           <div
             @click="toggleAccordionState('sprint-extra-tasks')"
-            class="ui segment accord-title">
+            :class="{
+              'ui segment accord-title': true,
+              'accord-active': activeAccordion === `sprint-extra-tasks`
+            }"
+          >
             <i class="dropdown icon"/>
             <span>Extra Tasks</span>
             <div
@@ -94,7 +98,11 @@
           class="ui segments">
           <div
             @click="toggleAccordionState(`sprint-${story.id}`)"
-            class="ui segment accord-title">
+            :class="{
+              'ui segment accord-title': true,
+              'accord-active': activeAccordion === `sprint-${story.id}`
+            }"
+          >
             <i class="dropdown icon"/>
             <span>{{ story.name }}</span>
             <div
@@ -257,7 +265,20 @@ export default {
   margin-bottom: 1rem;
 }
 
-#sprint-viewer .accord-title {
+#sprint-viewer .accord-title:hover {
   cursor: pointer;
+  background-color: gainsboro;
+}
+
+#sprint-viewer .accord-title .icon.dropdown {
+  transform: rotate(-90deg);
+}
+
+#sprint-viewer .accord-title.accord-active {
+  background-color: lightgray;
+}
+
+#sprint-viewer .accord-title.accord-active .icon.dropdown {
+  transform: rotate(0deg);
 }
 </style>
