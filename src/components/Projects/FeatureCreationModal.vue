@@ -141,6 +141,11 @@ export default {
       required: true,
       type: Object
     },
+    initialRelease: {
+      required: false,
+      type: String,
+      default: ''
+    },
     features: {
       required: true,
       type: Object
@@ -179,6 +184,11 @@ export default {
       return Object.keys(this.tasks).length
     },
     ...mapGetters(['newProjectId', 'currentUser'])
+  },
+  watch: {
+    initialRelease () {
+      $(this.$el).find('.ui.dropdown').dropdown('set exactly', [this.initialRelease])
+    }
   },
   mounted () {
     // TODO: better way to generate id
