@@ -26,12 +26,14 @@
     <div v-if="project.name === undefined">
       Loading project data. Please wait.
     </div>
-    <general-tab
-      v-else-if="view === 'general'"
-      :project="project"/>
-    <details-tab
-      v-else-if="view === 'details'"
-      :project="project"/>
+    <div v-else>
+      <general-tab
+        v-show="view === 'general'"
+        :project="project"/>
+      <details-tab
+        v-show="view === 'details'"
+        :project="project"/>
+    </div>
   </div>
 </template>
 

@@ -6,7 +6,9 @@
       <select
         v-model="currentReleaseId"
         class="ui dropdown">
-        <option value="">Select a Release</option>
+        <option value="">
+          {{ numReleases > 0 ? 'Select a Release' : 'Add a Release' }}
+        </option>
         <option
           v-for="release in releases"
           :key="release.id"
@@ -20,7 +22,12 @@
           blue: isReleaseActive
         }"
       >
-        <b>{{ isReleaseActive ? 'ACTIVE' : 'INACTIVE' }}</b>
+        <b v-if="currentRelease">
+          {{ isReleaseActive ? 'ACTIVE' : 'INACTIVE' }}
+        </b>
+        <b v-else>
+          {{ numReleases }} {{ numReleases === 1 ? 'Release' : 'Releases' }} found
+        </b>
       </span>
       <a class="ui right floated compact white inverted icon button">
         <i class="plus icon"/>
@@ -81,6 +88,12 @@ export default {
     isReleaseActive () {
       return this.currentDate.valueOf() > this.startDate.valueOf() &&
         this.currentDate.valueOf() < this.endDate.valueOf()
+    },
+    numReleases () {
+      if (!this.releases) {
+        return 0
+      }
+      return Object.keys(this.releases).length
     }
   },
   watch: {

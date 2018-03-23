@@ -20,7 +20,12 @@
           blue: isSprintActive
         }"
       >
-        <b>{{ isSprintActive ? 'ACTIVE' : 'INACTIVE' }}</b>
+        <b v-if="currentSprint">
+          {{ isSprintActive ? 'ACTIVE' : 'INACTIVE' }}
+        </b>
+        <b v-else>
+          {{ numSprints }} {{ numSprints === 1 ? 'Sprint' : 'Sprints' }} found
+        </b>
       </span>
       <a class="ui right floated compact white inverted icon button">
         <i class="plus icon"/>
@@ -237,6 +242,9 @@ export default {
       }
       return this.currentSprint.stories
         .map(id => this.stories[id])
+    },
+    numSprints () {
+      return this.release.sprints.length
     }
   },
   watch: {
