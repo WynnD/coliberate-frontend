@@ -28,6 +28,8 @@
         @showmodal="showModal"
         :release="currentRelease"
         :features="project.features"
+        :stories="project.stories"
+        :tasks="project.tasks"
       />
     </div>
     <div

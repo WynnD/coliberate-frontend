@@ -70,7 +70,7 @@ export const state = {
           name: 'Feature Management',
           description: 'Our project will feature the management of features',
           stories: ['story-0'], // array of associated story IDs
-          tasks: [] // array of associated task IDs (not associated with stories)
+          tasks: ['task-0'] // array of associated task IDs (not associated with stories)
         },
         'feature-1': {
           id: 'feature-1',
