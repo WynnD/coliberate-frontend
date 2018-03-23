@@ -20,7 +20,19 @@
         :showing-boolean="activeAccordion === `feature-list-${featureId}`">
         <section slot="title">
           <i class="dropdown icon"/>
-          {{ features[featureId].name }}
+          <span>{{ features[featureId].name }}</span>
+          <div class="ui buttons right floated compact">
+            <button
+              @click.stop="featureEditHandler(featureId)"
+              class="ui inverted violet icon button">
+              <i class="icon edit"/>
+            </button>
+            <button
+              @click.stop="featureRemoveHandler(featureId)"
+              class="ui inverted red icon button">
+              <i class="icon trash"/>
+            </button>
+          </div>
         </section>
 
         <section slot="content">
@@ -29,22 +41,6 @@
           Also buttons/links for edit/remove interactions will be here
         </section>
       </accordion-item>
-      <!-- <div class="ui three stackable raised cards">
-        <div
-          v-for="featureId in release.features"
-          :key="featureId"
-          :id="featureId"
-          class="ui card">
-          <div class="content">
-            <div class="header">{{ features[featureId].name }}</div>
-            <div class="description">
-              <p>{{ features[featureId].description }}</p>
-              <hr>
-              Also buttons/links for edit/remove interactions will be here
-            </div>
-          </div>
-        </div>
-      </div> -->
     </div>
   </div>
 </template>
@@ -78,12 +74,17 @@ export default {
   },
   methods: {
     toggleAccordionState (field) {
-      console.debug(field)
       if (this.activeAccordion === field) {
         this.activeAccordion = ''
       } else {
         this.activeAccordion = field
       }
+    },
+    featureEditHandler (featureId) {
+      console.debug('Clicked edit for', featureId)
+    },
+    featureRemoveHandler (featureId) {
+      console.debug('Clicked remove for', featureId)
     }
   }
 }

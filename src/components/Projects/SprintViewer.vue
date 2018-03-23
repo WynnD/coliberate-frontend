@@ -113,8 +113,16 @@
               {{ story.status.toUpperCase() }}
             </div>
             <div class="ui buttons right floated compact">
-              <button class="ui icon button"><i class="icon edit"/></button>
-              <button class="ui icon button"><i class="icon trash"/></button>
+              <button
+                @click.stop="storyEditHandler(story.id)"
+                class="ui inverted violet icon button">
+                <i class="icon edit"/>
+              </button>
+              <button
+                @click.stop="storyRemoveHandler(story.id)"
+                class="ui inverted red icon button">
+                <i class="icon trash"/>
+              </button>
             </div>
           </section>
 
@@ -250,12 +258,17 @@ export default {
   },
   methods: {
     toggleAccordionState (field) {
-      console.debug(field)
       if (this.activeAccordion === field) {
         this.activeAccordion = ''
       } else {
         this.activeAccordion = field
       }
+    },
+    storyEditHandler (storyId) {
+      console.debug('Clicked edit for', storyId)
+    },
+    storyRemoveHandler (storyId) {
+      console.debug('Clicked remove for', storyId)
     }
   }
 }
