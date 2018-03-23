@@ -125,7 +125,7 @@
                   {{ story.description }}
                 </div>
                 <div class="eight wide column">
-                  Story 1 stats here
+                  {{ story.name }} stats here
                 </div>
               </div>
               <div class="row">
