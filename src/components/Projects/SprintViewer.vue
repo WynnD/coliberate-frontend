@@ -28,7 +28,7 @@
         </b>
       </span>
       <a
-        @click="$emit('showmodal', 'sprint')"
+        @click="$emit('showmodal', 'sprint-create')"
         class="ui right floated compact white inverted icon button">
         <i class="plus icon"/>
       </a>

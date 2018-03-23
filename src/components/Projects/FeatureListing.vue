@@ -2,11 +2,15 @@
   <div class="ui segments">
     <div class="ui inverted grey segment">
       <span class="ui header">Features ({{ numFeatures }})</span>
-      <a class="ui right floated compact white inverted icon button">
+      <a
+        @click="$emit('showmodal', 'feature-create')"
+        class="ui right floated compact white inverted icon button">
         <i class="plus icon"/>
       </a>
     </div>
-    <div class="ui segment">
+    <div
+      v-if="release.features.length > 0"
+      class="ui segment">
       <div class="ui three stackable raised cards">
         <div
           v-for="featureId in release.features"

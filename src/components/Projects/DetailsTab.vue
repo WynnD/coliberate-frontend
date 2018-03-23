@@ -1,5 +1,13 @@
 <template>
   <div class="ui stackable grid">
+    <feature-creation-modal
+      id="feature-creation-modal"
+      :stories="project.stories"
+      :tasks="project.tasks"
+      :features="project.features"
+      :releases="project.releases"
+      :initial-release="currentReleaseId"
+    />
     <sprint-creation-modal
       id="sprint-creation-modal"
       :releases="project.releases"
@@ -17,6 +25,7 @@
       v-if="currentRelease"
       class="column sixteen wide">
       <feature-listing
+        @showmodal="showModal"
         :release="currentRelease"
         :features="project.features"
       />
@@ -37,6 +46,7 @@
 
 <script>
 import ReleaseSelector from '@/components/Projects/ReleaseSelector'
+import FeatureCreationModal from '@/components/Projects/FeatureCreationModal'
 import FeatureListing from '@/components/Projects/FeatureListing'
 import SprintCreationModal from '@/components/Projects/SprintCreationModal'
 import SprintViewer from '@/components/Projects/SprintViewer'
@@ -45,6 +55,7 @@ import SprintViewer from '@/components/Projects/SprintViewer'
 export default {
   components: {
     'release-selector': ReleaseSelector,
+    'feature-creation-modal': FeatureCreationModal,
     'feature-listing': FeatureListing,
     'sprint-creation-modal': SprintCreationModal,
     'sprint-viewer': SprintViewer
@@ -67,7 +78,11 @@ export default {
     }
   },
   mounted () {
-    this.modals.sprint = $('#project-page #sprint-creation-modal')
+    this.modals['sprint-create'] = $(this.$el).find('#sprint-creation-modal')
+      .modal('setting', 'closable', false)
+      .modal('hide')
+
+    this.modals['feature-create'] = $(this.$el).find('#feature-creation-modal')
       .modal('setting', 'closable', false)
       .modal('hide')
   },
