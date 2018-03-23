@@ -27,7 +27,9 @@
           {{ numSprints }} {{ numSprints === 1 ? 'Sprint' : 'Sprints' }} found
         </b>
       </span>
-      <a class="ui right floated compact white inverted icon button">
+      <a
+        @click="$emit('showmodal', 'sprint')"
+        class="ui right floated compact white inverted icon button">
         <i class="plus icon"/>
       </a>
     </div>

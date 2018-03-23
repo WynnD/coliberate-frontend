@@ -31,7 +31,11 @@
                 <select
                   v-model="sprint.associatedRelease"
                   class="ui fluid dropdown">
-                  <option value="">Select a Release</option>
+                  <option
+                    disabled
+                    value="">
+                    Select a Release
+                  </option>
                   <option
                     v-for="release in releases"
                     :key="release.id"
@@ -153,6 +157,11 @@ export default {
       required: true,
       type: Object
     },
+    initialRelease: {
+      required: false,
+      type: String,
+      default: ''
+    },
     sprints: {
       required: true,
       type: Object
@@ -197,6 +206,11 @@ export default {
       return this.getFormattedDate(date)
     },
     ...mapGetters(['newProjectId', 'currentUser'])
+  },
+  watch: {
+    initialRelease () {
+      $(this.$el).find('.ui.dropdown').dropdown('set exactly', this.initialRelease)
+    }
   },
   mounted () {
     // TODO: better way to generate id
