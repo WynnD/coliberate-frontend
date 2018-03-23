@@ -51,16 +51,12 @@
         </a>
       </div>
       <div>
-        <div
-          id="extra-tasks"
-          class="ui segments">
-          <div
-            @click="toggleAccordionState('sprint-extra-tasks')"
-            :class="{
-              'ui segment accord-title': true,
-              'accord-active': activeAccordion === `sprint-extra-tasks`
-            }"
-          >
+        <accordion-item
+          id="sprint-extra-tasks"
+          @toggle-accordion-state="toggleAccordionState"
+          name="sprint-extra-tasks"
+          :showing-boolean="activeAccordion === 'sprint-extra-tasks'">
+          <section slot="title">
             <i class="dropdown icon"/>
             <span>Extra Tasks</span>
             <div
@@ -71,10 +67,8 @@
             >
               {{ tasksRemaining }} REMAINING
             </div>
-          </div>
-          <div
-            v-show="activeAccordion === 'sprint-extra-tasks'"
-            class="ui segment accord-content">
+          </section>
+          <section slot="content">
             <div class="ui fluid container grid">
               <div class="row">
                 <div class="sixteen wide column">
@@ -97,19 +91,15 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-        <div
+          </section>
+        </accordion-item>
+        <accordion-item
           v-for="story in sprintStories"
           :key="story.id"
-          class="ui segments">
-          <div
-            @click="toggleAccordionState(`sprint-${story.id}`)"
-            :class="{
-              'ui segment accord-title': true,
-              'accord-active': activeAccordion === `sprint-${story.id}`
-            }"
-          >
+          @toggle-accordion-state="toggleAccordionState"
+          :name="`sprint-${story.id}`"
+          :showing-boolean="activeAccordion === `sprint-${story.id}`">
+          <section slot="title">
             <i class="dropdown icon"/>
             <span>{{ story.name }}</span>
             <div
@@ -126,11 +116,9 @@
               <button class="ui icon button"><i class="icon edit"/></button>
               <button class="ui icon button"><i class="icon trash"/></button>
             </div>
-          </div>
+          </section>
 
-          <div
-            v-show="activeAccordion === `sprint-${story.id}`"
-            class="ui segment accord-content">
+          <section slot="content">
             <div class="ui fluid container grid">
               <div class="row">
                 <div class="eight wide column">
@@ -163,8 +151,8 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </section>
+        </accordion-item>
       </div>
     </div>
   </div>
@@ -172,11 +160,13 @@
 
 <script>
 import SingleTaskCard from '@/components/Projects/Cards/SingleTaskCard'
+import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
 
 /* global $ */
 export default {
   components: {
-    'task-card': SingleTaskCard
+    'task-card': SingleTaskCard,
+    'accordion-item': SegmentAccordionItem
   },
   props: {
     release: {
@@ -260,6 +250,7 @@ export default {
   },
   methods: {
     toggleAccordionState (field) {
+      console.debug(field)
       if (this.activeAccordion === field) {
         this.activeAccordion = ''
       } else {
