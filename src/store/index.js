@@ -51,7 +51,7 @@ export const state = {
           name: 'Sprint 1',
           startDate: new Date(currentDate.valueOf() - oneWeek).toDateString(), // can't be earlier than associated release
           endDate: new Date(new Date().valueOf() + oneWeek).toDateString(), // can't be later than associated release
-          stories: ['story-0'], // array of story IDs
+          stories: ['story-0', 'story-1'], // array of story IDs
           tasks: ['task-3', 'task-2'] // array of tasks
         },
         'sprint-1': {
@@ -90,7 +90,7 @@ export const state = {
       stories: {
         'story-0': {
           id: 'story-0',
-          status: 'todo',
+          status: 'in-progress',
           // progress can be 100%, but doesn't necessarily mean that story is completed
           // for example, didn't generate/assign every task associated with this story
           name: 'Add Feature',

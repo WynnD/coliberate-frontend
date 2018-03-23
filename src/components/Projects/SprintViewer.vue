@@ -43,159 +43,107 @@
           <i class="plus icon"/>
         </a>
       </div>
-      <div class="ui styled fluid accordion">
-        <!-- Extra Tasks Section -->
-        <div class="active title">
-          <i class="dropdown icon"/>
-          <span>Extra Tasks</span>
+      <div>
+        <div
+          id="extra-tasks"
+          class="ui segments">
           <div
-            :class="{
-              'ui left pointing label': true,
-              yellow: tasksRemaining > 0
-            }"
-          >
-            {{ tasksRemaining }} REMAINING
-          </div>
-        </div>
-        <div class="active content">
-          <div class="ui fluid container grid">
-            <div class="row">
-              <div class="sixteen wide column">
-                <span class="ui small header">
-                  Tasks ({{ tasksRemaining }}/{{ totalTasks }} Remaining)
-                </span>
-                <a class="ui right floated compact icon button">
-                  <i class="plus icon"/>
-                </a>
-              </div>
+            @click="toggleAccordionState('sprint-extra-tasks')"
+            class="ui segment accord-title">
+            <i class="dropdown icon"/>
+            <span>Extra Tasks</span>
+            <div
+              :class="{
+                'ui left pointing label': true,
+                yellow: tasksRemaining > 0
+              }"
+            >
+              {{ tasksRemaining }} REMAINING
             </div>
-            <div class="row">
-              <div class="sixteen wide column">
-                <div class="ui three stackable cards">
-                  <task-card
-                    v-for="task in sprintTasks"
-                    :key="task.id"
-                    :task="task"/>
+          </div>
+          <div
+            v-show="activeAccordion === 'sprint-extra-tasks'"
+            class="ui segment accord-content">
+            <div class="ui fluid container grid">
+              <div class="row">
+                <div class="sixteen wide column">
+                  <span class="ui small header">
+                    Tasks ({{ tasksRemaining }}/{{ totalTasks }} Remaining)
+                  </span>
+                  <a class="ui right floated compact icon button">
+                    <i class="plus icon"/>
+                  </a>
                 </div>
-                <!-- <div class="ui three column stackable grid">
-                  <div class="column">
-                    <div class="ui fluid card">
-                      <div class="content">
-                        <div class="header">Task 1 Card</div>
-                        <div class="description">
-                          Task 1 description here. Also buttons/links for edit/remove interactions will be here
-                        </div>
-                      </div>
-                    </div>
+              </div>
+              <div class="row">
+                <div class="sixteen wide column">
+                  <div class="ui three stackable cards">
+                    <task-card
+                      v-for="task in sprintTasks"
+                      :key="task.id"
+                      :task="task"/>
                   </div>
-                  <div class="column">
-                    <div class="ui fluid card">
-                      <div class="content">
-                        <div class="header">Task 2 Card</div>
-                        <div class="description">
-                          Task 2 description here. Will need to make sure height is consistent
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="column">
-                    <div class="ui fluid card">
-                      <div class="content">
-                        <div class="header">Task 3 Card</div>
-                        <div class="description">
-                          Task 3 description here
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="column">
-                    <div class="ui fluid card">
-                      <div class="content">
-                        <div class="header">Task 4 Card</div>
-                        <div class="description">
-                          Task 4 description here
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div> -->
+                </div>
               </div>
             </div>
           </div>
         </div>
-        <!-- STORY 1 -->
-        <div class="title">
-          <i class="dropdown icon"/>
-          <span>Story 1</span>
-          <div class="ui left pointing label yellow">
-            IN-PROGRESS
-          </div>
-          <div class="ui buttons right floated compact">
-            <button class="ui icon button"><i class="icon edit"/></button>
-            <button class="ui icon button"><i class="icon trash"/></button>
-          </div>
-        </div>
-        <div class="content">
-          <div class="ui fluid container grid">
-            <div class="row">
-              <div class="eight wide column">
-                Story 1 description here.
-              </div>
-              <div class="eight wide column">
-                Story 1 stats here
-              </div>
+        <div
+          v-for="story in sprintStories"
+          :key="story.id"
+          class="ui segments">
+          <div
+            @click="toggleAccordionState(`sprint-${story.id}`)"
+            class="ui segment accord-title">
+            <i class="dropdown icon"/>
+            <span>{{ story.name }}</span>
+            <div
+              :class="{
+                'ui left pointing label story-status': true,
+                yellow: story.status === 'in-progress',
+                green: story.status === 'done',
+                red: story.status === 'todo'
+              }"
+            >
+              {{ story.status.toUpperCase() }}
             </div>
-            <div class="row">
-              <div class="sixteen wide column">
-                <hr>
-                <span class="ui small header">Tasks (4)</span>
-                <a class="ui right floated compact icon button">
-                  <i class="plus icon"/>
-                </a>
-              </div>
+            <div class="ui buttons right floated compact">
+              <button class="ui icon button"><i class="icon edit"/></button>
+              <button class="ui icon button"><i class="icon trash"/></button>
             </div>
-            <div class="row">
-              <div class="sixteen wide column">
-                <div class="ui three column stackable grid">
-                  <div class="column">
-                    <div class="ui fluid card">
-                      <div class="content">
-                        <div class="header">Task 1 Card</div>
-                        <div class="description">
-                          Task 1 description here. Also buttons/links for edit/remove interactions will be here
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="column">
-                    <div class="ui fluid card">
-                      <div class="content">
-                        <div class="header">Task 2 Card</div>
-                        <div class="description">
-                          Task 2 description here. Will need to make sure height is consistent
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="column">
-                    <div class="ui fluid card">
-                      <div class="content">
-                        <div class="header">Task 3 Card</div>
-                        <div class="description">
-                          Task 3 description here
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="column">
-                    <div class="ui fluid card">
-                      <div class="content">
-                        <div class="header">Task 4 Card</div>
-                        <div class="description">
-                          Task 4 description here
-                        </div>
-                      </div>
-                    </div>
+          </div>
+
+          <div
+            v-show="activeAccordion === `sprint-${story.id}`"
+            class="ui segment accord-content">
+            <div class="ui fluid container grid">
+              <div class="row">
+                <div class="eight wide column">
+                  {{ story.description }}
+                </div>
+                <div class="eight wide column">
+                  Story 1 stats here
+                </div>
+              </div>
+              <div class="row">
+                <div class="sixteen wide column">
+                  <hr>
+                  <span class="ui small header">Tasks ({{ story.tasks.length }})</span>
+                  <a class="ui right floated compact icon button">
+                    <i class="plus icon"/>
+                  </a>
+                </div>
+              </div>
+              <div class="row">
+                <div class="sixteen wide column">
+                  <span v-if="story.tasks.length === 0">No tasks found</span>
+                  <div
+                    v-else
+                    class="ui three stackable cards">
+                    <task-card
+                      v-for="taskId in story.tasks"
+                      :key="taskId"
+                      :task="tasks[taskId]"/>
                   </div>
                 </div>
               </div>
@@ -235,7 +183,8 @@ export default {
   },
   data () {
     return {
-      currentSprintId: ''
+      currentSprintId: '',
+      activeAccordion: ''
     }
   },
   computed: {
@@ -273,24 +222,31 @@ export default {
     },
     totalTasks () {
       return this.sprintTasks.length
+    },
+    sprintStories () {
+      if (!this.currentSprint) {
+        return []
+      }
+      return this.currentSprint.stories
+        .map(id => this.stories[id])
     }
   },
   watch: {
     currentSprint (newValue) {
-      if (newValue) {
-        setTimeout(() => {
-          this.refreshAccordion()
-        }, 50)
-      }
+      // reset accordion states on new sprint selection
+      this.accordionStates = newValue ? {} : this.accordionStates
     }
   },
   mounted () {
     $(this.$el).find('.ui.dropdown').dropdown()
-    this.refreshAccordion()
   },
   methods: {
-    refreshAccordion () {
-      $(this.$el).find('.ui.accordion').accordion('refresh')
+    toggleAccordionState (field) {
+      if (this.activeAccordion === field) {
+        this.activeAccordion = ''
+      } else {
+        this.activeAccordion = field
+      }
     }
   }
 }
@@ -299,5 +255,9 @@ export default {
 <style>
 #sprint-viewer #task-story-listing>.header {
   margin-bottom: 1rem;
+}
+
+#sprint-viewer .accord-title {
+  cursor: pointer;
 }
 </style>
