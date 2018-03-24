@@ -40,17 +40,18 @@ export default {
 .accord-title {
   background-color: #EEE;
 }
+
 .accord-title:hover {
   cursor: pointer;
   background-color: gainsboro;
 }
 
-.accord-title .icon.dropdown {
-  transform: rotate(-90deg);
+.accord-title.accord-active:not(:hover) {
+  background-color: lightgray;
 }
 
-.accord-title.accord-active {
-  background-color: lightgray;
+.accord-title .icon.dropdown {
+  transform: rotate(-90deg);
 }
 
 .accord-title.accord-active .icon.dropdown {

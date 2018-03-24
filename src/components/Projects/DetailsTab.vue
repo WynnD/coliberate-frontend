@@ -19,6 +19,12 @@
       :stories="project.stories"
       :tasks="project.tasks"
     />
+
+    <div class="column sixteen wide">
+      <backlog-viewer
+        @showmodal="showModal"
+        :project="project"/>
+    </div>
     <div class="column sixteen wide">
       <release-selector
         @showmodal="showModal"
@@ -51,6 +57,7 @@
 </template>
 
 <script>
+import BacklogViewer from '@/components/Projects/BacklogViewer'
 import ReleaseCreationModal from '@/components/Projects/ReleaseCreationModal'
 import ReleaseSelector from '@/components/Projects/ReleaseSelector'
 import FeatureCreationModal from '@/components/Projects/FeatureCreationModal'
@@ -61,6 +68,7 @@ import SprintViewer from '@/components/Projects/SprintViewer'
 /* global $ */
 export default {
   components: {
+    'backlog-viewer': BacklogViewer,
     'release-creation-modal': ReleaseCreationModal,
     'release-selector': ReleaseSelector,
     'feature-creation-modal': FeatureCreationModal,

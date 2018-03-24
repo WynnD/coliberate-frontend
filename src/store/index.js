@@ -70,7 +70,7 @@ export const state = {
           name: 'Feature Management',
           description: 'Our project will feature the management of features',
           stories: ['story-0'], // array of associated story IDs
-          tasks: ['task-0'] // array of associated task IDs (not associated with stories)
+          tasks: ['task-0', 'task-2'] // array of associated task IDs (not associated with stories)
         },
         'feature-1': {
           id: 'feature-1',
@@ -111,6 +111,18 @@ export const state = {
           // represents urgency/importance to project
           // effort value defined by tasks
           tasks: ['task-1'] // array of associated task IDs
+        },
+        'story-2': {
+          id: 'story-2',
+          status: 'todo',
+          // progress can be 100%, but doesn't necessarily mean that story is completed
+          // for example, didn't generate/assign every task associated with this story
+          name: 'Add Sprints',
+          description: 'Users will be able to add sprints to our application',
+          businessValue: 8,
+          // represents urgency/importance to project
+          // effort value defined by tasks
+          tasks: [] // array of associated task IDs
         }
       },
       tasks: {
@@ -145,6 +157,14 @@ export const state = {
           description: 'create tasks for adding UI to features and tasks',
           points: 3,
           takenBy: ['member-0']
+        },
+        'task-4': {
+          id: 'task-4',
+          status: 'todo',
+          name: 'Check for bugs when adding stuff',
+          description: 'check for bugs when adding things like releases and tasks',
+          points: 10,
+          takenBy: []
         }
       },
       pointHistory: {},
