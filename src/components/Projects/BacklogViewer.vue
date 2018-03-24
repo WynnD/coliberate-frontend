@@ -360,8 +360,8 @@
         v-for="storyId in orphanedData.stories"
         :key="storyId"
         @toggle-accordion-state="toggleAccordionSubState"
-        :name="`sprint-${sprintId}-list-${storyId}`"
-        :showing-boolean="activeSubAccordion === `sprint-${sprintId}-list-${storyId}`">
+        :name="`story-list-${storyId}`"
+        :showing-boolean="activeSubAccordion === `story-list-${storyId}`">
         <section slot="title">
           <i class="dropdown icon"/>
           <span>{{ project.stories[storyId].name }}</span>
