@@ -21,11 +21,6 @@
     />
 
     <div class="column sixteen wide">
-      <backlog-viewer
-        @showmodal="showModal"
-        :project="project"/>
-    </div>
-    <div class="column sixteen wide">
       <release-selector
         @showmodal="showModal"
         :releases="project.releases"
@@ -52,6 +47,11 @@
         :stories="project.stories"
         :tasks="project.tasks"
       />
+    </div>
+    <div class="column sixteen wide">
+      <backlog-viewer
+        @showmodal="showModal"
+        :project="project"/>
     </div>
   </div>
 </template>

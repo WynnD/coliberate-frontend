@@ -22,6 +22,17 @@
 
     <div
       v-show="showBacklog"
+      v-if="!hasBacklogItems"
+      class="ui segment">
+      <div class="ui message positive">
+        <div class="header">No unassociated items found</div>
+        <p>No action necessary.</p>
+      </div>
+    </div>
+
+    <div
+      v-show="showBacklog"
+      v-if="orphanedData.features.length > 0"
       class="ui segment">
       <div class="ui medium header">Features</div>
       <div v-if="orphanedData.features.length === 0">
@@ -182,6 +193,7 @@
 
     <div
       v-show="showBacklog"
+      v-if="orphanedData.sprints.length > 0"
       class="ui segment">
       <span class="ui header medium">Sprints</span>
       <div v-if="orphanedData.sprints.length === 0">
@@ -342,6 +354,7 @@
 
     <div
       v-show="showBacklog"
+      v-if="orphanedData.stories.length > 0"
       class="ui segment">
       <div class="ui header medium">Stories</div>
       <div v-if="orphanedData.stories.length === 0">
@@ -428,6 +441,7 @@
 
     <div
       v-show="showBacklog"
+      v-if="orphanedData.tasks.length > 0"
       class="ui segment">
       <div class="ui medium header">Tasks</div>
       <div v-if="orphanedData.tasks.length === 0">
@@ -472,7 +486,8 @@ export default {
     return {
       activeAccordion: '',
       activeSubAccordion: '',
-      showBacklog: false
+      showBacklog: false,
+      hasBacklogItems: false
     }
   },
   computed: {
@@ -540,9 +555,11 @@ export default {
   },
   mounted () {
     // show backlog on first load if there's anything in it
-    this.showBacklog = Object.keys(this.orphanedData)
+    this.hasBacklogItems = Object.keys(this.orphanedData)
       .map(key => this.orphanedData[key].length > 0)
       .filter(val => !!val).length > 0
+
+    this.showBacklog = this.hasBacklogItems
   },
   methods: {
     toggleAccordionState (field) {
@@ -604,16 +621,16 @@ export default {
 
 <style>
 #backlog-header {
-  background-color: #A66;
+  background-color: #999;
 }
 
 #backlog-header:hover {
   cursor: pointer;
-  background-color: #A55;
+  background-color: #888;
 }
 
 #backlog-header.active-backlog:not(:hover) {
-  background-color: #A44;
+  background-color: #777;
 }
 
 #backlog-header .icon.dropdown {
