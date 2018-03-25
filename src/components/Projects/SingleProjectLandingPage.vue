@@ -26,7 +26,9 @@
     <div v-if="project.name === undefined">
       Loading project data. Please wait.
     </div>
-    <div v-else>
+    <div
+      v-else
+      id="tab-container">
       <general-tab
         v-show="view === 'general'"
         :project="project"/>
@@ -91,3 +93,9 @@ export default {
   }
 }
 </script>
+
+<style>
+#project-page #tab-container {
+  padding-bottom: 1rem;
+}
+</style>
