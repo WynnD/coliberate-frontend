@@ -249,10 +249,10 @@ export default {
 
           if (button.hasClass('checked')) {
             button.addClass('red inverted')
-            label.text('Remove from feature')
+            label.text('Remove from sprint')
           } else {
             button.removeClass('red inverted')
-            label.text('Add to feature')
+            label.text('Add to sprint')
           }
         })
     },
