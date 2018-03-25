@@ -3,7 +3,7 @@ import Router from 'vue-router'
 
 import Home from '@/components/Home'
 import ProjectListPage from '@/components/Projects/ProjectList'
-import SingleProjectPage from '@/components/Projects/SingleProjectPage'
+import SingleProjectLandingPage from '@/components/Projects/SingleProjectLandingPage'
 import LoginPage from '@/components/Members/Login'
 import RegisterPage from '@/components/Members/Register'
 import MemberListPage from '@/components/Members/MemberList'
@@ -29,7 +29,7 @@ export default new Router({
     },
     {
       path: '/projects/:id',
-      component: SingleProjectPage
+      component: SingleProjectLandingPage
     },
     {
       path: '/members',

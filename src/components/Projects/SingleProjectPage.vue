@@ -17,9 +17,16 @@
     </div>
     <div class="ui three stackable raised cards">
       <overview-card :project="project"/>
-      <sprint-card :project="project"/>
-      <team-card :project="project"/>
-      <!-- TODO: Cards for stories, tasks, sprints -->
+      <sprint-card
+        v-if="project.sprints"
+        :project="project"/>
+      <team-card
+        v-if="project.members"
+        :project="project"/>
+      <feature-card
+        v-if="project.features"
+        :project="project"/>
+        <!-- TODO: Cards for stories, tasks, sprints -->
     </div>
   </div>
 </template>
@@ -29,13 +36,15 @@ import { mapGetters } from 'vuex'
 import TeamCard from '@/components/Projects/Cards/TeamCard'
 import OverviewCard from '@/components/Projects/Cards/OverviewCard'
 import SprintCard from '@/components/Projects/Cards/SprintCard'
+import FeatureCard from '@/components/Projects/Cards/FeatureCard'
 
 /* global $ */
 export default {
   components: {
     'overview-card': OverviewCard,
     'team-card': TeamCard,
-    'sprint-card': SprintCard
+    'sprint-card': SprintCard,
+    'feature-card': FeatureCard
   },
   data () {
     return {
@@ -56,7 +65,10 @@ export default {
       return this.project.activities
     },
     startDate () {
-      return new Date(this.project.auditLog[this.project.auditLog.length - 1].date).toDateString()
+      if (this.project.auditLog) {
+        return new Date(this.project.auditLog[this.project.auditLog.length - 1].date).toDateString()
+      }
+      return new Date().toDateString()
     }
   },
   async mounted () {
