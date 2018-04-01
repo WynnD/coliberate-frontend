@@ -37,7 +37,21 @@
       v-if="currentSprint"
       id="overview"
       class="ui segment">
-      <div class="ui header medium">Overview</div>
+      <div class="ui header medium">
+        <span>Overview</span>
+        <div class="ui buttons right floated compact">
+          <button
+            @click.stop="sprintEditHandler(currentSprint.id)"
+            class="ui inverted violet icon button">
+            <i class="icon edit"/>
+          </button>
+          <button
+            @click.stop="sprintRemoveHandler(currentSprint.id)"
+            class="ui inverted red icon button">
+            <i class="icon trash"/>
+          </button>
+        </div>
+      </div>
       <span>Sprint-level statistics go here (story completion, task completion, visual for days remaining, burndown/up chart, etc.)</span>
     </div>
     <div
@@ -273,6 +287,12 @@ export default {
     },
     storyRemoveHandler (storyId) {
       console.debug('Clicked remove for', storyId)
+    },
+    sprintEditHandler (sprintId) {
+      console.debug('Clicked edit for', sprintId)
+    },
+    sprintRemoveHandler (sprintId) {
+      console.debug('Clicked remove for', sprintId)
     }
   }
 }
