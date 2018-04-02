@@ -128,7 +128,7 @@ export default {
     showModal (type = '') {
       console.debug({type}, this.modals[type])
       const isRemoveCommand = type.indexOf('remove') > -1 && type.indexOf('|') > -1
-      if (this.modals[type] && isRemoveCommand) {
+      if (this.modals[type] && !isRemoveCommand) {
         this.modals[type].modal('show')
       } else if (isRemoveCommand) {
         const [modalType, target] = type.split('|')
