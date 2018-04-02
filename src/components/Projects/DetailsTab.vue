@@ -2,7 +2,7 @@
   <div class="ui stackable grid">
     <release-creation-modal
       id="release-creation-modal"
-      :releases="project.releases"/>
+      :project="project"/>
     <feature-creation-modal
       id="feature-creation-modal"
       :stories="project.stories"
