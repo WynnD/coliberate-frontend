@@ -19,6 +19,14 @@
       :stories="project.stories"
       :tasks="project.tasks"
     />
+    <sprint-removal-modal
+      id="sprint-removal-modal"
+      :releases="project.releases"
+      :target-sprint-id="removeTargetId"
+      :sprints="project.sprints"
+      :stories="project.stories"
+      :tasks="project.tasks"
+    />
 
     <div class="column sixteen wide">
       <release-selector
@@ -64,6 +72,7 @@ import FeatureCreationModal from '@/components/Projects/FeatureCreationModal'
 import FeatureListing from '@/components/Projects/FeatureListing'
 import SprintCreationModal from '@/components/Projects/SprintCreationModal'
 import SprintViewer from '@/components/Projects/SprintViewer'
+import SprintRemovalModal from '@/components/Projects/SprintRemovalModal'
 
 /* global $ */
 export default {
@@ -74,7 +83,8 @@ export default {
     'feature-creation-modal': FeatureCreationModal,
     'feature-listing': FeatureListing,
     'sprint-creation-modal': SprintCreationModal,
-    'sprint-viewer': SprintViewer
+    'sprint-viewer': SprintViewer,
+    'sprint-removal-modal': SprintRemovalModal
   },
   props: {
     project: {
@@ -85,6 +95,7 @@ export default {
   data () {
     return {
       currentReleaseId: 'nothing',
+      removeTargetId: 'nothing',
       modals: {}
     }
   },
@@ -95,6 +106,10 @@ export default {
   },
   mounted () {
     this.modals['sprint-create'] = $(this.$el).find('#sprint-creation-modal')
+      .modal('setting', 'closable', false)
+      .modal('hide')
+
+    this.modals['sprint-remove'] = $(this.$el).find('#sprint-removal-modal')
       .modal('setting', 'closable', false)
       .modal('hide')
 
@@ -110,10 +125,17 @@ export default {
     handleReleaseChange (releaseId) {
       this.currentReleaseId = releaseId
     },
-    showModal (type) {
+    showModal (type = '') {
       console.debug({type}, this.modals[type])
-      if (this.modals[type]) {
+      const isRemoveCommand = type.indexOf('remove') > -1 && type.indexOf('|') > -1
+      if (this.modals[type] && isRemoveCommand) {
         this.modals[type].modal('show')
+      } else if (isRemoveCommand) {
+        const [modalType, target] = type.split('|')
+        this.removeTargetId = target
+        if (this.modals[modalType]) {
+          this.modals[modalType].modal('show')
+        }
       }
     }
   }

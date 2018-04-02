@@ -293,6 +293,7 @@ export default {
     },
     sprintRemoveHandler (sprintId) {
       console.debug('Clicked remove for', sprintId)
+      this.$emit('showmodal', `sprint-remove|${sprintId}`)
     }
   }
 }
