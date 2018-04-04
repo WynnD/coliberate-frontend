@@ -29,6 +29,10 @@
               v-model="release.endDate"
               type="date">
           </div>
+          <div class="ui error message">
+            <div class="header">Error</div>
+            <p>An error has occurred</p>
+          </div>
         </div>
         <!-- add sprints and features here -->
       </div>
@@ -37,7 +41,7 @@
       <button
         type="submit"
         class="ui green button"
-        @click="registerHandler">
+        @click="registerClickHandler">
         Add
       </button>
       <div class="ui cancel red button">Cancel</div>
@@ -46,6 +50,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 /* global $ */
 export default {
   props: {
@@ -57,14 +63,14 @@ export default {
   data () {
     return {
       release: {
-        id: '',
         name: '',
         description: '',
         startDate: '',
         endDate: '',
         features: [], // array of feature IDs
         sprints: [] // array of sprint IDs
-      }
+      },
+      $form: null
     }
   },
   computed: {
@@ -77,12 +83,23 @@ export default {
       // set to two sprint lengths after current start date
       const date = new Date(new Date(this.defaultStartDate).valueOf() + this.project.defaultSprintLength * 2 * oneDay)
       return this.getFormattedDate(date)
-    }
+    },
+    defaultRelease () {
+      return {
+        name: '',
+        description: '',
+        startDate: this.defaultStartDate,
+        endDate: this.defaultEndDate,
+        features: [], // array of feature IDs
+        sprints: [] // array of sprint IDs
+      }
+    },
+    ...mapGetters(['currentUser', 'isDevelopmentMode'])
   },
   mounted () {
-    // TODO: better way to generate id
-    this.release.startDate = this.defaultStartDate
-    this.release.endDate = this.defaultEndDate
+    this.resetReleaseData()
+
+    this.$form = $(this.$el)
   },
   methods: {
     getFormattedDate (date) {
@@ -94,9 +111,10 @@ export default {
 
       return `${year}-${month}-${day}`
     },
-    async registerHandler () {
-      const data = {
-        name: this.release.id.trim(),
+    async registerClickHandler () {
+      const releaseData = {
+        id: Math.ceil(Math.random() * 1000).toString().padStart(4, '0'),
+        name: this.release.name.trim(),
         description: this.release.description.trim(),
         startDate: this.release.startDate,
         endDate: this.release.endDate,
@@ -104,19 +122,21 @@ export default {
         sprints: this.release.sprints
       }
 
+      releaseData.name = releaseData.name || `release-${releaseData.id}`
+
       // eslint-disable-next-line
-      console.debug("Sending register info:", data)
+      console.debug("Sending register info:", releaseData)
 
       try {
-        const result = await this.register(data)
-
-        if (result.status !== 200) {
-          // eslint-disable-next-line
-          console.debug("Register failed!", result);
-          this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
-        } else {
+        const result = await this.register(releaseData)
+        console.debug(result)
+        if (result === 'OK') {
+          this.resetReleaseData()
           this.$form.modal('hide')
-          this.$router.push({ path: `/releases/${projectData.id}` })
+          this.$emit('update')
+        } else {
+          console.debug('Register failed!', result)
+          this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
         }
       } catch (err) {
         // eslint-disable-next-line
@@ -128,31 +148,35 @@ export default {
     },
 
     async register (data = {}) {
-      const textFields = ['name', 'description', 'startDate', 'endDate']
-      let errorMessage
-      console.debug('checking release data', { data })
-      textFields.forEach(f => {
-        if (!errorMessage && (!data[f] || data[f].toString().trim().length === 0)) {
-          errorMessage = { responseJSON: { error: `${f} field is empty` } }
-        }
-      })
-
-      if (errorMessage) {
-        return errorMessage
-      }
-
       this.$form.addClass('loading')
       const response = await this.sendRegisterData(data)
       // eslint-disable-next-line
-      console.debug('register', { data })
-      return data
+      console.debug('register', { response })
+      return response
     },
-    sendRegisterData (data) {
+    sendRegisterData (releaseData) {
+      const apiUrl = `api/projects/${this.project.id}/releases`
+      const payload = {
+        releaseData,
+        memberID: this.currentUser.id,
+        projectID: this.project.id
+      }
+      // console.debug({ payload, apiUrl })
       return new Promise((resolve, reject) => {
-        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.post(`${url}/api/releases`, { data })
+        const url = this.isDevelopmentMode ? 'http://localhost' : ''
+        $.post(`${url}/${apiUrl}`, payload)
           .done(resolve).fail(reject)
       })
+    },
+    notifyError (message = 'An error occurred while trying to register') {
+      this.$form.find('.ui.message p').text(message)
+      this.$form.addClass('error')
+    },
+    resetReleaseData () {
+      Object.keys(this.defaultRelease)
+        .forEach(field => {
+          this.release[field] = this.defaultRelease[field]
+        })
     }
   }
 }

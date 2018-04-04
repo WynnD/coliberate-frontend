@@ -75,6 +75,11 @@ export default {
     releases: {
       required: true,
       type: Object
+    },
+    initialRelease: {
+      required: false,
+      type: String,
+      default: ''
     }
   },
   data () {
@@ -115,6 +120,12 @@ export default {
   watch: {
     currentReleaseId (newValue) {
       this.$emit('changerelease', newValue)
+    },
+    initialRelease (newValue) {
+      console.debug({newValue})
+      this.currentReleaseId = newValue
+      $(this.$el).find('.ui.dropdown')
+        .dropdown('set exactly', newValue)
     }
   },
   mounted () {

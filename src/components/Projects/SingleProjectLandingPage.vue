@@ -33,6 +33,7 @@
         v-show="view === 'general'"
         :project="project"/>
       <details-tab
+        @update="getProjectData"
         v-show="view === 'details'"
         :project="project"/>
     </div>
@@ -70,22 +71,22 @@ export default {
     }
 
     try {
-      this.project = await this.getProjectData(this.currentUser().id)
+      await this.getProjectData()
     } catch (err) {
       console.error(err)
     }
     console.debug(this.project)
   },
   methods: {
-    getProjectData (id) {
+    getProjectData () {
+      const id = this.currentUser().id
       return new Promise((resolve, reject) => {
         const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
         $.get(`${url}/api/projects/${this.projectId}?member_id=${id}`)
           .done(response => {
-            const list = response
-
-            console.debug('got project response', response, list)
-            resolve(list[0])
+            console.debug('got project response', response)
+            this.project = response[0]
+            resolve(this.project)
           }).fail(reject)
       })
     },
