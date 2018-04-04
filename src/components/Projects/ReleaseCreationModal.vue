@@ -46,7 +46,7 @@
 </template>
 
 <script>
-
+/* global $ */
 export default {
   props: {
     project: {
@@ -126,7 +126,7 @@ export default {
       }
       this.$form.removeClass('loading')
     },
-    
+
     async register (data = {}) {
       const textFields = ['name', 'description', 'startDate', 'endDate']
       let errorMessage
@@ -153,7 +153,7 @@ export default {
         $.post(`${url}/api/releases`, { data })
           .done(resolve).fail(reject)
       })
-    },
+    }
   }
 }
 
