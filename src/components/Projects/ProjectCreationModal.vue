@@ -43,14 +43,15 @@
           <ul>
             <li
               v-for="member in project.members"
-              :key="member.memberID">
-              <b v-if="member.memberID === currentUser.id || +member.memberID === currentUser.id">
+              :key="member.id">
+              <b v-if="member.id === currentUser.id || +member.id === currentUser.id">
                 {{ currentUser.name }}
               </b>
-              <b v-else-if="memberById(member.memberID)">
-                {{ memberById(member.memberID).name }}
+              <b v-else-if="memberById(member.id)">
+                {{ memberById(member.id).name }}
               </b>
-              <b v-else> {{ member.memberID }}</b> - {{ member.role }}
+              <b v-else>{{ member.id }}</b>
+              - {{ member.role }}
             </li>
           </ul>
         </div>
@@ -62,16 +63,25 @@
               <div class="ui fluid labeled input">
                 <div class="ui label">Predicted Start Date</div>
                 <input
-                  v-model="project.startdate"
+                  v-model="project.startDate"
                   type="date"
                   placeholder="Start Date">
               </div>
             </div>
             <div class="eight wide column">
               <div class="ui fluid labeled input">
+                <div class="ui label">Predicted End Date</div>
+                <input
+                  v-model="project.endDate"
+                  type="date"
+                  placeholder="End Date">
+              </div>
+            </div>
+            <div class="eight wide column">
+              <div class="ui fluid labeled input">
                 <div class="ui label">Sprint Length (days)</div>
                 <input
-                  v-model="project.sprintLength"
+                  v-model="project.defaultSprintLength"
                   type="number">
               </div>
             </div>
@@ -109,44 +119,39 @@ export default {
         id: 0,
         name: '',
         description: '',
-        activities: [],
-        stories: [],
-        members: [],
-        startdate: '1970-12-31',
-        sprintLength: 14
+        features: {},
+        stories: {},
+        members: {},
+        tasks: {},
+        startDate: '1970-12-31',
+        endDate: '1970-12-31',
+        defaultSprintLength: 14
       },
       $form: null
     }
   },
   computed: {
-    currentDate () {
+    defaultStartDate () {
       const date = new Date()
-      let [year, month, day] = [
-        date.getFullYear(),
-        date.getMonth() + 1,
-        date.getDate()
-      ]
-
-      if (month < 10) {
-        month = `0${month}`
-      }
-
-      if (day < 10) {
-        day = `0${day}`
-      }
-
-      return `${year}-${month}-${day}`
+      return this.getFormattedDate(date)
+    },
+    defaultEndDate () {
+      const oneDay = 24 * 60 * 60 * 1000
+      // set to two sprint lengths after current start date
+      const date = new Date(new Date(this.defaultStartDate).valueOf() + this.project.defaultSprintLength * 2 * oneDay)
+      return this.getFormattedDate(date)
     },
     ...mapGetters(['newProjectId', 'currentUser'])
   },
 
   mounted () {
     this.project.id = this.newProjectId
-    this.project.startDate = this.currentDate
-    this.project.members.push({
-      memberID: this.currentUser.id,
+    this.project.startDate = this.defaultStartDate
+    this.project.endDate = this.defaultEndDate
+    this.project.members[this.currentUser.id] = {
+      id: this.currentUser.id,
       role: 'Scrum Master'
-    })
+    }
 
     this.getMembers()
 
@@ -165,11 +170,18 @@ export default {
   },
 
   methods: {
+    getFormattedDate (date) {
+      let [year, month, day] = [
+        date.getFullYear(),
+        (date.getMonth() + 1).toString().padStart(2, '0'),
+        (date.getDate()).toString().padStart(2, '0')
+      ]
+      return `${year}-${month}-${day}`
+    },
     showData () {
       // eslint-disable-next-line
       console.debug(this);
     },
-
     getMembers () {
       return new Promise((resolve, reject) => {
         const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
@@ -189,25 +201,23 @@ export default {
           }).fail(reject)
       })
     },
-
     async registerHandler () {
       const projectData = {
         name: this.project.name.trim(),
         id: this.project.id,
         description: this.project.description.trim(),
         members: this.project.members,
-        startdate: this.project.startdate,
-        sprintLength: this.project.sprintLength
+        startDate: this.project.startDate,
+        defaultSprintLength: this.project.defaultSprintLength
       }
       // eslint-disable-next-line
       console.debug("Sending register info:", projectData)
 
       try {
         const result = await this.register(projectData)
+        console.debug(result)
 
-        if (result.status !== 200) {
-          // eslint-disable-next-line
-          console.debug("Register failed!", result);
+        if (result !== 'OK') {
           this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
         } else {
           this.$form.modal('hide')
@@ -223,15 +233,20 @@ export default {
     },
 
     sendRegisterData (projectData) {
+      const apiUrl = 'api/projects'
+      const payload = {
+        projectData,
+        member_id: this.currentUser.id
+      }
       return new Promise((resolve, reject) => {
         const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.post(`${url}/api/projects`, { projectData })
+        $.post(`${url}/${apiUrl}`, payload)
           .done(resolve).fail(reject)
       })
     },
 
     async register (projectData = {}) {
-      const textFields = ['name', 'id', 'description', 'startdate']
+      const textFields = ['name', 'id', 'description', 'startDate']
       let errorMessage
       console.debug('checking project data', { projectData })
       textFields.forEach(f => {
@@ -245,10 +260,10 @@ export default {
       }
 
       this.$form.addClass('loading')
-      const data = await this.sendRegisterData(projectData)
+      const response = await this.sendRegisterData(projectData)
       // eslint-disable-next-line
-      console.debug('register', { data })
-      return data
+      console.debug('register', { response })
+      return response
     },
 
     notifyError (message = 'An error occurred while trying to register') {

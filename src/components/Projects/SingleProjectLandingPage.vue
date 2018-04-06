@@ -85,7 +85,7 @@ export default {
         $.get(`${url}/api/projects/${this.projectId}?member_id=${id}`)
           .done(response => {
             console.debug('got project response', response)
-            this.project = response[0]
+            this.project = response
             resolve(this.project)
           }).fail(reject)
       })
