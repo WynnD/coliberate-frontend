@@ -82,10 +82,7 @@ export default {
         const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
         $.get(`${url}/api/projects/${this.projectId}?member_id=${id}`)
           .done(response => {
-            const list = response
-
-            console.debug('got project response', response, list)
-            resolve(list[0])
+            resolve(response)
           }).fail(reject)
       })
     },
