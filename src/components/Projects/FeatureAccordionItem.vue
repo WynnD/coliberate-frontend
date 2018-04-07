@@ -7,7 +7,9 @@
     <section slot="title">
       <i class="dropdown icon"/>
       <span>{{ feature.name }}</span>
-      <div class="ui buttons right floated compact">
+      <div
+        v-if="showButtons"
+        class="ui buttons right floated compact">
         <button
           @click.stop="featureEditHandler"
           class="ui inverted violet icon button">
@@ -29,7 +31,9 @@
         class="ui segment">
         <div class="header">
           <span class="ui header medium">Tasks and Stories</span>
-          <a class="ui right floated compact icon button">
+          <a
+            v-if="showButtons"
+            class="ui right floated compact icon button">
             <i class="plus icon"/>
           </a>
         </div>
@@ -39,41 +43,9 @@
             :showing-boolean="activeSubAccordion === `${feature.id}-extra-tasks`"
             :assigned-task-list="feature.tasks"
             :all-tasks="tasks"
+            :show-buttons="showButtons"
             @toggle-accordion-state="toggleAccordionSubState"
           />
-          <!-- <accordion-item
-            @toggle-accordion-state="toggleAccordionSubState"
-            :name="`${feature.id}-extra-tasks`"
-            :showing-boolean="activeSubAccordion === `${feature.id}-extra-tasks`">
-            <section slot="title">
-              <i class="dropdown icon"/>
-              <span>Extra Tasks</span>
-            </section>
-            <section slot="content">
-              <div class="ui fluid container grid">
-                <div class="row">
-                  <div class="sixteen wide column">
-                    <span class="ui small header">
-                      Tasks ({{ numUnfinishedTasks }}/{{ featureTasks.length }} Remaining)
-                    </span>
-                    <a class="ui right floated compact icon button">
-                      <i class="plus icon"/>
-                    </a>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="sixteen wide column">
-                    <div class="ui three stackable cards">
-                      <task-card
-                        v-for="task in featureTasks"
-                        :key="task.id"
-                        :task="task"/>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </accordion-item> -->
           <story-accordion-item
             v-for="story in featureStories"
             :key="story.id"
@@ -81,6 +53,7 @@
             :name="`${feature.id}-list-${story.id}`"
             :story="story"
             :tasks="tasks"
+            :show-buttons="showButtons"
             :showing-boolean="activeSubAccordion === `${feature.id}-list-${story.id}`"
           />
         </div>
@@ -116,6 +89,11 @@ export default {
     tasks: {
       required: true,
       type: Object
+    },
+    showButtons: {
+      required: false,
+      type: Boolean,
+      default: true
     }
   },
   data () {
