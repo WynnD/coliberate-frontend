@@ -71,6 +71,7 @@ export default {
 
     try {
       this.project = await this.getProjectData(this.currentUser().id)
+      await this.getMembers()
     } catch (err) {
       console.error(err)
     }
@@ -82,10 +83,25 @@ export default {
         const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
         $.get(`${url}/api/projects/${this.projectId}?member_id=${id}`)
           .done(response => {
-            const list = response
+            resolve(response)
+          }).fail(reject)
+      })
+    },
+    getMembers () {
+      return new Promise((resolve, reject) => {
+        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
+        $.get(`${url}/api/members`)
+          .done(response => {
+            const members = response.data
 
-            console.debug('got project response', response, list)
-            resolve(list[0])
+            const memberObject = {}
+            members.forEach(m => {
+              memberObject[m.id.toString()] = m
+            })
+            console.debug('Got member data', memberObject)
+
+            this.$store.commit('updateMemberData', memberObject)
+            resolve()
           }).fail(reject)
       })
     },
