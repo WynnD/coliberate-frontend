@@ -18,7 +18,7 @@
           <tr
             v-for="(value,key) in members"
             :key="key">
-            <td>{{ key }}</td>
+            <td>{{ value.name }}</td>
             <td>{{ value.role }}</td>
           </tr>
         </tbody>
@@ -28,6 +28,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   props: {
     project: {
@@ -35,17 +37,19 @@ export default {
       required: true
     }
   },
-  data () {
-    return {
-      members: {
-        'Big Jeffrey': {
-          role: 'Scrum Master'
-        },
-        'Little Wendy': {
-          role: 'Scrum Master 2.0'
+  computed: {
+    members () {
+      return Object.values(this.project.members).map(entry => {
+        const member = this.memberById()(entry.id)
+        return {
+          name: member ? member.name : entry.id,
+          ...entry
         }
-      }
+      })
     }
+  },
+  methods: {
+    ...mapGetters(['memberById'])
   }
 }
 
