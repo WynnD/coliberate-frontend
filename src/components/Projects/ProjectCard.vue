@@ -15,7 +15,10 @@
         </div>
       </div>
     </div>
-    <activity-list :activities="activities"/>
+    <div class="content">
+      <span class="ui sub header">Recent Activity</span>
+      <activity-list :activities="activities"/>
+    </div>
     <div class="extra content">
       <router-link
         :to="routerLink"

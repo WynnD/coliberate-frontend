@@ -1,31 +1,22 @@
 <template>
-  <div class="ui card">
+  <div class="ui activity-card card">
+    <div
+      class="content"
+      id="header-container">
+      <span class="header">Recent Activity</span>
+    </div>
     <div class="content">
-      <div class="header">Recent Activity</div>
-      <div
-        v-if="project.auditLog.length > 0"
-        class="ui small feed">
-        <activity-item
-          v-for="(activity, index) in project.auditLog"
-          :key="index"
-          :activity-data="activity.description"
-        />
-      </div>
-      <div
-        v-else
-        class="ui small feed">
-        <activity-item :activity-data="'No activity for this project'"/>
-      </div>
+      <activity-list :activities="project.auditLog"/>
     </div>
   </div>
 </template>
 
 <script>
-import ActivityItem from '@/components/Projects/ActivityItem'
+import ActivityList from '@/components/Projects/ActivityList'
 
 export default {
   components: {
-    'activity-item': ActivityItem
+    'activity-list': ActivityList
   },
   props: {
     project: {
@@ -35,3 +26,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.ui.card .content#header-container {
+  max-height: 3.5rem;
+}
+</style>
