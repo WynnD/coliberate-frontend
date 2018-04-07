@@ -1,6 +1,10 @@
 <template>
-  <div class="ui card">
-    <div class="content">
+  <div
+    id="team-card"
+    class="ui card">
+    <div
+      id="header-container"
+      class="content">
       <span class="header">Team</span>
     </div>
 
