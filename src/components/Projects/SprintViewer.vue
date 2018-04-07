@@ -107,74 +107,15 @@
             </div>
           </section>
         </accordion-item>
-        <accordion-item
+        <story-accordion-item
           v-for="story in sprintStories"
           :key="story.id"
           @toggle-accordion-state="toggleAccordionState"
           :name="`sprint-${story.id}`"
-          :showing-boolean="activeAccordion === `sprint-${story.id}`">
-          <section slot="title">
-            <i class="dropdown icon"/>
-            <span>{{ story.name }}</span>
-            <div
-              :class="{
-                'ui left pointing label story-status': true,
-                yellow: story.status === 'in-progress',
-                green: story.status === 'done',
-                red: story.status === 'todo'
-              }"
-            >
-              {{ story.status.toUpperCase() }}
-            </div>
-            <div class="ui buttons right floated compact">
-              <button
-                @click.stop="storyEditHandler(story.id)"
-                class="ui inverted violet icon button">
-                <i class="icon edit"/>
-              </button>
-              <button
-                @click.stop="storyRemoveHandler(story.id)"
-                class="ui inverted red icon button">
-                <i class="icon trash"/>
-              </button>
-            </div>
-          </section>
-
-          <section slot="content">
-            <div class="ui fluid container grid">
-              <div class="row">
-                <div class="eight wide column">
-                  {{ story.description }}
-                </div>
-                <div class="eight wide column">
-                  {{ story.name }} stats here
-                </div>
-              </div>
-              <div class="row">
-                <div class="sixteen wide column">
-                  <hr>
-                  <span class="ui small header">Tasks ({{ story.tasks.length }})</span>
-                  <a class="ui right floated compact icon button">
-                    <i class="plus icon"/>
-                  </a>
-                </div>
-              </div>
-              <div class="row">
-                <div class="sixteen wide column">
-                  <span v-if="story.tasks.length === 0">No tasks found</span>
-                  <div
-                    v-else
-                    class="ui three stackable cards">
-                    <task-card
-                      v-for="taskId in story.tasks"
-                      :key="taskId"
-                      :task="tasks[taskId]"/>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        </accordion-item>
+          :showing-boolean="activeAccordion === `sprint-${story.id}`"
+          :story="story"
+          :tasks="tasks"
+        />
       </div>
     </div>
   </div>
@@ -182,12 +123,14 @@
 
 <script>
 import SingleTaskCard from '@/components/Projects/Cards/SingleTaskCard'
+import StoryAccordionItem from '@/components/Projects/StoryAccordionItem'
 import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
 
 /* global $ */
 export default {
   components: {
     'task-card': SingleTaskCard,
+    'story-accordion-item': StoryAccordionItem,
     'accordion-item': SegmentAccordionItem
   },
   props: {
