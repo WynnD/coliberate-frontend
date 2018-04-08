@@ -38,7 +38,21 @@
     <div
       v-if="currentRelease"
       class="ui segment">
-      <div class="ui header medium">Overview</div>
+      <div class="ui header medium">
+        <span>Overview</span>
+        <div class="ui buttons right floated compact">
+          <button
+            @click.stop="releaseEditHandler(currentRelease.id)"
+            class="ui inverted violet icon button">
+            <i class="icon edit"/>
+          </button>
+          <button
+            @click.stop="releaseRemoveHandler(currentRelease.id)"
+            class="ui inverted red icon button">
+            <i class="icon trash"/>
+          </button>
+        </div>
+      </div>
       <div class="ui two column grid">
         <div class="column">
           <div>{{ currentRelease.description }}</div>
@@ -61,6 +75,11 @@ export default {
     releases: {
       required: true,
       type: Object
+    },
+    initialRelease: {
+      required: false,
+      type: String,
+      default: ''
     }
   },
   data () {
@@ -101,10 +120,24 @@ export default {
   watch: {
     currentReleaseId (newValue) {
       this.$emit('changerelease', newValue)
+    },
+    initialRelease (newValue) {
+      console.debug({newValue})
+      this.currentReleaseId = newValue
+      $(this.$el).find('.ui.dropdown')
+        .dropdown('set exactly', newValue)
     }
   },
   mounted () {
     $(this.$el).find('.ui.dropdown').dropdown()
+  },
+  methods: {
+    releaseEditHandler (releaseId) {
+      console.debug('Clicked edit for', releaseId)
+    },
+    releaseRemoveHandler (releaseId) {
+      console.debug('Clicked remove for', releaseId)
+    }
   }
 }
 </script>

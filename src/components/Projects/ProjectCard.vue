@@ -1,13 +1,18 @@
 <template>
-  <div class="ui card">
+  <div class="ui project card">
     <div class="content">
-      <div class="header">{{ name }}</div>
+      <div class="header">
+        <p>{{ name }}</p>
+      </div>
     </div>
     <div class="content">
       <h4 class="ui sub header"><b>About</b></h4>
       <div class="ui small feed">
         <div class="event">
           <div class="content">
+            <div class="meta">
+              Created {{ startDate }}
+            </div>
             <div class="summary">
               {{ description }}
             </div>
@@ -17,12 +22,12 @@
     </div>
     <div class="content">
       <span class="ui sub header">Recent Activity</span>
-      <activity-list :activities="activities"/>
+      <activity-list :activities="project.auditLog"/>
     </div>
     <div class="extra content">
       <router-link
         :to="routerLink"
-        class="ui button">Open Project</router-link>
+        class="ui fluid button">Open Project</router-link>
     </div>
   </div>
 </template>
@@ -44,9 +49,6 @@ export default {
     routerLink () {
       return `/projects/${this.project.id}`
     },
-    activitiesList () {
-      return this.project.activities
-    },
     name () {
       return this.project.name
     },
@@ -55,7 +57,31 @@ export default {
     },
     activities () {
       return this.project.activities
+    },
+    startDate () {
+      if (this.project.auditLog) {
+        return new Date(this.project.auditLog[this.project.auditLog.length - 1].date).toDateString()
+      }
+      return new Date().toDateString()
     }
   }
 }
 </script>
+
+<style>
+.ui.project.card .content .content.activity-list>.ui.small.feed .activity-item .content .summary {
+  color: gray;
+}
+
+.ui.project.card .content>.ui.small.feed {
+  margin-top: 0;
+}
+
+.ui.project.card .content>.ui.small.feed>.event>.content>.summary {
+  font-weight: inherit;
+}
+
+.ui.project.card>.content {
+  border-top: 1px solid rgba(34,36,38, 0.25);
+}
+</style>
