@@ -113,7 +113,6 @@ export default {
     },
     async registerClickHandler () {
       const releaseData = {
-        // id: Math.ceil(Math.random() * 10000).toString().padStart(4, '0'),
         id: this.generateUniqueId()(this.project.releases, 'release-', 4),
         name: this.release.name.trim(),
         description: this.release.description.trim(),
