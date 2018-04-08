@@ -17,12 +17,11 @@
             </div>
 
             <div class="sixteen wide column">
-              <div class="ui fluid labeled input">
-                <div class="ui label">Description</div>
-                <input
+              <div class="ui label">Description</div>
+              <div class="ui fluid input">
+                <textarea
                   v-model="project.description"
-                  type="text"
-                  placeholder="Project Description">
+                  placeholder="Project Description"/>
               </div>
             </div>
           </div>
@@ -134,14 +133,7 @@ export default {
   },
 
   mounted () {
-    this.project.startDate = this.defaultStartDate
-    this.project.endDate = this.defaultEndDate
-    this.project.members[this.currentUser.id] = {
-      id: this.currentUser.id,
-      role: 'Scrum Master'
-    }
-
-    this.getMembers()
+    this.resetProjectData()
 
     this.$form = $(this.$el)
     this.$form.submit((e) => {
@@ -168,29 +160,6 @@ export default {
         (date.getDate()).toString().padStart(2, '0')
       ]
       return `${year}-${month}-${day}`
-    },
-    showData () {
-      // eslint-disable-next-line
-      console.debug(this);
-    },
-    getMembers () {
-      return new Promise((resolve, reject) => {
-        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.get(`${url}/api/members`)
-          .done(response => {
-            const userID = this.$store.state.accountData.id
-            const members = response.data.filter(m => m.id !== userID)
-
-            const memberObject = {}
-            members.forEach(m => {
-              memberObject[m.id.toString()] = m
-            })
-            console.debug('Got member data', memberObject)
-
-            this.$store.commit('updateMemberData', memberObject)
-            resolve()
-          }).fail(reject)
-      })
     },
     async registerHandler () {
       const projectData = {
@@ -222,6 +191,7 @@ export default {
           } catch (err) {
             console.error('Error getting project data', err)
           }
+          this.resetProjectData()
 
           // disabled, as server assigning project ID can make this lead to erroneous page
           // this.$router.push({ path: `/projects/${projectData.id}` })
@@ -285,6 +255,27 @@ export default {
     notifyError (message = 'An error occurred while trying to register') {
       this.$form.find('.ui.message p').text(message)
       this.$form.addClass('error')
+    },
+    resetProjectData () {
+      const defaults = {
+        name: '',
+        description: '',
+        defaultSprintLength: 14,
+        startDate: '1970-12-31',
+        endDate: '1970-12-31',
+        members: {}
+      }
+      Object.keys(defaults)
+        .forEach(field => {
+          this.project[field] = defaults[field]
+        })
+
+      this.project.startDate = this.defaultStartDate
+      this.project.endDate = this.defaultEndDate
+      this.project.members[this.currentUser.id] = {
+        id: this.currentUser.id,
+        role: 'Scrum Master'
+      }
     },
     ...mapMutations(['addProject']),
     ...mapGetters(['memberById'])
