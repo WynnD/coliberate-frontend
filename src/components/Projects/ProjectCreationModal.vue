@@ -151,7 +151,7 @@ export default {
 
     // add support for submitting by pressing enter
     // should we have this? It seems like this could be easy to accidentally press
-    /* 
+    /*
     this.$form.on('keypress', e => {
       if (e.key === 'Enter') {
         this.registerHandler()
@@ -194,6 +194,8 @@ export default {
     },
     async registerHandler () {
       const projectData = {
+        // could be overwritten in backend, don't worry about it too much
+        id: Math.floor(Math.random() * 10000).toString().padStart(4, '0'),
         name: this.project.name.trim(),
         description: this.project.description.trim(),
         members: this.project.members,
@@ -211,7 +213,7 @@ export default {
         if (result !== 'OK') {
           this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
         } else {
-          this.$form.modal('hide');
+          this.$form.modal('hide')
 
           try {
             const memberID = this.$store.state.accountData.id
@@ -221,7 +223,8 @@ export default {
             console.error('Error getting project data', err)
           }
 
-          this.$router.push({ path: `/projects/${projectData.id}` })
+          // disabled, as server assigning project ID can make this lead to erroneous page
+          // this.$router.push({ path: `/projects/${projectData.id}` })
         }
       } catch (err) {
         // eslint-disable-next-line
