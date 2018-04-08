@@ -11,7 +11,7 @@
           v-for="sprintId in release.sprints"
           :key="sprintId"
           :value="sprintId">
-          {{ sprintId }}
+          {{ sprints[sprintId].name || sprintId }}
         </option>
       </select>
       <span
