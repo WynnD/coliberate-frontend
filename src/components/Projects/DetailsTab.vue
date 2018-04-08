@@ -1,8 +1,9 @@
 <template>
   <div class="ui stackable grid">
     <release-creation-modal
+      @update="handleNewRelease"
       id="release-creation-modal"
-      :releases="project.releases"/>
+      :project="project"/>
     <feature-creation-modal
       id="feature-creation-modal"
       :stories="project.stories"
@@ -32,6 +33,7 @@
       <release-selector
         @showmodal="showModal"
         :releases="project.releases"
+        :initial-release="currentReleaseId"
         @changerelease="handleReleaseChange"/>
     </div>
     <div
@@ -125,7 +127,12 @@ export default {
     handleReleaseChange (releaseId) {
       this.currentReleaseId = releaseId
     },
-    showModal (type = '') {
+    handleNewRelease () {
+      this.currentReleaseId = ''
+      this.$emit('update')
+      console.debug('handled new release')
+    },
+    showModal (type) {
       console.debug({type}, this.modals[type])
       const isRemoveCommand = type.indexOf('remove') > -1 && type.indexOf('|') > -1
       if (this.modals[type] && !isRemoveCommand) {
