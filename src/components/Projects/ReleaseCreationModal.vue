@@ -113,7 +113,7 @@ export default {
     },
     async registerClickHandler () {
       const releaseData = {
-        id: Math.ceil(Math.random() * 1000).toString().padStart(4, '0'),
+        id: this.generateUniqueId()(this.project.releases, 'release-', 4),
         name: this.release.name.trim(),
         description: this.release.description.trim(),
         startDate: this.release.startDate,
@@ -177,7 +177,8 @@ export default {
         .forEach(field => {
           this.release[field] = this.defaultRelease[field]
         })
-    }
+    },
+    ...mapGetters(['generateUniqueId'])
   }
 }
 
