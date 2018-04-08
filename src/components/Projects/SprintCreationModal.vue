@@ -8,21 +8,13 @@
         <div class="ui segment">
           <div class="ui header">General Info</div>
           <div class="ui stackable grid">
-            <div class="eight wide column">
+            <div class="sixteen wide column">
               <div class="ui fluid labeled input">
                 <div class="ui label">Name</div>
                 <input
                   v-model="sprint.name"
                   type="text"
                   placeholder="Sprint Name">
-              </div>
-            </div>
-            <div class="eight wide column">
-              <div class="ui fluid labeled input">
-                <div class="ui label">ID</div>
-                <div class="ui basic button disabled">
-                  {{ sprint.id }}
-                </div>
               </div>
             </div>
             <div class="sixteen wide column">
@@ -214,7 +206,7 @@ export default {
   },
   mounted () {
     // TODO: better way to generate id
-    this.sprint.id = this.generateRandomId()
+    this.sprint.id = this.generateUniqueId()(this.sprints, 'sprint-', 4)
 
     this.sprint.startDate = this.defaultStartDate
     this.sprint.endDate = this.defaultEndDate
@@ -274,18 +266,6 @@ export default {
       setTimeout(() => {
         this.updateButtons()
       }, 50)
-    },
-    generateRandomId () {
-      const createID = (prefix, number) => `${prefix}${number.toString().padStart(4, '0')}`
-      const prefix = 'sprint-'
-      let numberId = Math.floor(Math.random() * 1000)
-      let numIterations = 0
-      while (this.sprints[createID(prefix, numberId)] && numIterations < 1000) {
-        numberId = Math.floor(Math.random() * 1000)
-        numIterations++
-      }
-
-      return createID(prefix, numberId)
     },
     getFormattedDate (date) {
       let [year, month, day] = [
@@ -410,7 +390,7 @@ export default {
       this.$form.addClass('error')
     },
     ...mapMutations(['addProject']),
-    ...mapGetters(['memberById'])
+    ...mapGetters(['generateUniqueId'])
   }
 }
 </script>
