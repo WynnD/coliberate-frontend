@@ -149,6 +149,11 @@ export default {
     tasks: {
       required: true,
       type: Object
+    },
+    initialSprint: {
+      required: false,
+      type: String,
+      default: ''
     }
   },
   data () {
@@ -212,6 +217,12 @@ export default {
     release () {
       this.currentSprintId = ''
       $(this.$el).find('.ui.dropdown').dropdown('restore defaults')
+    },
+    initialSprint (newValue) {
+      console.debug({ newValue })
+      this.currentSprintId = newValue
+      $(this.$el).find('.ui.dropdown')
+        .dropdown('set exactly', newValue)
     }
   },
   mounted () {

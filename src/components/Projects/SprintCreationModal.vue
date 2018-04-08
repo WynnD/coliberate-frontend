@@ -125,7 +125,7 @@
       <button
         type="submit"
         class="ui green button"
-        @click="registerHandler">
+        @click="registerClickHandler">
         Add
       </button>
       <div class="ui cancel red button">Cancel</div>
@@ -165,15 +165,16 @@ export default {
     tasks: {
       required: true,
       type: Object
+    },
+    projectId: {
+      required: true,
+      type: String
     }
   },
   data () {
     return {
       sprint: {
-        id: 0,
         name: '',
-        stories: [],
-        tasks: [],
         associatedRelease: '',
         startDate: '',
         endDate: ''
@@ -197,7 +198,7 @@ export default {
       const date = new Date(new Date().valueOf() + 2 * oneWeek)
       return this.getFormattedDate(date)
     },
-    ...mapGetters(['newProjectId', 'currentUser'])
+    ...mapGetters(['isDevelopmentMode', 'currentUser'])
   },
   watch: {
     initialRelease () {
@@ -205,22 +206,16 @@ export default {
     }
   },
   mounted () {
-    // TODO: better way to generate id
-    this.sprint.id = this.generateUniqueId()(this.sprints, 'sprint-', 4)
-
-    this.sprint.startDate = this.defaultStartDate
-    this.sprint.endDate = this.defaultEndDate
-
     this.$form = $(this.$el)
     this.$form.submit((e) => {
       e.preventDefault()
-      this.registerHandler()
+      this.registerClickHandler()
     })
 
     // add support for submitting by pressing enter
     this.$form.on('keypress', e => {
       if (e.key === 'Enter') {
-        this.registerHandler()
+        this.registerClickHandler()
       }
     })
 
@@ -228,6 +223,7 @@ export default {
 
     this.initCheckboxes()
     this.updateButtons()
+    this.resetSprintData()
   },
   methods: {
     initCheckboxes () {
@@ -325,69 +321,81 @@ export default {
           return `${value} ${value === 1 ? attr : `${attr}s`}`
         }).join(', ')
     },
-    async registerHandler () {
-      console.debug(this.sprint)
-      // const projectData = {
-      //   name: this.project.name.trim(),
-      //   id: this.project.id,
-      //   description: this.project.description.trim(),
-      //   members: this.project.members,
-      //   startdate: this.project.startdate,
-      //   sprintLength: this.project.sprintLength
-      // }
-      // // eslint-disable-next-line
-      // console.debug("Sending register info:", projectData)
+    async registerClickHandler () {
+      const sprintData = {
+        id: this.generateUniqueId()(this.sprints, 'sprint-', 4),
+        name: this.sprint.name.trim(),
+        stories: Object.keys(this.selectedStories).filter(id => this.selectedStories[id]),
+        tasks: Object.keys(this.selectedTasks).filter(id => this.selectedTasks[id]),
+        startDate: this.sprint.startDate,
+        endDate: this.sprint.endDate
+      }
 
-      // try {
-      //   const result = await this.register(projectData)
+      sprintData.name = sprintData.name || sprintData.id
 
-      //   if (result.status !== 200) {
-      //     // eslint-disable-next-line
-      //     console.debug("Register failed!", result);
-      //     this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
-      //   } else {
-      //     this.$form.modal('hide')
-      //     this.$router.push({ path: `/projects/${projectData.id}` })
-      //   }
-      // } catch (err) {
-      //   // eslint-disable-next-line
-      //   console.debug("Register failed!", err);
-      //   const message = `${err.status}: ${err.statusText}`
-      //   this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
-      // }
-      // this.$form.removeClass('loading')
+      try {
+        const result = await this.register(sprintData, this.sprint.associatedRelease)
+        console.debug(result)
+        if (result === 'OK') {
+          this.resetSprintData()
+          this.$form.modal('hide')
+          this.$emit('update')
+        } else {
+          console.debug('Register failed!')
+          this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
+        }
+      } catch (err) {
+        console.debug('Register failed', err)
+        const message = `${err.status}: ${err.statusText}`
+        this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
+      }
+      this.$form.removeClass('loading')
     },
-    sendRegisterData (projectData) {
+    async register (data = {}, associatedRelease) {
+      this.$form.addClass('loading')
+      const response = await this.sendRegisterData(data, associatedRelease)
+      // eslint-disable-next-line
+      console.debug('register', { response })
+      return response
+    },
+    sendRegisterData (sprintData, associatedRelease) {
+      const apiUrl = `api/projects/${this.projectId}/sprints`
+      const payload = {
+        sprintData,
+        associatedRelease,
+        memberID: this.currentUser.id,
+        projectID: this.projectId
+      }
+      console.debug('sending register data', { payload, apiUrl })
       return new Promise((resolve, reject) => {
-        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.post(`${url}/api/projects`, { projectData })
+        const url = this.isDevelopmentMode ? 'http://localhost' : ''
+        $.post(`${url}/${apiUrl}`, payload)
           .done(resolve).fail(reject)
       })
     },
-    async register (projectData = {}) {
-      const textFields = ['name', 'id', 'description', 'startdate']
-      let errorMessage
-      console.debug('checking project data', { projectData })
-      textFields.forEach(f => {
-        if (!errorMessage && (!projectData[f] || projectData[f].toString().trim().length === 0)) {
-          errorMessage = { responseJSON: { error: `${f} field is empty` } }
-        }
-      })
-
-      if (errorMessage) {
-        return errorMessage
-      }
-
-      this.$form.addClass('loading')
-      const data = await this.sendRegisterData(projectData)
-      // eslint-disable-next-line
-      console.debug('register', { data })
-      return data
-    },
-
     notifyError (message = 'An error occurred while trying to register') {
       this.$form.find('.ui.message p').text(message)
       this.$form.addClass('error')
+    },
+    resetSprintData () {
+      const defaults = {
+        name: '',
+        associatedRelease: this.initialRelease,
+        startDate: this.defaultStartDate,
+        endDate: this.defaultEndDate
+      }
+      Object.keys(defaults)
+        .forEach(field => {
+          this.sprint[field] = defaults[field]
+        })
+
+      Object.keys(this.selectedStories)
+        .filter(id => this.selectedStories[id])
+        .forEach(id => { this.toggleStory(id) })
+
+      Object.keys(this.selectedTasks)
+        .filter(id => this.selectedTasks[id])
+        .forEach(id => { this.toggleTask(id) })
     },
     ...mapMutations(['addProject']),
     ...mapGetters(['generateUniqueId'])

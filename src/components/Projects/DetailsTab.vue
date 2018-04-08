@@ -13,12 +13,14 @@
       :initial-release="currentReleaseId"
     />
     <sprint-creation-modal
+      @update="handleNewSprint"
       id="sprint-creation-modal"
       :releases="project.releases"
       :initial-release="currentReleaseId"
       :sprints="project.sprints"
       :stories="project.stories"
       :tasks="project.tasks"
+      :project-id="project.id || ''"
     />
     <sprint-removal-modal
       id="sprint-removal-modal"
@@ -56,6 +58,7 @@
         :sprints="project.sprints"
         :stories="project.stories"
         :tasks="project.tasks"
+        :initial-sprint="currentSprintId"
       />
     </div>
     <div class="column sixteen wide">
@@ -97,6 +100,7 @@ export default {
   data () {
     return {
       currentReleaseId: 'nothing',
+      currentSprintId: 'nothing',
       removeTargetId: 'nothing',
       modals: {}
     }
@@ -131,6 +135,11 @@ export default {
       this.currentReleaseId = ''
       this.$emit('update')
       console.debug('handled new release')
+    },
+    handleNewSprint () {
+      this.currentSprintId = ''
+      this.$emit('update')
+      console.debug('handled new sprint')
     },
     showModal (type) {
       console.debug({type}, this.modals[type])
