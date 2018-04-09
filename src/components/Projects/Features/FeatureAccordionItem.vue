@@ -64,7 +64,7 @@
 
 <script>
 import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
-import ExtraTasksAccordionItem from '@/components/Projects/ExtraTasksAccordionItem'
+import ExtraTasksAccordionItem from '@/components/Projects/Tasks/ExtraTasksAccordionItem'
 import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
 
 export default {

@@ -27,7 +27,7 @@
 
 <script>
 import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
-import FeatureAccordionItem from '@/components/Projects/FeatureAccordionItem'
+import FeatureAccordionItem from '@/components/Projects/Features/FeatureAccordionItem'
 
 export default {
   components: {
