@@ -113,7 +113,7 @@ export default {
     },
     async registerClickHandler () {
       const releaseData = {
-        id: Math.ceil(Math.random() * 1000).toString().padStart(4, '0'),
+        id: this.generateUniqueId()(this.project.releases, 'release-', 4),
         name: this.release.name.trim(),
         description: this.release.description.trim(),
         startDate: this.release.startDate,
@@ -131,9 +131,9 @@ export default {
         const result = await this.register(releaseData)
         console.debug(result)
         if (result === 'OK') {
-          this.resetReleaseData()
           this.$form.modal('hide')
-          this.$emit('update')
+          this.$emit('update', releaseData.id)
+          this.resetReleaseData()
         } else {
           console.debug('Register failed!', result)
           this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
@@ -177,7 +177,8 @@ export default {
         .forEach(field => {
           this.release[field] = this.defaultRelease[field]
         })
-    }
+    },
+    ...mapGetters(['generateUniqueId'])
   }
 }
 

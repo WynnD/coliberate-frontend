@@ -606,6 +606,7 @@ export default {
     },
     sprintRemoveHandler (sprintId) {
       console.debug('Clicked remove for', sprintId)
+      this.$emit('showmodal', `sprint-remove|${sprintId}`)
     },
     getSprintTasks (sprintId) {
       return this.project.sprints[sprintId].tasks

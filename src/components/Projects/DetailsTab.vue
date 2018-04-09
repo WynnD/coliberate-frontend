@@ -13,9 +13,19 @@
       :initial-release="currentReleaseId"
     />
     <sprint-creation-modal
+      @update="handleNewSprint"
       id="sprint-creation-modal"
       :releases="project.releases"
       :initial-release="currentReleaseId"
+      :sprints="project.sprints"
+      :stories="project.stories"
+      :tasks="project.tasks"
+      :project-id="project.id || ''"
+    />
+    <sprint-removal-modal
+      id="sprint-removal-modal"
+      :releases="project.releases"
+      :target-sprint-id="removeTargetId"
       :sprints="project.sprints"
       :stories="project.stories"
       :tasks="project.tasks"
@@ -48,6 +58,7 @@
         :sprints="project.sprints"
         :stories="project.stories"
         :tasks="project.tasks"
+        :initial-sprint="currentSprintId"
       />
     </div>
     <div class="column sixteen wide">
@@ -67,6 +78,8 @@ import FeatureListing from '@/components/Projects/Features/FeatureListing'
 import SprintCreationModal from '@/components/Projects/Sprints/SprintCreationModal'
 import SprintViewer from '@/components/Projects/Sprints/SprintViewer'
 
+import SprintRemovalModal from '@/components/Projects/SprintRemovalModal'
+
 /* global $ */
 export default {
   components: {
@@ -76,7 +89,8 @@ export default {
     'feature-creation-modal': FeatureCreationModal,
     'feature-listing': FeatureListing,
     'sprint-creation-modal': SprintCreationModal,
-    'sprint-viewer': SprintViewer
+    'sprint-viewer': SprintViewer,
+    'sprint-removal-modal': SprintRemovalModal
   },
   props: {
     project: {
@@ -87,6 +101,8 @@ export default {
   data () {
     return {
       currentReleaseId: 'nothing',
+      currentSprintId: 'nothing',
+      removeTargetId: 'nothing',
       modals: {}
     }
   },
@@ -100,6 +116,10 @@ export default {
       .modal('setting', 'closable', false)
       .modal('hide')
 
+    this.modals['sprint-remove'] = $(this.$el).find('#sprint-removal-modal')
+      .modal('setting', 'closable', false)
+      .modal('hide')
+
     this.modals['feature-create'] = $(this.$el).find('#feature-creation-modal')
       .modal('setting', 'closable', false)
       .modal('hide')
@@ -110,17 +130,36 @@ export default {
   },
   methods: {
     handleReleaseChange (releaseId) {
+      console.debug({ releaseId })
       this.currentReleaseId = releaseId
     },
-    handleNewRelease () {
-      this.currentReleaseId = ''
+    handleNewRelease (newRelease) {
+      this.currentReleaseId = newRelease || ''
       this.$emit('update')
       console.debug('handled new release')
     },
+    handleNewSprint (updateData) {
+      const { sprint, release } = updateData
+      console.debug(sprint, release)
+      this.currentSprintId = ''
+      this.currentReleaseId = release || ''
+      setTimeout(() => {
+        this.currentSprintId = sprint || ''
+      }, 50)
+      this.$emit('update')
+      console.debug('handled new sprint')
+    },
     showModal (type) {
       console.debug({type}, this.modals[type])
-      if (this.modals[type]) {
+      const isRemoveCommand = type.indexOf('remove') > -1 && type.indexOf('|') > -1
+      if (this.modals[type] && !isRemoveCommand) {
         this.modals[type].modal('show')
+      } else if (isRemoveCommand) {
+        const [modalType, target] = type.split('|')
+        this.removeTargetId = target
+        if (this.modals[modalType]) {
+          this.modals[modalType].modal('show')
+        }
       }
     }
   }

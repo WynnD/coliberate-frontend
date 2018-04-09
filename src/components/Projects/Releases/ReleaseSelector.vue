@@ -119,13 +119,24 @@ export default {
   },
   watch: {
     currentReleaseId (newValue) {
+      console.debug('currentReleaseID', newValue)
       this.$emit('changerelease', newValue)
     },
     initialRelease (newValue) {
       console.debug({newValue})
-      this.currentReleaseId = newValue
       $(this.$el).find('.ui.dropdown')
         .dropdown('set exactly', newValue)
+      this.currentReleaseId = newValue
+      console.debug('currentReleaseID', this.currentReleaseId)
+    },
+    releases () {
+      const currentReleaseId = this.currentReleaseId
+      console.debug('releases updated', currentReleaseId)
+      $(this.$el).find('.ui.dropdown')
+        .dropdown('set exactly', this.currentReleaseId)
+      setTimeout(() => {
+        this.currentReleaseId = currentReleaseId
+      }, 50)
     }
   },
   mounted () {

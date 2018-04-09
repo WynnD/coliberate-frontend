@@ -175,7 +175,7 @@ export default {
           description: 'Project Created by <b>Big Jeffrey</b>' // probably generated server side based on what's changed
         }
       ],
-      sprintLength: 14
+      defaultSprintLength: 14
     }
   },
   members: {
