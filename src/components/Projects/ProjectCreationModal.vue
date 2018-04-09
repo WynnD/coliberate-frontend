@@ -6,7 +6,7 @@
         <div class="ui segment">
           <div class="ui header">General Info</div>
           <div class="ui stackable grid">
-            <div class="eight wide column">
+            <div class="sixteen wide column">
               <div class="ui fluid labeled input">
                 <div class="ui label">Name</div>
                 <input
@@ -15,14 +15,7 @@
                   placeholder="Project Name">
               </div>
             </div>
-            <div class="eight wide column">
-              <div class="ui fluid labeled input">
-                <div class="ui label">ID</div>
-                <div class="ui basic button disabled">
-                  {{ project.id }}
-                </div>
-              </div>
-            </div>
+
             <div class="sixteen wide column">
               <div class="ui fluid labeled input">
                 <div class="ui label">Description</div>
@@ -61,7 +54,7 @@
           <div class="ui stackable grid">
             <div class="eight wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">Predicted Start Date</div>
+                <div class="ui label">Start Date</div>
                 <input
                   v-model="project.startDate"
                   type="date"
@@ -70,7 +63,7 @@
             </div>
             <div class="eight wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">Predicted End Date</div>
+                <div class="ui label">End Date</div>
                 <input
                   v-model="project.endDate"
                   type="date"
@@ -116,16 +109,12 @@ export default {
   data () {
     return {
       project: {
-        id: 0,
         name: '',
         description: '',
-        features: {},
-        stories: {},
-        members: {},
-        tasks: {},
         startDate: '1970-12-31',
         endDate: '1970-12-31',
-        defaultSprintLength: 14
+        defaultSprintLength: 14,
+        members: {}
       },
       $form: null
     }
@@ -145,7 +134,6 @@ export default {
   },
 
   mounted () {
-    this.project.id = this.newProjectId
     this.project.startDate = this.defaultStartDate
     this.project.endDate = this.defaultEndDate
     this.project.members[this.currentUser.id] = {
@@ -162,11 +150,14 @@ export default {
     })
 
     // add support for submitting by pressing enter
+    // should we have this? It seems like this could be easy to accidentally press
+    /*
     this.$form.on('keypress', e => {
       if (e.key === 'Enter') {
         this.registerHandler()
       }
     })
+    */
   },
 
   methods: {
@@ -203,11 +194,13 @@ export default {
     },
     async registerHandler () {
       const projectData = {
+        // could be overwritten in backend, don't worry about it too much
+        id: Math.floor(Math.random() * 10000).toString().padStart(4, '0'),
         name: this.project.name.trim(),
-        id: this.project.id,
         description: this.project.description.trim(),
         members: this.project.members,
-        startDate: this.project.startDate,
+        startDate: this.project.startDate.trim(),
+        endDate: this.project.endDate.trim(),
         defaultSprintLength: this.project.defaultSprintLength
       }
       // eslint-disable-next-line
@@ -221,7 +214,17 @@ export default {
           this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
         } else {
           this.$form.modal('hide')
-          this.$router.push({ path: `/projects/${projectData.id}` })
+
+          try {
+            const memberID = this.$store.state.accountData.id
+            const projectList = await this.getProjectList(memberID)
+            this.$store.commit('updateProjectList', projectList)
+          } catch (err) {
+            console.error('Error getting project data', err)
+          }
+
+          // disabled, as server assigning project ID can make this lead to erroneous page
+          // this.$router.push({ path: `/projects/${projectData.id}` })
         }
       } catch (err) {
         // eslint-disable-next-line
@@ -246,7 +249,7 @@ export default {
     },
 
     async register (projectData = {}) {
-      const textFields = ['name', 'id', 'description', 'startDate']
+      const textFields = ['name', 'description', 'startDate', 'endDate']
       let errorMessage
       console.debug('checking project data', { projectData })
       textFields.forEach(f => {
@@ -264,6 +267,19 @@ export default {
       // eslint-disable-next-line
       console.debug('register', { response })
       return response
+    },
+
+    getProjectList (id) {
+      return new Promise((resolve, reject) => {
+        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
+        $.get(`${url}/api/projects?member_id=${id}`)
+          .done(response => {
+            const list = response
+
+            console.debug('got project response', response, list)
+            resolve(list)
+          }).fail(reject)
+      })
     },
 
     notifyError (message = 'An error occurred while trying to register') {
