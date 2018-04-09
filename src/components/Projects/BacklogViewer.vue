@@ -468,7 +468,7 @@
 </template>
 
 <script>
-import SingleTaskCard from '@/components/Projects/Cards/SingleTaskCard'
+import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
 import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
 
 export default {
@@ -606,6 +606,7 @@ export default {
     },
     sprintRemoveHandler (sprintId) {
       console.debug('Clicked remove for', sprintId)
+      this.$emit('showmodal', `sprint-remove|${sprintId}`)
     },
     getSprintTasks (sprintId) {
       return this.project.sprints[sprintId].tasks

@@ -86,6 +86,10 @@ export default {
           }
         })
 
+      if (valuesOnly) {
+        return attributes
+      }
+
       const msg = Object.keys(attributes)
         .filter(attr => ignoredAttributes.indexOf(attr) === -1 && attributes[attr] > 0)
         .map(attr => {
@@ -93,7 +97,7 @@ export default {
           return `${value} ${value === 1 ? attr : `${attr}s`}`
         })
 
-      return !valuesOnly ? `${msg[0]} ${newer - older < 0 ? 'ago' : 'from now'}` : attributes
+      return msg[0] ? `${msg[0]} ${newer - older < 0 ? 'ago' : 'from now'}` : 'Now'
     }
   }
 }

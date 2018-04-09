@@ -8,7 +8,7 @@
         <div class="ui segment">
           <div class="ui header">General Info</div>
           <div class="ui stackable grid">
-            <div class="eight wide column">
+            <div class="sixteen wide column">
               <div class="ui fluid labeled input">
                 <div class="ui label">Name</div>
                 <input
@@ -17,19 +17,11 @@
                   placeholder="Sprint Name">
               </div>
             </div>
-            <div class="eight wide column">
-              <div class="ui fluid labeled input">
-                <div class="ui label">ID</div>
-                <div class="ui basic button disabled">
-                  {{ sprint.id }}
-                </div>
-              </div>
-            </div>
             <div class="sixteen wide column">
               <div class="ui fluid labeled input">
                 <div class="ui label">Release</div>
                 <select
-                  v-model="sprint.associatedRelease"
+                  v-model="associatedRelease"
                   class="ui fluid dropdown">
                   <option
                     disabled
@@ -133,7 +125,7 @@
       <button
         type="submit"
         class="ui green button"
-        @click="registerHandler">
+        @click="registerClickHandler">
         Add
       </button>
       <div class="ui cancel red button">Cancel</div>
@@ -142,8 +134,8 @@
 </template>
 
 <script>
-import SingleStoryCard from '@/components/Projects/Cards/SingleStoryCard'
-import SingleTaskCard from '@/components/Projects/Cards/SingleTaskCard'
+import SingleStoryCard from '@/components/Projects/Stories/SingleStoryCard'
+import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
 import { mapMutations, mapGetters } from 'vuex'
 
 /* global $ */
@@ -173,19 +165,20 @@ export default {
     tasks: {
       required: true,
       type: Object
+    },
+    projectId: {
+      required: true,
+      type: String
     }
   },
   data () {
     return {
       sprint: {
-        id: 0,
         name: '',
-        stories: [],
-        tasks: [],
-        associatedRelease: '',
         startDate: '',
         endDate: ''
       },
+      associatedRelease: '',
       selectedStories: {},
       selectedTasks: {},
       numSelectedStories: 0,
@@ -205,7 +198,7 @@ export default {
       const date = new Date(new Date().valueOf() + 2 * oneWeek)
       return this.getFormattedDate(date)
     },
-    ...mapGetters(['newProjectId', 'currentUser'])
+    ...mapGetters(['isDevelopmentMode', 'currentUser'])
   },
   watch: {
     initialRelease () {
@@ -213,22 +206,16 @@ export default {
     }
   },
   mounted () {
-    // TODO: better way to generate id
-    this.sprint.id = this.generateRandomId()
-
-    this.sprint.startDate = this.defaultStartDate
-    this.sprint.endDate = this.defaultEndDate
-
     this.$form = $(this.$el)
     this.$form.submit((e) => {
       e.preventDefault()
-      this.registerHandler()
+      this.registerClickHandler()
     })
 
     // add support for submitting by pressing enter
     this.$form.on('keypress', e => {
       if (e.key === 'Enter') {
-        this.registerHandler()
+        this.registerClickHandler()
       }
     })
 
@@ -236,6 +223,7 @@ export default {
 
     this.initCheckboxes()
     this.updateButtons()
+    this.resetSprintData()
   },
   methods: {
     initCheckboxes () {
@@ -256,36 +244,37 @@ export default {
           }
         })
     },
-    toggleStory (id) {
-      this.selectedStories[id] = !this.selectedStories[id]
+    toggleStory (id, value, updateButtons = true) {
+      if (value !== undefined) {
+        this.selectedStories[id] = !!value
+      } else {
+        this.selectedStories[id] = !this.selectedStories[id]
+      }
       this.numSelectedStories = Object.keys(this.selectedStories)
         .filter(s => this.selectedStories[s])
         .length
-      setTimeout(() => {
-        this.updateButtons()
-      }, 50)
+
+      if (updateButtons) {
+        setTimeout(() => {
+          this.updateButtons()
+        }, 50)
+      }
     },
-    toggleTask (id) {
-      this.selectedTasks[id] = !this.selectedTasks[id]
+    toggleTask (id, value, updateButtons = true) {
+      if (value !== undefined) {
+        this.selectedTasks[id] = !!value
+      } else {
+        this.selectedTasks[id] = !this.selectedTasks[id]
+      }
       this.numSelectedTasks = Object.keys(this.selectedTasks)
         .filter(t => this.selectedTasks[t])
         .length
 
-      setTimeout(() => {
-        this.updateButtons()
-      }, 50)
-    },
-    generateRandomId () {
-      const createID = (prefix, number) => `${prefix}${number.toString().padStart(4, '0')}`
-      const prefix = 'sprint-'
-      let numberId = Math.floor(Math.random() * 1000)
-      let numIterations = 0
-      while (this.sprints[createID(prefix, numberId)] && numIterations < 1000) {
-        numberId = Math.floor(Math.random() * 1000)
-        numIterations++
+      if (updateButtons) {
+        setTimeout(() => {
+          this.updateButtons()
+        }, 50)
       }
-
-      return createID(prefix, numberId)
     },
     getFormattedDate (date) {
       let [year, month, day] = [
@@ -345,72 +334,84 @@ export default {
           return `${value} ${value === 1 ? attr : `${attr}s`}`
         }).join(', ')
     },
-    async registerHandler () {
-      console.debug(this.sprint)
-      // const projectData = {
-      //   name: this.project.name.trim(),
-      //   id: this.project.id,
-      //   description: this.project.description.trim(),
-      //   members: this.project.members,
-      //   startdate: this.project.startdate,
-      //   sprintLength: this.project.sprintLength
-      // }
-      // // eslint-disable-next-line
-      // console.debug("Sending register info:", projectData)
+    async registerClickHandler () {
+      const sprintData = {
+        id: this.generateUniqueId()(this.sprints, 'sprint-', 4),
+        name: this.sprint.name.trim(),
+        stories: Object.keys(this.selectedStories).filter(id => this.selectedStories[id]),
+        tasks: Object.keys(this.selectedTasks).filter(id => this.selectedTasks[id]),
+        startDate: this.sprint.startDate,
+        endDate: this.sprint.endDate
+      }
 
-      // try {
-      //   const result = await this.register(projectData)
+      sprintData.name = sprintData.name || sprintData.id
 
-      //   if (result.status !== 200) {
-      //     // eslint-disable-next-line
-      //     console.debug("Register failed!", result);
-      //     this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
-      //   } else {
-      //     this.$form.modal('hide')
-      //     this.$router.push({ path: `/projects/${projectData.id}` })
-      //   }
-      // } catch (err) {
-      //   // eslint-disable-next-line
-      //   console.debug("Register failed!", err);
-      //   const message = `${err.status}: ${err.statusText}`
-      //   this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
-      // }
-      // this.$form.removeClass('loading')
+      try {
+        const result = await this.register(sprintData, this.associatedRelease)
+        console.debug(result)
+        if (result === 'OK') {
+          this.$form.modal('hide')
+          this.$emit('update', { sprint: sprintData.id, release: this.associatedRelease })
+          this.resetSprintData()
+        } else {
+          console.debug('Register failed!')
+          this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
+        }
+      } catch (err) {
+        console.debug('Register failed', err)
+        const message = `${err.status}: ${err.statusText}`
+        this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
+      }
+      this.$form.removeClass('loading')
     },
-    sendRegisterData (projectData) {
+    async register (data = {}, associatedRelease) {
+      this.$form.addClass('loading')
+      const response = await this.sendRegisterData(data, associatedRelease)
+      // eslint-disable-next-line
+      console.debug('register', { response })
+      return response
+    },
+    sendRegisterData (sprintData, associatedRelease) {
+      const apiUrl = `api/projects/${this.projectId}/sprints`
+      const payload = {
+        sprintData,
+        associatedRelease,
+        memberID: this.currentUser.id,
+        projectID: this.projectId
+      }
+      console.debug('sending register data', { payload, apiUrl })
       return new Promise((resolve, reject) => {
-        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.post(`${url}/api/projects`, { projectData })
+        const url = this.isDevelopmentMode ? 'http://localhost' : ''
+        $.post(`${url}/${apiUrl}`, payload)
           .done(resolve).fail(reject)
       })
     },
-    async register (projectData = {}) {
-      const textFields = ['name', 'id', 'description', 'startdate']
-      let errorMessage
-      console.debug('checking project data', { projectData })
-      textFields.forEach(f => {
-        if (!errorMessage && (!projectData[f] || projectData[f].toString().trim().length === 0)) {
-          errorMessage = { responseJSON: { error: `${f} field is empty` } }
-        }
-      })
-
-      if (errorMessage) {
-        return errorMessage
-      }
-
-      this.$form.addClass('loading')
-      const data = await this.sendRegisterData(projectData)
-      // eslint-disable-next-line
-      console.debug('register', { data })
-      return data
-    },
-
     notifyError (message = 'An error occurred while trying to register') {
       this.$form.find('.ui.message p').text(message)
       this.$form.addClass('error')
     },
+    resetSprintData () {
+      const defaults = {
+        name: '',
+        associatedRelease: this.initialRelease,
+        startDate: this.defaultStartDate,
+        endDate: this.defaultEndDate
+      }
+      Object.keys(defaults)
+        .forEach(field => {
+          this.sprint[field] = defaults[field]
+        })
+
+      // reset checkboxes
+      this.selectedStories = {}
+      this.selectedTasks = {}
+      $(this.$el).find('#selection-section #toggle-btn').removeClass('checked')
+      setTimeout(() => {
+        this.updateButtons()
+      }, 100)
+    },
     ...mapMutations(['addProject']),
-    ...mapGetters(['memberById'])
+    ...mapGetters(['generateUniqueId'])
   }
 }
 </script>

@@ -13,9 +13,19 @@
       :initial-release="currentReleaseId"
     />
     <sprint-creation-modal
+      @update="handleNewSprint"
       id="sprint-creation-modal"
       :releases="project.releases"
       :initial-release="currentReleaseId"
+      :sprints="project.sprints"
+      :stories="project.stories"
+      :tasks="project.tasks"
+      :project-id="project.id || ''"
+    />
+    <sprint-removal-modal
+      id="sprint-removal-modal"
+      :releases="project.releases"
+      :target-sprint-id="removeTargetId"
       :sprints="project.sprints"
       :stories="project.stories"
       :tasks="project.tasks"
@@ -48,6 +58,7 @@
         :sprints="project.sprints"
         :stories="project.stories"
         :tasks="project.tasks"
+        :initial-sprint="currentSprintId"
       />
     </div>
     <div class="column sixteen wide">
@@ -60,12 +71,13 @@
 
 <script>
 import BacklogViewer from '@/components/Projects/BacklogViewer'
-import ReleaseCreationModal from '@/components/Projects/ReleaseCreationModal'
-import ReleaseSelector from '@/components/Projects/ReleaseSelector'
-import FeatureCreationModal from '@/components/Projects/FeatureCreationModal'
-import FeatureListing from '@/components/Projects/FeatureListing'
-import SprintCreationModal from '@/components/Projects/SprintCreationModal'
-import SprintViewer from '@/components/Projects/SprintViewer'
+import ReleaseCreationModal from '@/components/Projects/Releases/ReleaseCreationModal'
+import ReleaseSelector from '@/components/Projects/Releases/ReleaseSelector'
+import FeatureCreationModal from '@/components/Projects/Features/FeatureCreationModal'
+import FeatureListing from '@/components/Projects/Features/FeatureListing'
+import SprintCreationModal from '@/components/Projects/Sprints/SprintCreationModal'
+import SprintViewer from '@/components/Projects/Sprints/SprintViewer'
+import SprintRemovalModal from '@/components/Projects/Sprints/SprintRemovalModal'
 
 /* global $ */
 export default {
@@ -76,7 +88,8 @@ export default {
     'feature-creation-modal': FeatureCreationModal,
     'feature-listing': FeatureListing,
     'sprint-creation-modal': SprintCreationModal,
-    'sprint-viewer': SprintViewer
+    'sprint-viewer': SprintViewer,
+    'sprint-removal-modal': SprintRemovalModal
   },
   props: {
     project: {
@@ -87,6 +100,8 @@ export default {
   data () {
     return {
       currentReleaseId: 'nothing',
+      currentSprintId: 'nothing',
+      removeTargetId: 'nothing',
       modals: {}
     }
   },
@@ -100,6 +115,10 @@ export default {
       .modal('setting', 'closable', false)
       .modal('hide')
 
+    this.modals['sprint-remove'] = $(this.$el).find('#sprint-removal-modal')
+      .modal('setting', 'closable', false)
+      .modal('hide')
+
     this.modals['feature-create'] = $(this.$el).find('#feature-creation-modal')
       .modal('setting', 'closable', false)
       .modal('hide')
@@ -110,17 +129,36 @@ export default {
   },
   methods: {
     handleReleaseChange (releaseId) {
+      console.debug({ releaseId })
       this.currentReleaseId = releaseId
     },
-    handleNewRelease () {
-      this.currentReleaseId = ''
+    handleNewRelease (newRelease) {
+      this.currentReleaseId = newRelease || ''
       this.$emit('update')
       console.debug('handled new release')
     },
+    handleNewSprint (updateData) {
+      const { sprint, release } = updateData
+      console.debug(sprint, release)
+      this.currentSprintId = ''
+      this.currentReleaseId = release || ''
+      setTimeout(() => {
+        this.currentSprintId = sprint || ''
+      }, 50)
+      this.$emit('update')
+      console.debug('handled new sprint')
+    },
     showModal (type) {
       console.debug({type}, this.modals[type])
-      if (this.modals[type]) {
+      const isRemoveCommand = type.indexOf('remove') > -1 && type.indexOf('|') > -1
+      if (this.modals[type] && !isRemoveCommand) {
         this.modals[type].modal('show')
+      } else if (isRemoveCommand) {
+        const [modalType, target] = type.split('|')
+        this.removeTargetId = target
+        if (this.modals[modalType]) {
+          this.modals[modalType].modal('show')
+        }
       }
     }
   }

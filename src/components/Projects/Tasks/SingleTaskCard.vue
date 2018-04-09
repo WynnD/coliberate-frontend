@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { getters } from '@/store'
+import getters from '@/store/getters'
 
 export default {
   props: {

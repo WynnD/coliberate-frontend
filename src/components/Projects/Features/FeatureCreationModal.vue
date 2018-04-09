@@ -126,8 +126,8 @@
 </template>
 
 <script>
-import SingleStoryCard from '@/components/Projects/Cards/SingleStoryCard'
-import SingleTaskCard from '@/components/Projects/Cards/SingleTaskCard'
+import SingleStoryCard from '@/components/Projects/Stories/SingleStoryCard'
+import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
 import { mapMutations, mapGetters } from 'vuex'
 
 /* global $ */

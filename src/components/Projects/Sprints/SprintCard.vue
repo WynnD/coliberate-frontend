@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import SprintCreationModal from '@/components/Projects/SprintCreationModal'
+import SprintCreationModal from './SprintCreationModal'
 
 /* global $ */
 export default {
