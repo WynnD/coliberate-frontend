@@ -244,24 +244,37 @@ export default {
           }
         })
     },
-    toggleStory (id) {
-      this.selectedStories[id] = !this.selectedStories[id]
+    toggleStory (id, value, updateButtons = true) {
+      if (value !== undefined) {
+        this.selectedStories[id] = !!value
+      } else {
+        this.selectedStories[id] = !this.selectedStories[id]
+      }
       this.numSelectedStories = Object.keys(this.selectedStories)
         .filter(s => this.selectedStories[s])
         .length
-      setTimeout(() => {
-        this.updateButtons()
-      }, 50)
+
+      if (updateButtons) {
+        setTimeout(() => {
+          this.updateButtons()
+        }, 50)
+      }
     },
-    toggleTask (id) {
-      this.selectedTasks[id] = !this.selectedTasks[id]
+    toggleTask (id, value, updateButtons = true) {
+      if (value !== undefined) {
+        this.selectedTasks[id] = !!value
+      } else {
+        this.selectedTasks[id] = !this.selectedTasks[id]
+      }
       this.numSelectedTasks = Object.keys(this.selectedTasks)
         .filter(t => this.selectedTasks[t])
         .length
 
-      setTimeout(() => {
-        this.updateButtons()
-      }, 50)
+      if (updateButtons) {
+        setTimeout(() => {
+          this.updateButtons()
+        }, 50)
+      }
     },
     getFormattedDate (date) {
       let [year, month, day] = [
@@ -389,13 +402,13 @@ export default {
           this.sprint[field] = defaults[field]
         })
 
-      Object.keys(this.selectedStories)
-        .filter(id => this.selectedStories[id])
-        .forEach(id => { this.toggleStory(id) })
-
-      Object.keys(this.selectedTasks)
-        .filter(id => this.selectedTasks[id])
-        .forEach(id => { this.toggleTask(id) })
+      // reset checkboxes
+      this.selectedStories = {}
+      this.selectedTasks = {}
+      $(this.$el).find('#selection-section #toggle-btn').removeClass('checked')
+      setTimeout(() => {
+        this.updateButtons()
+      }, 100)
     },
     ...mapMutations(['addProject']),
     ...mapGetters(['generateUniqueId'])
