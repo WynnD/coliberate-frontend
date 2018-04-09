@@ -21,7 +21,7 @@
               <div class="ui fluid labeled input">
                 <div class="ui label">Release</div>
                 <select
-                  v-model="sprint.associatedRelease"
+                  v-model="associatedRelease"
                   class="ui fluid dropdown">
                   <option
                     disabled
@@ -175,10 +175,10 @@ export default {
     return {
       sprint: {
         name: '',
-        associatedRelease: '',
         startDate: '',
         endDate: ''
       },
+      associatedRelease: '',
       selectedStories: {},
       selectedTasks: {},
       numSelectedStories: 0,
@@ -347,12 +347,12 @@ export default {
       sprintData.name = sprintData.name || sprintData.id
 
       try {
-        const result = await this.register(sprintData, this.sprint.associatedRelease)
+        const result = await this.register(sprintData, this.associatedRelease)
         console.debug(result)
         if (result === 'OK') {
-          this.resetSprintData()
           this.$form.modal('hide')
-          this.$emit('update')
+          this.$emit('update', { sprint: sprintData.id, release: this.associatedRelease })
+          this.resetSprintData()
         } else {
           console.debug('Register failed!')
           this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))

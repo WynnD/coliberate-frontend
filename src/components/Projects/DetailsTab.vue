@@ -129,6 +129,7 @@ export default {
   },
   methods: {
     handleReleaseChange (releaseId) {
+      console.debug({ releaseId })
       this.currentReleaseId = releaseId
     },
     handleNewRelease () {
@@ -136,8 +137,14 @@ export default {
       this.$emit('update')
       console.debug('handled new release')
     },
-    handleNewSprint () {
+    handleNewSprint (updateData) {
+      const { sprint, release } = updateData
+      console.debug(sprint, release)
       this.currentSprintId = ''
+      this.currentReleaseId = release || ''
+      setTimeout(() => {
+        this.currentSprintId = sprint || ''
+      }, 50)
       this.$emit('update')
       console.debug('handled new sprint')
     },
