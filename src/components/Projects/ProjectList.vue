@@ -61,14 +61,14 @@ export default {
 
     try {
       const memberID = this.$store.state.accountData.id
-      const projectList = await this.getProjectList(memberID)
-      this.$store.commit('updateProjectList', projectList)
+      await this.getProjectList(memberID)
     } catch (err) {
       console.error('Error getting project data', err)
     }
   },
   methods: {
     showModal () {
+      this.getMembers()
       if (this.modal) {
         this.modal.modal('show')
       }
@@ -78,10 +78,28 @@ export default {
         const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
         $.get(`${url}/api/projects?member_id=${id}`)
           .done(response => {
-            const list = response
+            console.debug('got project response', response)
+            this.$store.commit('updateProjectList', response)
+            resolve(response)
+          }).fail(reject)
+      })
+    },
+    getMembers () {
+      return new Promise((resolve, reject) => {
+        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
+        $.get(`${url}/api/members`)
+          .done(response => {
+            const userID = this.$store.state.accountData.id
+            const members = response.data.filter(m => m.id !== userID)
 
-            console.debug('got project response', response, list)
-            resolve(list)
+            const memberObject = {}
+            members.forEach(m => {
+              memberObject[m.id.toString()] = m
+            })
+            console.debug('Got member data', memberObject)
+
+            this.$store.commit('updateMemberData', memberObject)
+            resolve()
           }).fail(reject)
       })
     }
