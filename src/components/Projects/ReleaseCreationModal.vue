@@ -131,9 +131,9 @@ export default {
         const result = await this.register(releaseData)
         console.debug(result)
         if (result === 'OK') {
-          this.resetReleaseData()
           this.$form.modal('hide')
-          this.$emit('update')
+          this.$emit('update', releaseData.id)
+          this.resetReleaseData()
         } else {
           console.debug('Register failed!', result)
           this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))

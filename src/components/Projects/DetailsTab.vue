@@ -132,8 +132,8 @@ export default {
       console.debug({ releaseId })
       this.currentReleaseId = releaseId
     },
-    handleNewRelease () {
-      this.currentReleaseId = ''
+    handleNewRelease (newRelease) {
+      this.currentReleaseId = newRelease || ''
       this.$emit('update')
       console.debug('handled new release')
     },
