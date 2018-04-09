@@ -70,7 +70,7 @@
 <script>
 import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
 import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
-import StoryAccordionItem from '@/components/Projects/StoryAccordionItem'
+import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
 
 export default {
   components: {

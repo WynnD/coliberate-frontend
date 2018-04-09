@@ -77,8 +77,7 @@ import FeatureCreationModal from '@/components/Projects/Features/FeatureCreation
 import FeatureListing from '@/components/Projects/Features/FeatureListing'
 import SprintCreationModal from '@/components/Projects/Sprints/SprintCreationModal'
 import SprintViewer from '@/components/Projects/Sprints/SprintViewer'
-
-import SprintRemovalModal from '@/components/Projects/SprintRemovalModal'
+import SprintRemovalModal from '@/components/Projects/Sprints/SprintRemovalModal'
 
 /* global $ */
 export default {

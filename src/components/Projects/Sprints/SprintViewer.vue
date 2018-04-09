@@ -123,7 +123,7 @@
 
 <script>
 import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
-import StoryAccordionItem from '@/components/Projects/StoryAccordionItem'
+import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
 import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
 
 /* global $ */
