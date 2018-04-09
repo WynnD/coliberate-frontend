@@ -1,8 +1,8 @@
 <template>
   <div class="ui modal form">
-    <div class="header">Add a Sprint</div>
+    <div class="header">Add a Feature</div>
     <div
-      id="sprint-modal-content"
+      id="feature-modal-content"
       class="scrolling content">
       <div class="ui segments">
         <div class="ui segment">
@@ -12,30 +12,37 @@
               <div class="ui fluid labeled input">
                 <div class="ui label">Name</div>
                 <input
-                  v-model="sprint.name"
+                  v-model="feature.name"
                   type="text"
-                  placeholder="Sprint Name">
+                  placeholder="Feature Name">
               </div>
             </div>
             <div class="eight wide column">
               <div class="ui fluid labeled input">
                 <div class="ui label">ID</div>
                 <div class="ui basic button disabled">
-                  {{ sprint.id }}
+                  {{ feature.id }}
                 </div>
               </div>
             </div>
             <div class="sixteen wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">Release</div>
+                <div class="ui label">Description</div>
+                <input
+                  v-model="feature.description"
+                  type="text"
+                  placeholder="Feature Description">
+              </div>
+            </div>
+            <div class="sixteen wide column">
+              <div class="ui fluid labeled input">
+                <div class="ui label">Associated Releases</div>
                 <select
-                  v-model="sprint.associatedRelease"
+                  name="releases"
+                  multiple=""
+                  v-model="feature.associatedReleases"
                   class="ui fluid dropdown">
-                  <option
-                    disabled
-                    value="">
-                    Select a Release
-                  </option>
+                  <option value="">Releases</option>
                   <option
                     v-for="release in releases"
                     :key="release.id"
@@ -44,29 +51,6 @@
                     {{ release.name }} ({{ getDateRange(release) }})
                   </option>
                 </select>
-              </div>
-            </div>
-            <div class="eight wide column">
-              <div class="ui fluid labeled input">
-                <div class="ui label">Start Date</div>
-                <input
-                  v-model="sprint.startDate"
-                  type="date"
-                  placeholder="Start Date">
-              </div>
-            </div>
-            <div class="eight wide column">
-              <div class="ui fluid labeled input">
-                <div class="ui label">End Date</div>
-                <input
-                  v-model="sprint.endDate"
-                  type="date"
-                  placeholder="Start Date">
-              </div>
-            </div>
-            <div class="sixteen wide colu">
-              <div class="label">
-                Sprint length is {{ getDateDifference(new Date(sprint.startDate), new Date(sprint.endDate)) }}
               </div>
             </div>
           </div>
@@ -78,7 +62,7 @@
           <div class="ui header">Story/Task Selection</div>
           <div class="meta">
             <h4 class="header">
-              Stories ({{ numSelectedStories }}/{{ Object.keys(stories).length }} added)
+              Stories ({{ numSelectedStories }}/{{ numStories }} added)
             </h4>
             <div class="ui three column stackable grid">
               <div
@@ -94,14 +78,14 @@
                       type="checkbox"
                       :value="story.id"
                       v-model="selectedStories[story.id]">
-                    <label>Add to sprint</label>
+                    <label>Add to feature</label>
                   </div>
                 </story-card>
               </div>
             </div>
           </div>
           <h4 class="header">
-            Tasks ({{ numSelectedTasks }}/{{ Object.keys(tasks).length }} added)
+            Tasks ({{ numSelectedTasks }}/{{ numTasks }} added)
           </h4>
           <div class="ui three column stackable grid">
             <div
@@ -117,7 +101,7 @@
                     type="checkbox"
                     :value="task.id"
                     v-model="selectedTasks[task.id]">
-                  <label>Add to sprint</label>
+                  <label>Add to feature</label>
                 </div>
               </task-card>
             </div>
@@ -142,8 +126,8 @@
 </template>
 
 <script>
-import SingleStoryCard from '@/components/Projects/Cards/SingleStoryCard'
-import SingleTaskCard from '@/components/Projects/Cards/SingleTaskCard'
+import SingleStoryCard from '@/components/Projects/Stories/SingleStoryCard'
+import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
 import { mapMutations, mapGetters } from 'vuex'
 
 /* global $ */
@@ -162,7 +146,7 @@ export default {
       type: String,
       default: ''
     },
-    sprints: {
+    features: {
       required: true,
       type: Object
     },
@@ -177,14 +161,13 @@ export default {
   },
   data () {
     return {
-      sprint: {
+      feature: {
         id: 0,
         name: '',
+        description: '',
         stories: [],
         tasks: [],
-        associatedRelease: '',
-        startDate: '',
-        endDate: ''
+        associatedReleases: []
       },
       selectedStories: {},
       selectedTasks: {},
@@ -194,30 +177,22 @@ export default {
     }
   },
   computed: {
-    defaultStartDate () {
-      const date = new Date()
-      return this.getFormattedDate(date)
+    numStories () {
+      return Object.keys(this.stories).length
     },
-    defaultEndDate () {
-      const oneDay = 24 * 60 * 60 * 1000
-      const oneWeek = 7 * oneDay
-      // TODO: change to use project's default sprint length value
-      const date = new Date(new Date().valueOf() + 2 * oneWeek)
-      return this.getFormattedDate(date)
+    numTasks () {
+      return Object.keys(this.tasks).length
     },
     ...mapGetters(['newProjectId', 'currentUser'])
   },
   watch: {
     initialRelease () {
-      $(this.$el).find('.ui.dropdown').dropdown('set exactly', this.initialRelease)
+      $(this.$el).find('.ui.dropdown').dropdown('set exactly', [this.initialRelease])
     }
   },
   mounted () {
     // TODO: better way to generate id
-    this.sprint.id = this.generateRandomId()
-
-    this.sprint.startDate = this.defaultStartDate
-    this.sprint.endDate = this.defaultEndDate
+    this.feature.id = this.generateRandomId()
 
     this.$form = $(this.$el)
     this.$form.submit((e) => {
@@ -233,7 +208,6 @@ export default {
     })
 
     $(this.$el).find('.ui.dropdown').dropdown()
-
     this.initCheckboxes()
     this.updateButtons()
   },
@@ -249,10 +223,10 @@ export default {
 
           if (button.hasClass('checked')) {
             button.addClass('red inverted')
-            label.text('Remove from sprint')
+            label.text('Remove from feature')
           } else {
             button.removeClass('red inverted')
-            label.text('Add to sprint')
+            label.text('Add to feature')
           }
         })
     },
@@ -277,76 +251,23 @@ export default {
     },
     generateRandomId () {
       const createID = (prefix, number) => `${prefix}${number.toString().padStart(4, '0')}`
-      const prefix = 'sprint-'
+      const prefix = 'feature-'
       let numberId = Math.floor(Math.random() * 1000)
       let numIterations = 0
-      while (this.sprints[createID(prefix, numberId)] && numIterations < 1000) {
+      while (this.features[createID(prefix, numberId)] && numIterations < 1000) {
         numberId = Math.floor(Math.random() * 1000)
         numIterations++
       }
 
       return createID(prefix, numberId)
     },
-    getFormattedDate (date) {
-      let [year, month, day] = [
-        date.getFullYear(),
-        (date.getMonth() + 1).toString().padStart(2, '0'),
-        (date.getDate()).toString().padStart(2, '0')
-      ]
-
-      return `${year}-${month}-${day}`
-    },
     getDateRange (release) {
       const startDate = new Date(release.startDate)
       const endDate = new Date(release.endDate)
       return `${startDate.toDateString()} to ${endDate.toDateString()}`
     },
-    getDateDifference (older, newer) {
-      const difference = new Date(Math.abs(newer - older))
-      const attributes = {
-        day: 0,
-        hour: 0,
-        minute: 0,
-        second: 0,
-        millisecond: 0
-      }
-
-      // conversion from this to milliseconds
-      const constants = {
-        millisecond: 1,
-        second: 1000,
-        minute: 1000 * 60,
-        hour: 1000 * 60 * 60,
-        day: 1000 * 60 * 60 * 24
-      }
-
-      const divide = (numerator, denominator) => {
-        return {
-          quotient: parseInt(numerator / denominator),
-          remainder: numerator % denominator
-        }
-      }
-
-      // convert time in ms to various attributes
-      let total = difference.getTime()
-      Object.keys(attributes)
-        .forEach((attr) => {
-          if (total > constants[attr]) {
-            const result = divide(total, constants[attr])
-            attributes[attr] = result.quotient
-            total = result.remainder
-          }
-        })
-
-      return Object.keys(attributes)
-        .filter(attr => attributes[attr] > 0)
-        .map(attr => {
-          const value = attributes[attr]
-          return `${value} ${value === 1 ? attr : `${attr}s`}`
-        }).join(', ')
-    },
     async registerHandler () {
-      console.debug(this.sprint)
+      console.debug(this.feature)
       // const projectData = {
       //   name: this.project.name.trim(),
       //   id: this.project.id,
@@ -416,7 +337,7 @@ export default {
 </script>
 
 <style>
-#sprint-modal-content #selection-section .grid {
+#feature-modal-content #selection-section .grid {
   max-height: 20rem;
   overflow-y: auto;
   border-top: 1px solid gray;

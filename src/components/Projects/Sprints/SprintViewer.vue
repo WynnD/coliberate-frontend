@@ -167,7 +167,7 @@
 </template>
 
 <script>
-import SingleTaskCard from '@/components/Projects/Cards/SingleTaskCard'
+import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
 import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
 
 /* global $ */

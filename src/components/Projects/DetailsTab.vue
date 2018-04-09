@@ -60,12 +60,12 @@
 
 <script>
 import BacklogViewer from '@/components/Projects/BacklogViewer'
-import ReleaseCreationModal from '@/components/Projects/ReleaseCreationModal'
-import ReleaseSelector from '@/components/Projects/ReleaseSelector'
-import FeatureCreationModal from '@/components/Projects/FeatureCreationModal'
-import FeatureListing from '@/components/Projects/FeatureListing'
-import SprintCreationModal from '@/components/Projects/SprintCreationModal'
-import SprintViewer from '@/components/Projects/SprintViewer'
+import ReleaseCreationModal from '@/components/Projects/Releases/ReleaseCreationModal'
+import ReleaseSelector from '@/components/Projects/Releases/ReleaseSelector'
+import FeatureCreationModal from '@/components/Projects/Features/FeatureCreationModal'
+import FeatureListing from '@/components/Projects/Features/FeatureListing'
+import SprintCreationModal from '@/components/Projects/Sprints/SprintCreationModal'
+import SprintViewer from '@/components/Projects/Sprints/SprintViewer'
 
 /* global $ */
 export default {
