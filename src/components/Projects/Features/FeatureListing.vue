@@ -64,8 +64,13 @@ export default {
   },
   watch: {
     release () {
-      this.activeAccordion = ''
-      this.activeSubAccordion = ''
+      this.activeAccordion = 'feature-list-'
+    },
+    activeAccordion (newValue = '') {
+      if (newValue.indexOf('feature-list') > -1) {
+        const featureId = newValue.split('feature-list-')[1]
+        this.$emit('changefeature', featureId)
+      }
     }
   },
   methods: {
@@ -75,7 +80,6 @@ export default {
       } else {
         this.activeAccordion = field
       }
-      this.activeSubAccordion = ''
     }
   }
 }

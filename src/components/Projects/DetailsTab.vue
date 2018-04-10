@@ -39,6 +39,7 @@
       :features="project.features"
       :sprints="project.sprints"
       :initial-sprint="currentSprintId"
+      :initial-feature="currentFeatureId"
       :project-id="project.id || ''"
       @update="handleNewStory"
     />
@@ -59,6 +60,7 @@
         :features="project.features"
         :stories="project.stories"
         :tasks="project.tasks"
+        @changefeature="handleFeatureChange"
       />
     </div>
     <div
@@ -116,6 +118,7 @@ export default {
     return {
       currentReleaseId: 'nothing',
       currentSprintId: 'nothing',
+      currentFeatureId: 'nothing',
       removeTargetId: 'nothing',
       modals: {}
     }
@@ -154,6 +157,10 @@ export default {
     handleSprintChange (sprintId) {
       console.debug({ sprintId })
       this.currentSprintId = sprintId
+    },
+    handleFeatureChange (featureId) {
+      console.debug({ featureId })
+      this.currentFeatureId = featureId
     },
     handleNewRelease (newRelease) {
       this.currentReleaseId = newRelease || ''
