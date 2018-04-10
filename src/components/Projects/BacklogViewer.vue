@@ -12,29 +12,28 @@
     >
       <i class="dropdown icon"/>
       <span class="ui header">Backlog/Sandbox</span>
+      <span class="ui left pointing label">
+        {{ numBackLogItems }} Backlog Items Found
+      </span>
     </div>
 
     <div
       v-show="showBacklog"
       class="ui segment">
       All items shown here aren't properly associated with specific parts of the project.
+      This could be due to creating an item without assigning it to its respective release,
+      sprint, or story, or deleting an item, making its child items unasssociated.
     </div>
 
     <div
       v-show="showBacklog"
-      v-if="!hasBacklogItems"
       class="ui segment">
-      <div class="ui message positive">
-        <div class="header">No unassociated items found</div>
-        <p>No action necessary.</p>
+      <div class="backlog-entry-title">
+        <span class="ui medium header">Features</span>
+        <a class="ui right floated compact icon button">
+          <i class="plus icon"/>
+        </a>
       </div>
-    </div>
-
-    <div
-      v-show="showBacklog"
-      v-if="orphanedData.features.length > 0"
-      class="ui segment">
-      <div class="ui medium header">Features</div>
       <div v-if="orphanedData.features.length === 0">
         <div class="ui message positive">
           <div class="header">No unassociated features found</div>
@@ -354,9 +353,13 @@
 
     <div
       v-show="showBacklog"
-      v-if="orphanedData.stories.length > 0"
       class="ui segment">
-      <div class="ui header medium">Stories</div>
+      <div class="backlog-entry-title">
+        <span class="ui medium header">Stories</span>
+        <a class="ui right floated compact icon button">
+          <i class="plus icon"/>
+        </a>
+      </div>
       <div v-if="orphanedData.stories.length === 0">
         <div class="ui message positive">
           <div class="header">No unassociated stories found</div>
@@ -441,9 +444,13 @@
 
     <div
       v-show="showBacklog"
-      v-if="orphanedData.tasks.length > 0"
       class="ui segment">
-      <div class="ui medium header">Tasks</div>
+      <div class="backlog-entry-title">
+        <span class="ui medium header">Tasks</span>
+        <a class="ui right floated compact icon button">
+          <i class="plus icon"/>
+        </a>
+      </div>
       <div v-if="orphanedData.tasks.length === 0">
         <div class="ui message positive">
           <div class="header">No unassociated tasks found</div>
@@ -486,8 +493,7 @@ export default {
     return {
       activeAccordion: '',
       activeSubAccordion: '',
-      showBacklog: false,
-      hasBacklogItems: false
+      showBacklog: false
     }
   },
   computed: {
@@ -551,14 +557,17 @@ export default {
         tasks: Object.keys(this.project.tasks)
           .filter(id => this.usedData.tasks.indexOf(id) === -1)
       }
+    },
+    numBackLogItems () {
+      return Object.keys(this.orphanedData)
+        .map(key => this.orphanedData[key].length > 0)
+        .filter(val => !!val).length
+    },
+    hasBacklogItems () {
+      return this.numBackLogItems.length > 0
     }
   },
   mounted () {
-    // show backlog on first load if there's anything in it
-    this.hasBacklogItems = Object.keys(this.orphanedData)
-      .map(key => this.orphanedData[key].length > 0)
-      .filter(val => !!val).length > 0
-
     this.showBacklog = this.hasBacklogItems
   },
   methods: {
@@ -640,5 +649,9 @@ export default {
 
 #backlog-header.active-backlog .icon.dropdown {
   transform: rotate(0deg);
+}
+
+.backlog-entry-title {
+  margin-bottom: 1rem;
 }
 </style>
