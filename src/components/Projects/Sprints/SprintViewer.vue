@@ -213,6 +213,7 @@ export default {
     currentSprint (newValue) {
       // reset accordion states on new sprint selection
       this.activeAccordion = ''
+      this.$emit('changesprint', this.currentSprintId)
     },
     release () {
       this.currentSprintId = ''

@@ -32,6 +32,16 @@
       :stories="project.stories"
       :tasks="project.tasks"
     />
+    <story-creation-modal
+      id="story-creation-modal"
+      :stories="project.stories"
+      :tasks="project.tasks"
+      :features="project.features"
+      :sprints="project.sprints"
+      :initial-sprint="currentSprintId"
+      :project-id="project.id || ''"
+      @update="handleNewStory"
+    />
 
     <div class="column sixteen wide">
       <release-selector
@@ -61,6 +71,7 @@
         :stories="project.stories"
         :tasks="project.tasks"
         :initial-sprint="currentSprintId"
+        @changesprint="handleSprintChange"
       />
     </div>
     <div class="column sixteen wide">
@@ -80,6 +91,7 @@ import FeatureListing from '@/components/Projects/Features/FeatureListing'
 import SprintCreationModal from '@/components/Projects/Sprints/SprintCreationModal'
 import SprintViewer from '@/components/Projects/Sprints/SprintViewer'
 import SprintRemovalModal from '@/components/Projects/Sprints/SprintRemovalModal'
+import StoryCreationModal from '@/components/Projects/Stories/StoryCreationModal'
 
 /* global $ */
 export default {
@@ -91,7 +103,8 @@ export default {
     'feature-listing': FeatureListing,
     'sprint-creation-modal': SprintCreationModal,
     'sprint-viewer': SprintViewer,
-    'sprint-removal-modal': SprintRemovalModal
+    'sprint-removal-modal': SprintRemovalModal,
+    'story-creation-modal': StoryCreationModal
   },
   props: {
     project: {
@@ -128,11 +141,19 @@ export default {
     this.modals['release-create'] = $(this.$el).find('#release-creation-modal')
       .modal('setting', 'closable', false)
       .modal('hide')
+
+    this.modals['story-create'] = $(this.$el).find('#story-creation-modal')
+      .modal('setting', 'closable', false)
+      .modal('hide')
   },
   methods: {
     handleReleaseChange (releaseId) {
       console.debug({ releaseId })
       this.currentReleaseId = releaseId
+    },
+    handleSprintChange (sprintId) {
+      console.debug({ sprintId })
+      this.currentSprintId = sprintId
     },
     handleNewRelease (newRelease) {
       this.currentReleaseId = newRelease || ''
@@ -158,7 +179,11 @@ export default {
 
       // set to first release in list
       this.currentReleaseId = releases[0]
+      this.$emit('update')
       console.debug('handled new feature')
+    },
+    handleNewStory () {
+      this.$emit('update')
     },
     showModal (type) {
       console.debug({type}, this.modals[type])
