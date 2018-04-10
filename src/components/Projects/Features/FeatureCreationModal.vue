@@ -8,7 +8,7 @@
         <div class="ui segment">
           <div class="ui header">General Info</div>
           <div class="ui stackable grid">
-            <div class="eight wide column">
+            <div class="sixteen wide column">
               <div class="ui fluid labeled input">
                 <div class="ui label">Name</div>
                 <input
@@ -17,21 +17,12 @@
                   placeholder="Feature Name">
               </div>
             </div>
-            <div class="eight wide column">
-              <div class="ui fluid labeled input">
-                <div class="ui label">ID</div>
-                <div class="ui basic button disabled">
-                  {{ feature.id }}
-                </div>
-              </div>
-            </div>
             <div class="sixteen wide column">
-              <div class="ui fluid labeled input">
-                <div class="ui label">Description</div>
-                <input
+              <div class="ui label">Description</div>
+              <div class="ui fluid input">
+                <textarea
                   v-model="feature.description"
-                  type="text"
-                  placeholder="Feature Description">
+                  placeholder="Feature Description"/>
               </div>
             </div>
             <div class="sixteen wide column">
@@ -128,7 +119,7 @@
 <script>
 import SingleStoryCard from '@/components/Projects/Stories/SingleStoryCard'
 import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
-import { mapMutations, mapGetters } from 'vuex'
+import { mapGetters } from 'vuex'
 
 /* global $ */
 export default {
@@ -157,16 +148,17 @@ export default {
     tasks: {
       required: true,
       type: Object
+    },
+    projectId: {
+      required: true,
+      type: String
     }
   },
   data () {
     return {
       feature: {
-        id: 0,
         name: '',
         description: '',
-        stories: [],
-        tasks: [],
         associatedReleases: []
       },
       selectedStories: {},
@@ -191,9 +183,6 @@ export default {
     }
   },
   mounted () {
-    // TODO: better way to generate id
-    this.feature.id = this.generateRandomId()
-
     this.$form = $(this.$el)
     this.$form.submit((e) => {
       e.preventDefault()
@@ -208,8 +197,10 @@ export default {
     })
 
     $(this.$el).find('.ui.dropdown').dropdown()
+
     this.initCheckboxes()
     this.updateButtons()
+    this.resetFeatureData()
   },
   methods: {
     initCheckboxes () {
@@ -249,89 +240,86 @@ export default {
         this.updateButtons()
       }, 50)
     },
-    generateRandomId () {
-      const createID = (prefix, number) => `${prefix}${number.toString().padStart(4, '0')}`
-      const prefix = 'feature-'
-      let numberId = Math.floor(Math.random() * 1000)
-      let numIterations = 0
-      while (this.features[createID(prefix, numberId)] && numIterations < 1000) {
-        numberId = Math.floor(Math.random() * 1000)
-        numIterations++
-      }
-
-      return createID(prefix, numberId)
-    },
     getDateRange (release) {
       const startDate = new Date(release.startDate)
       const endDate = new Date(release.endDate)
       return `${startDate.toDateString()} to ${endDate.toDateString()}`
     },
     async registerHandler () {
-      console.debug(this.feature)
-      // const projectData = {
-      //   name: this.project.name.trim(),
-      //   id: this.project.id,
-      //   description: this.project.description.trim(),
-      //   members: this.project.members,
-      //   startdate: this.project.startdate,
-      //   sprintLength: this.project.sprintLength
-      // }
-      // // eslint-disable-next-line
-      // console.debug("Sending register info:", projectData)
+      const featureData = {
+        id: this.generateUniqueId()(this.features, 'feature-', 4),
+        name: this.feature.name.trim(),
+        description: this.feature.description,
+        stories: Object.keys(this.selectedStories).filter(id => this.selectedStories[id]),
+        tasks: Object.keys(this.selectedTasks).filter(id => this.selectedTasks[id])
+      }
+      featureData.name = featureData.name || featureData.id
+      console.debug(featureData, this.feature.associatedReleases)
 
-      // try {
-      //   const result = await this.register(projectData)
-
-      //   if (result.status !== 200) {
-      //     // eslint-disable-next-line
-      //     console.debug("Register failed!", result);
-      //     this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
-      //   } else {
-      //     this.$form.modal('hide')
-      //     this.$router.push({ path: `/projects/${projectData.id}` })
-      //   }
-      // } catch (err) {
-      //   // eslint-disable-next-line
-      //   console.debug("Register failed!", err);
-      //   const message = `${err.status}: ${err.statusText}`
-      //   this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
-      // }
-      // this.$form.removeClass('loading')
+      try {
+        const result = await this.register(featureData, this.feature.associatedReleases)
+        console.debug(result)
+        if (result === 'OK') {
+          this.$form.modal('hide')
+          this.$emit('update')
+          this.resetFeatureData()
+        } else {
+          console.debug('Register failed!')
+          this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
+        }
+      } catch (err) {
+        console.debug('Register failed', err)
+        const message = `${err.status}: ${err.statusText}`
+        this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
+      }
+      this.$form.removeClass('loading')
     },
-    sendRegisterData (projectData) {
+    async register (data = {}, associatedReleases = []) {
+      this.$form.addClass('loading')
+      const response = await this.sendRegisterData(data, associatedReleases)
+      // eslint-disable-next-line
+      console.debug('register', { response })
+      return response
+    },
+    sendRegisterData (featureData, associatedReleases) {
+      const apiUrl = `api/projects/${this.projectId}/features`
+      const payload = {
+        featureData,
+        associatedReleases,
+        memberID: this.currentUser.id,
+        projectID: this.projectId
+      }
+      console.debug('sending register data', { payload, apiUrl })
       return new Promise((resolve, reject) => {
-        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.post(`${url}/api/projects`, { projectData })
+        const url = this.isDevelopmentMode ? 'http://localhost' : ''
+        $.post(`${url}/${apiUrl}`, payload)
           .done(resolve).fail(reject)
       })
     },
-    async register (projectData = {}) {
-      const textFields = ['name', 'id', 'description', 'startdate']
-      let errorMessage
-      console.debug('checking project data', { projectData })
-      textFields.forEach(f => {
-        if (!errorMessage && (!projectData[f] || projectData[f].toString().trim().length === 0)) {
-          errorMessage = { responseJSON: { error: `${f} field is empty` } }
-        }
-      })
-
-      if (errorMessage) {
-        return errorMessage
-      }
-
-      this.$form.addClass('loading')
-      const data = await this.sendRegisterData(projectData)
-      // eslint-disable-next-line
-      console.debug('register', { data })
-      return data
-    },
-
     notifyError (message = 'An error occurred while trying to register') {
       this.$form.find('.ui.message p').text(message)
       this.$form.addClass('error')
     },
-    ...mapMutations(['addProject']),
-    ...mapGetters(['memberById'])
+    resetFeatureData () {
+      const defaults = {
+        name: '',
+        description: '',
+        associatedReleases: [this.initialRelease]
+      }
+      Object.keys(defaults)
+        .forEach(field => {
+          this.feature[field] = defaults[field]
+        })
+
+      // reset checkboxes
+      this.selectedStories = {}
+      this.selectedTasks = {}
+      $(this.$el).find('#selection-section #toggle-btn').removeClass('checked')
+      setTimeout(() => {
+        this.updateButtons()
+      }, 100)
+    },
+    ...mapGetters(['generateUniqueId'])
   }
 }
 </script>

@@ -11,6 +11,7 @@
       :features="project.features"
       :releases="project.releases"
       :initial-release="currentReleaseId"
+      :project-id="project.id || ''"
     />
     <sprint-creation-modal
       @update="handleNewSprint"
