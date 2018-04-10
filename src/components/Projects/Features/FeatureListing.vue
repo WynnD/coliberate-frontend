@@ -65,13 +65,14 @@ export default {
   },
   watch: {
     release () {
-      this.activeAccordion = 'feature-list-'
+      this.activeAccordion = ''
     },
     activeAccordion (newValue = '') {
+      let featureId = ''
       if (newValue.indexOf('feature-list') > -1) {
-        const featureId = newValue.split('feature-list-')[1]
-        this.$emit('changefeature', featureId)
+        featureId = newValue.split('feature-list-')[1]
       }
+      this.$emit('changefeature', featureId)
     }
   },
   methods: {

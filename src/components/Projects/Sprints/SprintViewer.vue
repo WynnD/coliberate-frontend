@@ -60,8 +60,11 @@
       class="ui segment">
       <div class="header">
         <span class="ui header medium">Tasks and Stories</span>
-        <a class="ui right floated compact icon button">
+        <a
+          @click="$emit('showmodal', 'story-create')"
+          class="ui right floated compact icon button">
           <i class="plus icon"/>
+          Add Story
         </a>
       </div>
       <div>
