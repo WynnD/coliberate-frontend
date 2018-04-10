@@ -250,6 +250,51 @@ export default {
       }
       storyData.name = storyData.name || storyData.id
       console.debug(storyData, this.associatedFeatures, this.associatedSprints)
+
+      try {
+        const result = await this.register(storyData, this.associatedFeatures, this.associatedSprints)
+        console.debug(result)
+        if (result === 'OK') {
+          this.$form.modal('hide')
+          this.$emit('update')
+          this.resetStoryData()
+        } else {
+          console.debug('Register failed!')
+          this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
+        }
+      } catch (err) {
+        console.debug('Register failed', err)
+        const message = `${err.status}: ${err.statusText}`
+        this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
+      }
+      this.$form.removeClass('loading')
+    },
+    async register (data = {}, associatedFeatures, associatedSprints) {
+      this.$form.addClass('loading')
+      const response = await this.sendRegisterData(data, associatedFeatures, associatedSprints)
+      // eslint-disable-next-line
+      console.debug('register', { response })
+      return response
+    },
+    sendRegisterData (storyData, associatedFeatures, associatedSprints) {
+      const apiUrl = `api/projects/${this.projectId}/stories`
+      const payload = {
+        storyData,
+        associatedFeatures,
+        associatedSprints,
+        memberID: this.currentUser.id,
+        projectID: this.projectId
+      }
+      console.debug('sending register data', { payload, apiUrl })
+      return new Promise((resolve, reject) => {
+        const url = this.isDevelopmentMode ? 'http://localhost' : ''
+        $.post(`${url}/${apiUrl}`, payload)
+          .done(resolve).fail(reject)
+      })
+    },
+    notifyError (message = 'An error occurred while trying to register') {
+      this.$form.find('.ui.message p').text(message)
+      this.$form.addClass('error')
     },
     resetStoryData () {
       const defaults = {
@@ -274,3 +319,11 @@ export default {
   }
 }
 </script>
+
+<style>
+#story-modal-content #selection-section .grid {
+  max-height: 20rem;
+  overflow-y: auto;
+  border-top: 1px solid gray;
+}
+</style>
