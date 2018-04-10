@@ -258,7 +258,9 @@
       class="ui segment">
       <div class="backlog-entry-title">
         <span class="ui medium header">Tasks</span>
-        <a class="ui right floated compact icon button">
+        <a
+          @click="$emit('showmodal', 'task-create')"
+          class="ui right floated compact icon button">
           <i class="plus icon"/>
           Add Task
         </a>
