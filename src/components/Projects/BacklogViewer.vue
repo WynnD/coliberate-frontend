@@ -12,7 +12,11 @@
     >
       <i class="dropdown icon"/>
       <span class="ui header">Backlog/Sandbox</span>
-      <span class="ui left pointing label">
+      <span
+        :class="{
+          'ui left pointing label': true,
+          yellow: hasBacklogItems
+      }">
         {{ numBackLogItems }} Backlog Items Found
       </span>
     </div>
@@ -437,7 +441,12 @@ export default {
         .filter(val => !!val).length
     },
     hasBacklogItems () {
-      return this.numBackLogItems.length > 0
+      return this.numBackLogItems > 0
+    }
+  },
+  watch: {
+    hasBacklogItems (newValue) {
+      this.showBacklog = newValue
     }
   },
   mounted () {
