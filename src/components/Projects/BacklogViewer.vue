@@ -46,148 +46,17 @@
           <p><b>Suggested Action:</b> Edit these features so that they belong to a release.</p>
         </div>
       </div>
-      <accordion-item
+      <feature-accordion-item
         v-for="featureId in orphanedData.features"
         :key="featureId"
         :id="`backlog-features-${featureId}`"
+        :feature="project.features[featureId]"
+        :active-accordion="activeAccordion"
         @toggle-accordion-state="toggleAccordionState"
         :name="`backlog-features-${featureId}`"
-        :showing-boolean="activeAccordion === `backlog-features-${featureId}`">
-        <section slot="title">
-          <i class="dropdown icon"/>
-          <span>{{ project.features[featureId].name }}</span>
-          <div class="ui buttons right floated compact">
-            <button
-              @click.stop="featureEditHandler(featureId)"
-              class="ui inverted violet icon button">
-              <i class="icon edit"/>
-            </button>
-            <button
-              @click.stop="featureRemoveHandler(featureId)"
-              class="ui inverted red icon button">
-              <i class="icon trash"/>
-            </button>
-          </div>
-        </section>
-
-        <section slot="content">
-          {{ project.features[featureId].description }}
-          <hr>
-          <div
-            id="task-story-listing"
-            class="ui segment">
-            <div class="header">
-              <span class="ui header medium">Tasks and Stories</span>
-              <a class="ui right floated compact icon button">
-                <i class="plus icon"/>
-              </a>
-            </div>
-            <div>
-              <accordion-item
-                @toggle-accordion-state="toggleAccordionSubState"
-                :name="`backlog-sprints-${featureId}-extra-tasks`"
-                :showing-boolean="activeSubAccordion === `backlog-sprints-${featureId}-extra-tasks`">
-                <section slot="title">
-                  <i class="dropdown icon"/>
-                  <span>Extra Tasks</span>
-                </section>
-                <section slot="content">
-                  <div class="ui fluid container grid">
-                    <div class="row">
-                      <div class="sixteen wide column">
-                        <span class="ui small header">
-                          Tasks ({{ getNumUnfinishedTasks(featureId) }}/{{ getFeatureTasks(featureId).length }} Remaining)
-                        </span>
-                        <a class="ui right floated compact icon button">
-                          <i class="plus icon"/>
-                        </a>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="sixteen wide column">
-                        <div class="ui three stackable cards">
-                          <task-card
-                            v-for="task in getFeatureTasks(featureId)"
-                            :key="task.id"
-                            :task="task"/>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              </accordion-item>
-              <accordion-item
-                v-for="story in getFeatureStories(featureId)"
-                :key="story.id"
-                @toggle-accordion-state="toggleAccordionSubState"
-                :name="`feature-${featureId}-list-${story.id}`"
-                :showing-boolean="activeSubAccordion === `feature-${featureId}-list-${story.id}`">
-                <section slot="title">
-                  <i class="dropdown icon"/>
-                  <span>{{ story.name }}</span>
-                  <div
-                    :class="{
-                      'ui left pointing label story-status': true,
-                      yellow: story.status === 'in-progress',
-                      green: story.status === 'done',
-                      red: story.status === 'todo'
-                    }"
-                  >
-                    {{ story.status.toUpperCase() }}
-                  </div>
-                  <div class="ui buttons right floated compact">
-                    <button
-                      @click.stop="storyEditHandler(story.id)"
-                      class="ui inverted violet icon button">
-                      <i class="icon edit"/>
-                    </button>
-                    <button
-                      @click.stop="storyRemoveHandler(story.id)"
-                      class="ui inverted red icon button">
-                      <i class="icon trash"/>
-                    </button>
-                  </div>
-                </section>
-
-                <section slot="content">
-                  <div class="ui fluid container grid">
-                    <div class="row">
-                      <div class="eight wide column">
-                        {{ story.description }}
-                      </div>
-                      <div class="eight wide column">
-                        {{ story.name }} stats here
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="sixteen wide column">
-                        <hr>
-                        <span class="ui small header">Tasks ({{ story.tasks.length }})</span>
-                        <a class="ui right floated compact icon button">
-                          <i class="plus icon"/>
-                        </a>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="sixteen wide column">
-                        <span v-if="story.tasks.length === 0">No tasks found</span>
-                        <div
-                          v-else
-                          class="ui three stackable cards">
-                          <task-card
-                            v-for="taskId in story.tasks"
-                            :key="taskId"
-                            :task="tasks[taskId]"/>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              </accordion-item>
-            </div>
-          </div>
-        </section>
-      </accordion-item>
+        :stories="project.stories"
+        :tasks="project.tasks"
+      />
     </div>
 
     <div
@@ -476,11 +345,13 @@
 
 <script>
 import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
+import FeatureAccordionItem from '@/components/Projects/Features/FeatureAccordionItem'
 import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
 
 export default {
   components: {
     'task-card': SingleTaskCard,
+    'feature-accordion-item': FeatureAccordionItem,
     'accordion-item': SegmentAccordionItem
   },
   props: {
