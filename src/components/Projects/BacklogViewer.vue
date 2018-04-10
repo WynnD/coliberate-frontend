@@ -38,6 +38,7 @@
           @click="$emit('showmodal', 'feature-create')"
           class="ui right floated compact icon button">
           <i class="plus icon"/>
+          Add Feature
         </a>
       </div>
       <div v-if="orphanedData.features.length === 0">
@@ -114,9 +115,6 @@
             class="ui segment">
             <div class="header">
               <span class="ui header medium">Tasks and Stories</span>
-              <a class="ui right floated compact icon button">
-                <i class="plus icon"/>
-              </a>
             </div>
             <div>
               <accordion-item
@@ -134,9 +132,6 @@
                         <span class="ui small header">
                           Tasks
                         </span>
-                        <a class="ui right floated compact icon button">
-                          <i class="plus icon"/>
-                        </a>
                       </div>
                     </div>
                     <div class="row">
@@ -199,9 +194,6 @@
                       <div class="sixteen wide column">
                         <hr>
                         <span class="ui small header">Tasks ({{ story.tasks.length }})</span>
-                        <a class="ui right floated compact icon button">
-                          <i class="plus icon"/>
-                        </a>
                       </div>
                     </div>
                     <div class="row">
@@ -235,6 +227,7 @@
           @click="$emit('showmodal', 'story-create')"
           class="ui right floated compact icon button">
           <i class="plus icon"/>
+          Add Story
         </a>
       </div>
       <div v-if="orphanedData.stories.length === 0">
@@ -249,74 +242,15 @@
           <p><b>Suggested Action:</b> Edit these stories so that they belong to a sprint.</p>
         </div>
       </div>
-      <accordion-item
+      <story-accordion-item
         v-for="storyId in orphanedData.stories"
         :key="storyId"
         @toggle-accordion-state="toggleAccordionSubState"
         :name="`story-list-${storyId}`"
-        :showing-boolean="activeSubAccordion === `story-list-${storyId}`">
-        <section slot="title">
-          <i class="dropdown icon"/>
-          <span>{{ project.stories[storyId].name }}</span>
-          <div
-            :class="{
-              'ui left pointing label story-status': true,
-              yellow: project.stories[storyId].status === 'in-progress',
-              green: project.stories[storyId].status === 'done',
-              red: project.stories[storyId].status === 'todo'
-            }"
-          >
-            {{ project.stories[storyId].status.toUpperCase() }}
-          </div>
-          <div class="ui buttons right floated compact">
-            <button
-              @click.stop="storyEditHandler(project.stories[storyId].id)"
-              class="ui inverted violet icon button">
-              <i class="icon edit"/>
-            </button>
-            <button
-              @click.stop="storyRemoveHandler(project.stories[storyId].id)"
-              class="ui inverted red icon button">
-              <i class="icon trash"/>
-            </button>
-          </div>
-        </section>
-
-        <section slot="content">
-          <div class="ui fluid container grid">
-            <div class="row">
-              <div class="eight wide column">
-                {{ project.stories[storyId].description }}
-              </div>
-              <div class="eight wide column">
-                {{ project.stories[storyId].name }} stats here
-              </div>
-            </div>
-            <div class="row">
-              <div class="sixteen wide column">
-                <hr>
-                <span class="ui small header">Tasks ({{ project.stories[storyId].tasks.length }})</span>
-                <a class="ui right floated compact icon button">
-                  <i class="plus icon"/>
-                </a>
-              </div>
-            </div>
-            <div class="row">
-              <div class="sixteen wide column">
-                <span v-if="project.stories[storyId].tasks.length === 0">No tasks found</span>
-                <div
-                  v-else
-                  class="ui three stackable cards">
-                  <task-card
-                    v-for="taskId in project.stories[storyId].tasks"
-                    :key="taskId"
-                    :task="tasks[taskId]"/>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </accordion-item>
+        :story="project.stories[storyId]"
+        :tasks="project.tasks"
+        :showing-boolean="activeSubAccordion === `story-list-${storyId}`"
+      />
     </div>
 
     <div
@@ -326,6 +260,7 @@
         <span class="ui medium header">Tasks</span>
         <a class="ui right floated compact icon button">
           <i class="plus icon"/>
+          Add Task
         </a>
       </div>
       <div v-if="orphanedData.tasks.length === 0">
@@ -353,6 +288,7 @@
 
 <script>
 import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
+import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
 import FeatureAccordionItem from '@/components/Projects/Features/FeatureAccordionItem'
 import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
 
@@ -360,6 +296,7 @@ export default {
   components: {
     'task-card': SingleTaskCard,
     'feature-accordion-item': FeatureAccordionItem,
+    'story-accordion-item': StoryAccordionItem,
     'accordion-item': SegmentAccordionItem
   },
   props: {

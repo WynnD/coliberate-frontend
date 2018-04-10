@@ -50,6 +50,7 @@
               v-if="showButtons"
               class="ui right floated compact icon button">
               <i class="plus icon"/>
+              Add Task
             </a>
           </div>
         </div>

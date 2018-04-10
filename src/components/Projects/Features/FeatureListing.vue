@@ -6,6 +6,7 @@
         @click="$emit('showmodal', 'feature-create')"
         class="ui right floated compact white inverted icon button">
         <i class="plus icon"/>
+        Add Feature
       </a>
     </div>
     <div

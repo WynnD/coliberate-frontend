@@ -33,6 +33,7 @@
         @click="$emit('showmodal', 'release-create')"
         class="ui right floated compact white inverted icon button">
         <i class="plus icon"/>
+        Add Release
       </a>
     </div>
     <div
