@@ -8,13 +8,22 @@
         <div class="ui segment">
           <div class="ui header">General Info</div>
           <div class="ui stackable grid">
-            <div class="sixteen wide column">
+            <div class="eight wide column">
               <div class="ui fluid labeled input">
                 <div class="ui label">Name</div>
                 <input
                   v-model="story.name"
                   type="text"
                   placeholder="Story Name">
+              </div>
+            </div>
+            <div class="eight wide column">
+              <div class="ui fluid labeled input">
+                <div class="ui label">Business Value</div>
+                <input
+                  v-model="story.businessValue"
+                  type="number"
+                  placeholder="Story Business Value">
               </div>
             </div>
             <div class="sixteen wide column">
@@ -246,6 +255,7 @@ export default {
         id: this.generateUniqueId()(this.stories, 'story-', 4),
         name: this.story.name.trim(),
         description: this.story.description,
+        businessValue: this.story.businessValue,
         tasks: Object.keys(this.selectedTasks).filter(id => this.selectedTasks[id])
       }
       storyData.name = storyData.name || storyData.id
