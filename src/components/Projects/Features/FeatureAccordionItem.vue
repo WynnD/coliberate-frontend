@@ -47,6 +47,7 @@
             :all-tasks="tasks"
             :show-buttons="showButtons"
             @toggle-accordion-state="toggleAccordionSubState"
+            @showmodal="showModal"
           />
           <story-accordion-item
             v-for="story in featureStories"
@@ -57,6 +58,7 @@
             :tasks="tasks"
             :show-buttons="showButtons"
             :showing-boolean="activeSubAccordion === `${feature.id}-list-${story.id}`"
+            @showmodal="showModal"
           />
         </div>
       </div>
@@ -132,6 +134,9 @@ export default {
       } else {
         this.activeSubAccordion = field
       }
+    },
+    showModal (data) {
+      this.$emit('showmodal', data)
     }
   }
 }

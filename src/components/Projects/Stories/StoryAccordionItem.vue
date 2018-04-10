@@ -48,6 +48,7 @@
             <span class="ui small header">Tasks ({{ story.tasks.length }})</span>
             <a
               v-if="showButtons"
+              @click="$emit('showmodal', 'task-create')"
               class="ui right floated compact icon button">
               <i class="plus icon"/>
               Add Task
