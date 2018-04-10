@@ -12,6 +12,7 @@
       :releases="project.releases"
       :initial-release="currentReleaseId"
       :project-id="project.id || ''"
+      @update="handleNewFeature"
     />
     <sprint-creation-modal
       @update="handleNewSprint"
@@ -148,6 +149,16 @@ export default {
       }, 50)
       this.$emit('update')
       console.debug('handled new sprint')
+    },
+    handleNewFeature (releases = []) {
+      // don't need to do anything
+      if (releases.length === 0 || releases.indexOf(this.currentReleaseId) > -1) {
+        return
+      }
+
+      // set to first release in list
+      this.currentReleaseId = releases[0]
+      console.debug('handled new feature')
     },
     showModal (type) {
       console.debug({type}, this.modals[type])

@@ -261,7 +261,7 @@ export default {
         console.debug(result)
         if (result === 'OK') {
           this.$form.modal('hide')
-          this.$emit('update')
+          this.$emit('update', this.feature.associatedReleases)
           this.resetFeatureData()
         } else {
           console.debug('Register failed!')
