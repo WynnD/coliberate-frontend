@@ -20,6 +20,7 @@
         @toggle-accordion-state="toggleAccordionState"
         :stories="stories"
         :tasks="tasks"
+        @showmodal="showModal"
       />
     </div>
   </div>
@@ -80,6 +81,9 @@ export default {
       } else {
         this.activeAccordion = field
       }
+    },
+    showModal (type) {
+      this.$emit('showmodal', type)
     }
   }
 }
