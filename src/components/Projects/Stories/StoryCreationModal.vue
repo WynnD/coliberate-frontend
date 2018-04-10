@@ -263,6 +263,7 @@ export default {
         })
       this.associatedFeatures = [this.initialFeature]
       this.associatedSprints = [this.initialSprint]
+      this.numSelectedTasks = 0
       this.selectedTasks = {}
       $(this.$el).find('#selection-section #toggle-btn').removeClass('checked')
       setTimeout(() => {
