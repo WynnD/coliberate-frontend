@@ -181,7 +181,7 @@ export default {
     numTasks () {
       return Object.keys(this.tasks).length
     },
-    ...mapGetters(['currentUser'])
+    ...mapGetters(['currentUser', 'isDevelopmentMode'])
   },
   watch: {
     initialFeature (newValue) {
