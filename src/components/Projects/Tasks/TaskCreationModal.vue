@@ -198,7 +198,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['currentUser'])
+    ...mapGetters(['currentUser', 'isDevelopmentMode'])
   },
   watch: {
     initialFeature (newValue) {
