@@ -1,45 +1,73 @@
 <template>
   <div class="ui modal form">
-    <div class="header">Add a Feature</div>
+    <div class="header">Add a Story</div>
     <div
-      id="feature-modal-content"
+      id="story-modal-content"
       class="scrolling content">
       <div class="ui segments">
         <div class="ui segment">
           <div class="ui header">General Info</div>
           <div class="ui stackable grid">
-            <div class="sixteen wide column">
+            <div class="eight wide column">
               <div class="ui fluid labeled input">
                 <div class="ui label">Name</div>
                 <input
-                  v-model="feature.name"
+                  v-model="story.name"
                   type="text"
-                  placeholder="Feature Name">
+                  placeholder="Story Name">
+              </div>
+            </div>
+            <div class="eight wide column">
+              <div class="ui fluid labeled input">
+                <div class="ui label">Business Value</div>
+                <input
+                  v-model="story.businessValue"
+                  type="number"
+                  placeholder="Story Business Value">
               </div>
             </div>
             <div class="sixteen wide column">
               <div class="ui label">Description</div>
               <div class="ui fluid input">
                 <textarea
-                  v-model="feature.description"
-                  placeholder="Feature Description"/>
+                  v-model="story.description"
+                  placeholder="Story Description"/>
               </div>
             </div>
             <div class="sixteen wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">Associated Releases</div>
+                <div class="ui label">Associated Features</div>
                 <select
-                  name="releases"
+                  name="features"
                   multiple=""
-                  v-model="feature.associatedReleases"
+                  v-model="associatedFeatures"
                   class="ui fluid dropdown">
-                  <option value="">Releases</option>
+                  <option value="">Features</option>
                   <option
-                    v-for="release in releases"
-                    :key="release.id"
-                    :value="release.id"
+                    v-for="feature in features"
+                    :key="feature.id"
+                    :value="feature.id"
                   >
-                    {{ release.name }} ({{ getDateRange(release) }})
+                    {{ feature.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="sixteen wide column">
+              <div class="ui fluid labeled input">
+                <div class="ui label">Associated Sprints</div>
+                <select
+                  name="sprints"
+                  multiple=""
+                  v-model="associatedSprints"
+                  class="ui fluid dropdown">
+                  <option value="">Sprints</option>
+                  <option
+                    v-for="sprint in sprints"
+                    :key="sprint.id"
+                    :value="sprint.id"
+                  >
+                    {{ sprint.name }} ({{ getDateRange(sprint) }})
                   </option>
                 </select>
               </div>
@@ -50,34 +78,10 @@
         <div
           id="selection-section"
           class="ui segment">
-          <div class="ui header">Story/Task Selection</div>
-          <div class="meta">
-            <h4 class="header">
-              Stories ({{ numSelectedStories }}/{{ numStories }} added)
-            </h4>
-            <div class="ui three column stackable grid">
-              <div
-                v-for="story in stories"
-                :key="story.id"
-                class="column">
-                <story-card :story="story">
-                  <div
-                    id="toggle-btn"
-                    @click="toggleStory(story.id)"
-                    class="ui fluid button checkbox">
-                    <input
-                      type="checkbox"
-                      :value="story.id"
-                      v-model="selectedStories[story.id]">
-                    <label>Add to feature</label>
-                  </div>
-                </story-card>
-              </div>
-            </div>
+          <div class="ui header">
+            <span>Task Selection</span>
+            <span>({{ numSelectedTasks }}/{{ numTasks }} added)</span>
           </div>
-          <h4 class="header">
-            Tasks ({{ numSelectedTasks }}/{{ numTasks }} added)
-          </h4>
           <div class="ui three column stackable grid">
             <div
               v-for="task in tasks"
@@ -92,7 +96,7 @@
                     type="checkbox"
                     :value="task.id"
                     v-model="selectedTasks[task.id]">
-                  <label>Add to feature</label>
+                  <label>Add to story</label>
                 </div>
               </task-card>
             </div>
@@ -117,30 +121,15 @@
 </template>
 
 <script>
-import SingleStoryCard from '@/components/Projects/Stories/SingleStoryCard'
 import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
 import { mapGetters } from 'vuex'
 
 /* global $ */
 export default {
   components: {
-    'story-card': SingleStoryCard,
     'task-card': SingleTaskCard
   },
   props: {
-    releases: {
-      required: true,
-      type: Object
-    },
-    initialRelease: {
-      required: false,
-      type: String,
-      default: ''
-    },
-    features: {
-      required: true,
-      type: Object
-    },
     stories: {
       required: true,
       type: Object
@@ -149,6 +138,24 @@ export default {
       required: true,
       type: Object
     },
+    features: {
+      required: true,
+      type: Object
+    },
+    sprints: {
+      required: true,
+      type: Object
+    },
+    initialFeature: {
+      required: false,
+      type: String,
+      default: ''
+    },
+    initialSprint: {
+      required: false,
+      type: String,
+      default: ''
+    },
     projectId: {
       required: true,
       type: String
@@ -156,30 +163,36 @@ export default {
   },
   data () {
     return {
-      feature: {
+      story: {
         name: '',
         description: '',
-        associatedReleases: []
+        businessValue: 5
       },
-      selectedStories: {},
+      associatedFeatures: [],
+      associatedSprints: [],
       selectedTasks: {},
-      numSelectedStories: 0,
       numSelectedTasks: 0,
-      $form: null
+      $form: null,
+      featureDropdown: null,
+      sprintDropdown: null
     }
   },
   computed: {
-    numStories () {
-      return Object.keys(this.stories).length
-    },
     numTasks () {
       return Object.keys(this.tasks).length
     },
-    ...mapGetters(['isDevelopmentMode', 'currentUser'])
+    ...mapGetters(['currentUser', 'isDevelopmentMode'])
   },
   watch: {
-    initialRelease () {
-      $(this.$el).find('.ui.dropdown').dropdown('set exactly', [this.initialRelease])
+    initialFeature (newValue) {
+      if (this.featureDropdown) {
+        this.featureDropdown.dropdown('set exactly', [newValue])
+      }
+    },
+    initialSprint (newValue) {
+      if (this.sprintDropdown) {
+        this.sprintDropdown.dropdown('set exactly', [newValue])
+      }
     }
   },
   mounted () {
@@ -189,18 +202,19 @@ export default {
       this.registerHandler()
     })
 
-    // add support for submitting by pressing enter
-    this.$form.on('keypress', e => {
-      if (e.key === 'Enter') {
-        this.registerHandler()
-      }
-    })
+    // // add support for submitting by pressing enter
+    // this.$form.on('keypress', e => {
+    //   if (e.key === 'Enter') {
+    //     this.registerHandler()
+    //   }
+    // })
 
-    $(this.$el).find('.ui.dropdown').dropdown()
+    this.featureDropdown = $(this.$el).find('.ui.dropdown[name="features"]').dropdown()
+    this.sprintDropdown = $(this.$el).find('.ui.dropdown[name="sprints"]').dropdown()
 
     this.initCheckboxes()
     this.updateButtons()
-    this.resetFeatureData()
+    this.resetStoryData()
   },
   methods: {
     initCheckboxes () {
@@ -221,15 +235,6 @@ export default {
           }
         })
     },
-    toggleStory (id) {
-      this.selectedStories[id] = !this.selectedStories[id]
-      this.numSelectedStories = Object.keys(this.selectedStories)
-        .filter(s => this.selectedStories[s])
-        .length
-      setTimeout(() => {
-        this.updateButtons()
-      }, 50)
-    },
     toggleTask (id) {
       this.selectedTasks[id] = !this.selectedTasks[id]
       this.numSelectedTasks = Object.keys(this.selectedTasks)
@@ -240,29 +245,33 @@ export default {
         this.updateButtons()
       }, 50)
     },
-    getDateRange (release) {
-      const startDate = new Date(release.startDate)
-      const endDate = new Date(release.endDate)
+    getDateRange (sprint) {
+      const startDate = new Date(sprint.startDate)
+      const endDate = new Date(sprint.endDate)
       return `${startDate.toDateString()} to ${endDate.toDateString()}`
     },
     async registerHandler () {
-      const featureData = {
-        id: this.generateUniqueId()(this.features, 'feature-', 4),
-        name: this.feature.name.trim(),
-        description: this.feature.description,
-        stories: Object.keys(this.selectedStories).filter(id => this.selectedStories[id]),
+      const storyData = {
+        id: this.generateUniqueId()(this.stories, 'story-', 4),
+        name: this.story.name.trim(),
+        description: this.story.description,
+        businessValue: this.story.businessValue,
         tasks: Object.keys(this.selectedTasks).filter(id => this.selectedTasks[id])
       }
-      featureData.name = featureData.name || featureData.id
-      console.debug(featureData, this.feature.associatedReleases)
+      storyData.name = storyData.name || storyData.id
+      const associatedData = {
+        features: this.associatedFeatures.filter(id => !!id),
+        sprints: this.associatedSprints.filter(id => !!id)
+      }
+      console.debug(storyData, associatedData)
 
       try {
-        const result = await this.register(featureData, this.feature.associatedReleases)
+        const result = await this.register(storyData, associatedData)
         console.debug(result)
         if (result === 'OK') {
           this.$form.modal('hide')
-          this.$emit('update', this.feature.associatedReleases)
-          this.resetFeatureData()
+          this.$emit('update')
+          this.resetStoryData()
         } else {
           console.debug('Register failed!')
           this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
@@ -274,18 +283,19 @@ export default {
       }
       this.$form.removeClass('loading')
     },
-    async register (data = {}, associatedReleases = []) {
+    async register (data = {}, associatedData) {
       this.$form.addClass('loading')
-      const response = await this.sendRegisterData(data, associatedReleases)
+      const response = await this.sendRegisterData(data, associatedData)
       // eslint-disable-next-line
       console.debug('register', { response })
       return response
     },
-    sendRegisterData (featureData, associatedReleases) {
-      const apiUrl = `api/projects/${this.projectId}/features`
+    sendRegisterData (storyData, associatedData) {
+      const apiUrl = `api/projects/${this.projectId}/stories`
       const payload = {
-        featureData,
-        associatedReleases,
+        storyData,
+        associatedFeatures: associatedData.features,
+        associatedSprints: associatedData.sprints,
         memberID: this.currentUser.id,
         projectID: this.projectId
       }
@@ -300,19 +310,19 @@ export default {
       this.$form.find('.ui.message p').text(message)
       this.$form.addClass('error')
     },
-    resetFeatureData () {
+    resetStoryData () {
       const defaults = {
         name: '',
         description: '',
-        associatedReleases: [this.initialRelease]
+        businessValue: 5
       }
       Object.keys(defaults)
         .forEach(field => {
-          this.feature[field] = defaults[field]
+          this.story[field] = defaults[field]
         })
-
-      // reset checkboxes
-      this.selectedStories = {}
+      this.associatedFeatures = [this.initialFeature]
+      this.associatedSprints = [this.initialSprint]
+      this.numSelectedTasks = 0
       this.selectedTasks = {}
       $(this.$el).find('#selection-section #toggle-btn').removeClass('checked')
       setTimeout(() => {
@@ -325,7 +335,7 @@ export default {
 </script>
 
 <style>
-#feature-modal-content #selection-section .grid {
+#story-modal-content #selection-section .grid {
   max-height: 20rem;
   overflow-y: auto;
   border-top: 1px solid gray;

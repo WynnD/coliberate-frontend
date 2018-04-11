@@ -6,6 +6,14 @@
     <section slot="title">
       <i class="dropdown icon"/>
       <span>Extra Tasks</span>
+      <div
+        :class="{
+          'ui left pointing label': true,
+          yellow: numUnfinishedTasks > 0
+        }"
+      >
+        {{ numUnfinishedTasks }} REMAINING
+      </div>
     </section>
     <section slot="content">
       <div class="ui fluid container grid">
@@ -18,6 +26,7 @@
               v-if="showButtons"
               class="ui right floated compact icon button">
               <i class="plus icon"/>
+              Add Task
             </a>
           </div>
         </div>

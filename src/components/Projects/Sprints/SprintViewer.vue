@@ -31,6 +31,7 @@
         @click="$emit('showmodal', 'sprint-create')"
         class="ui right floated compact white inverted icon button">
         <i class="plus icon"/>
+        Add Sprint
       </a>
     </div>
     <div
@@ -60,53 +61,22 @@
       class="ui segment">
       <div class="header">
         <span class="ui header medium">Tasks and Stories</span>
-        <a class="ui right floated compact icon button">
+        <a
+          @click="$emit('showmodal', 'story-create')"
+          class="ui right floated compact icon button">
           <i class="plus icon"/>
+          Add Story
         </a>
       </div>
       <div>
-        <accordion-item
+        <extra-tasks-accordion-item
           id="sprint-extra-tasks"
           @toggle-accordion-state="toggleAccordionState"
           name="sprint-extra-tasks"
-          :showing-boolean="activeAccordion === 'sprint-extra-tasks'">
-          <section slot="title">
-            <i class="dropdown icon"/>
-            <span>Extra Tasks</span>
-            <div
-              :class="{
-                'ui left pointing label': true,
-                yellow: tasksRemaining > 0
-              }"
-            >
-              {{ tasksRemaining }} REMAINING
-            </div>
-          </section>
-          <section slot="content">
-            <div class="ui fluid container grid">
-              <div class="row">
-                <div class="sixteen wide column">
-                  <span class="ui small header">
-                    Tasks ({{ tasksRemaining }}/{{ totalTasks }} Remaining)
-                  </span>
-                  <a class="ui right floated compact icon button">
-                    <i class="plus icon"/>
-                  </a>
-                </div>
-              </div>
-              <div class="row">
-                <div class="sixteen wide column">
-                  <div class="ui three stackable cards">
-                    <task-card
-                      v-for="task in sprintTasks"
-                      :key="task.id"
-                      :task="task"/>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        </accordion-item>
+          :showing-boolean="activeAccordion === 'sprint-extra-tasks'"
+          :assigned-task-list="currentSprint.tasks"
+          :all-tasks="tasks"
+        />
         <story-accordion-item
           v-for="story in sprintStories"
           :key="story.id"
@@ -124,6 +94,7 @@
 <script>
 import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
 import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
+import ExtraTasksAccordionItem from '@/components/Projects/Tasks/ExtraTasksAccordionItem'
 import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
 
 /* global $ */
@@ -131,6 +102,7 @@ export default {
   components: {
     'task-card': SingleTaskCard,
     'story-accordion-item': StoryAccordionItem,
+    'extra-tasks-accordion-item': ExtraTasksAccordionItem,
     'accordion-item': SegmentAccordionItem
   },
   props: {
@@ -213,6 +185,7 @@ export default {
     currentSprint (newValue) {
       // reset accordion states on new sprint selection
       this.activeAccordion = ''
+      this.$emit('changesprint', this.currentSprintId)
     },
     release () {
       this.currentSprintId = ''

@@ -6,6 +6,7 @@
         @click="$emit('showmodal', 'feature-create')"
         class="ui right floated compact white inverted icon button">
         <i class="plus icon"/>
+        Add Feature
       </a>
     </div>
     <div
@@ -20,6 +21,7 @@
         @toggle-accordion-state="toggleAccordionState"
         :stories="stories"
         :tasks="tasks"
+        @showmodal="showModal"
       />
     </div>
   </div>
@@ -65,7 +67,13 @@ export default {
   watch: {
     release () {
       this.activeAccordion = ''
-      this.activeSubAccordion = ''
+    },
+    activeAccordion (newValue = '') {
+      let featureId = ''
+      if (newValue.indexOf('feature-list') > -1) {
+        featureId = newValue.split('feature-list-')[1]
+      }
+      this.$emit('changefeature', featureId)
     }
   },
   methods: {
@@ -75,7 +83,9 @@ export default {
       } else {
         this.activeAccordion = field
       }
-      this.activeSubAccordion = ''
+    },
+    showModal (type) {
+      this.$emit('showmodal', type)
     }
   }
 }

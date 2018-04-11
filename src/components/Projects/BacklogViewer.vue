@@ -12,29 +12,35 @@
     >
       <i class="dropdown icon"/>
       <span class="ui header">Backlog/Sandbox</span>
+      <span
+        :class="{
+          'ui left pointing label': true,
+          yellow: hasBacklogItems
+      }">
+        {{ numBackLogItems }} Backlog Items Found
+      </span>
     </div>
 
     <div
       v-show="showBacklog"
       class="ui segment">
       All items shown here aren't properly associated with specific parts of the project.
+      This could be due to creating an item without assigning it to its respective release,
+      sprint, or story, or deleting an item, making its child items unasssociated.
     </div>
 
     <div
       v-show="showBacklog"
-      v-if="!hasBacklogItems"
       class="ui segment">
-      <div class="ui message positive">
-        <div class="header">No unassociated items found</div>
-        <p>No action necessary.</p>
+      <div class="backlog-entry-title">
+        <span class="ui medium header">Features</span>
+        <a
+          @click="$emit('showmodal', 'feature-create')"
+          class="ui right floated compact icon button">
+          <i class="plus icon"/>
+          Add Feature
+        </a>
       </div>
-    </div>
-
-    <div
-      v-show="showBacklog"
-      v-if="orphanedData.features.length > 0"
-      class="ui segment">
-      <div class="ui medium header">Features</div>
       <div v-if="orphanedData.features.length === 0">
         <div class="ui message positive">
           <div class="header">No unassociated features found</div>
@@ -47,148 +53,17 @@
           <p><b>Suggested Action:</b> Edit these features so that they belong to a release.</p>
         </div>
       </div>
-      <accordion-item
+      <feature-accordion-item
         v-for="featureId in orphanedData.features"
         :key="featureId"
         :id="`backlog-features-${featureId}`"
+        :feature="project.features[featureId]"
+        :active-accordion="activeAccordion"
         @toggle-accordion-state="toggleAccordionState"
         :name="`backlog-features-${featureId}`"
-        :showing-boolean="activeAccordion === `backlog-features-${featureId}`">
-        <section slot="title">
-          <i class="dropdown icon"/>
-          <span>{{ project.features[featureId].name }}</span>
-          <div class="ui buttons right floated compact">
-            <button
-              @click.stop="featureEditHandler(featureId)"
-              class="ui inverted violet icon button">
-              <i class="icon edit"/>
-            </button>
-            <button
-              @click.stop="featureRemoveHandler(featureId)"
-              class="ui inverted red icon button">
-              <i class="icon trash"/>
-            </button>
-          </div>
-        </section>
-
-        <section slot="content">
-          {{ project.features[featureId].description }}
-          <hr>
-          <div
-            id="task-story-listing"
-            class="ui segment">
-            <div class="header">
-              <span class="ui header medium">Tasks and Stories</span>
-              <a class="ui right floated compact icon button">
-                <i class="plus icon"/>
-              </a>
-            </div>
-            <div>
-              <accordion-item
-                @toggle-accordion-state="toggleAccordionSubState"
-                :name="`backlog-sprints-${featureId}-extra-tasks`"
-                :showing-boolean="activeSubAccordion === `backlog-sprints-${featureId}-extra-tasks`">
-                <section slot="title">
-                  <i class="dropdown icon"/>
-                  <span>Extra Tasks</span>
-                </section>
-                <section slot="content">
-                  <div class="ui fluid container grid">
-                    <div class="row">
-                      <div class="sixteen wide column">
-                        <span class="ui small header">
-                          Tasks ({{ getNumUnfinishedTasks(featureId) }}/{{ getFeatureTasks(featureId).length }} Remaining)
-                        </span>
-                        <a class="ui right floated compact icon button">
-                          <i class="plus icon"/>
-                        </a>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="sixteen wide column">
-                        <div class="ui three stackable cards">
-                          <task-card
-                            v-for="task in getFeatureTasks(featureId)"
-                            :key="task.id"
-                            :task="task"/>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              </accordion-item>
-              <accordion-item
-                v-for="story in getFeatureStories(featureId)"
-                :key="story.id"
-                @toggle-accordion-state="toggleAccordionSubState"
-                :name="`feature-${featureId}-list-${story.id}`"
-                :showing-boolean="activeSubAccordion === `feature-${featureId}-list-${story.id}`">
-                <section slot="title">
-                  <i class="dropdown icon"/>
-                  <span>{{ story.name }}</span>
-                  <div
-                    :class="{
-                      'ui left pointing label story-status': true,
-                      yellow: story.status === 'in-progress',
-                      green: story.status === 'done',
-                      red: story.status === 'todo'
-                    }"
-                  >
-                    {{ story.status.toUpperCase() }}
-                  </div>
-                  <div class="ui buttons right floated compact">
-                    <button
-                      @click.stop="storyEditHandler(story.id)"
-                      class="ui inverted violet icon button">
-                      <i class="icon edit"/>
-                    </button>
-                    <button
-                      @click.stop="storyRemoveHandler(story.id)"
-                      class="ui inverted red icon button">
-                      <i class="icon trash"/>
-                    </button>
-                  </div>
-                </section>
-
-                <section slot="content">
-                  <div class="ui fluid container grid">
-                    <div class="row">
-                      <div class="eight wide column">
-                        {{ story.description }}
-                      </div>
-                      <div class="eight wide column">
-                        {{ story.name }} stats here
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="sixteen wide column">
-                        <hr>
-                        <span class="ui small header">Tasks ({{ story.tasks.length }})</span>
-                        <a class="ui right floated compact icon button">
-                          <i class="plus icon"/>
-                        </a>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="sixteen wide column">
-                        <span v-if="story.tasks.length === 0">No tasks found</span>
-                        <div
-                          v-else
-                          class="ui three stackable cards">
-                          <task-card
-                            v-for="taskId in story.tasks"
-                            :key="taskId"
-                            :task="tasks[taskId]"/>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              </accordion-item>
-            </div>
-          </div>
-        </section>
-      </accordion-item>
+        :stories="project.stories"
+        :tasks="project.tasks"
+      />
     </div>
 
     <div
@@ -240,9 +115,6 @@
             class="ui segment">
             <div class="header">
               <span class="ui header medium">Tasks and Stories</span>
-              <a class="ui right floated compact icon button">
-                <i class="plus icon"/>
-              </a>
             </div>
             <div>
               <accordion-item
@@ -260,9 +132,6 @@
                         <span class="ui small header">
                           Tasks
                         </span>
-                        <a class="ui right floated compact icon button">
-                          <i class="plus icon"/>
-                        </a>
                       </div>
                     </div>
                     <div class="row">
@@ -325,9 +194,6 @@
                       <div class="sixteen wide column">
                         <hr>
                         <span class="ui small header">Tasks ({{ story.tasks.length }})</span>
-                        <a class="ui right floated compact icon button">
-                          <i class="plus icon"/>
-                        </a>
                       </div>
                     </div>
                     <div class="row">
@@ -354,9 +220,16 @@
 
     <div
       v-show="showBacklog"
-      v-if="orphanedData.stories.length > 0"
       class="ui segment">
-      <div class="ui header medium">Stories</div>
+      <div class="backlog-entry-title">
+        <span class="ui medium header">Stories</span>
+        <a
+          @click="$emit('showmodal', 'story-create')"
+          class="ui right floated compact icon button">
+          <i class="plus icon"/>
+          Add Story
+        </a>
+      </div>
       <div v-if="orphanedData.stories.length === 0">
         <div class="ui message positive">
           <div class="header">No unassociated stories found</div>
@@ -369,81 +242,27 @@
           <p><b>Suggested Action:</b> Edit these stories so that they belong to a sprint.</p>
         </div>
       </div>
-      <accordion-item
+      <story-accordion-item
         v-for="storyId in orphanedData.stories"
         :key="storyId"
         @toggle-accordion-state="toggleAccordionSubState"
         :name="`story-list-${storyId}`"
-        :showing-boolean="activeSubAccordion === `story-list-${storyId}`">
-        <section slot="title">
-          <i class="dropdown icon"/>
-          <span>{{ project.stories[storyId].name }}</span>
-          <div
-            :class="{
-              'ui left pointing label story-status': true,
-              yellow: project.stories[storyId].status === 'in-progress',
-              green: project.stories[storyId].status === 'done',
-              red: project.stories[storyId].status === 'todo'
-            }"
-          >
-            {{ project.stories[storyId].status.toUpperCase() }}
-          </div>
-          <div class="ui buttons right floated compact">
-            <button
-              @click.stop="storyEditHandler(project.stories[storyId].id)"
-              class="ui inverted violet icon button">
-              <i class="icon edit"/>
-            </button>
-            <button
-              @click.stop="storyRemoveHandler(project.stories[storyId].id)"
-              class="ui inverted red icon button">
-              <i class="icon trash"/>
-            </button>
-          </div>
-        </section>
-
-        <section slot="content">
-          <div class="ui fluid container grid">
-            <div class="row">
-              <div class="eight wide column">
-                {{ project.stories[storyId].description }}
-              </div>
-              <div class="eight wide column">
-                {{ project.stories[storyId].name }} stats here
-              </div>
-            </div>
-            <div class="row">
-              <div class="sixteen wide column">
-                <hr>
-                <span class="ui small header">Tasks ({{ project.stories[storyId].tasks.length }})</span>
-                <a class="ui right floated compact icon button">
-                  <i class="plus icon"/>
-                </a>
-              </div>
-            </div>
-            <div class="row">
-              <div class="sixteen wide column">
-                <span v-if="project.stories[storyId].tasks.length === 0">No tasks found</span>
-                <div
-                  v-else
-                  class="ui three stackable cards">
-                  <task-card
-                    v-for="taskId in project.stories[storyId].tasks"
-                    :key="taskId"
-                    :task="tasks[taskId]"/>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </accordion-item>
+        :story="project.stories[storyId]"
+        :tasks="project.tasks"
+        :showing-boolean="activeSubAccordion === `story-list-${storyId}`"
+      />
     </div>
 
     <div
       v-show="showBacklog"
-      v-if="orphanedData.tasks.length > 0"
       class="ui segment">
-      <div class="ui medium header">Tasks</div>
+      <div class="backlog-entry-title">
+        <span class="ui medium header">Tasks</span>
+        <a class="ui right floated compact icon button">
+          <i class="plus icon"/>
+          Add Task
+        </a>
+      </div>
       <div v-if="orphanedData.tasks.length === 0">
         <div class="ui message positive">
           <div class="header">No unassociated tasks found</div>
@@ -469,11 +288,15 @@
 
 <script>
 import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
+import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
+import FeatureAccordionItem from '@/components/Projects/Features/FeatureAccordionItem'
 import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
 
 export default {
   components: {
     'task-card': SingleTaskCard,
+    'feature-accordion-item': FeatureAccordionItem,
+    'story-accordion-item': StoryAccordionItem,
     'accordion-item': SegmentAccordionItem
   },
   props: {
@@ -486,8 +309,7 @@ export default {
     return {
       activeAccordion: '',
       activeSubAccordion: '',
-      showBacklog: false,
-      hasBacklogItems: false
+      showBacklog: false
     }
   },
   computed: {
@@ -551,14 +373,22 @@ export default {
         tasks: Object.keys(this.project.tasks)
           .filter(id => this.usedData.tasks.indexOf(id) === -1)
       }
+    },
+    numBackLogItems () {
+      return Object.keys(this.orphanedData)
+        .map(key => this.orphanedData[key].length > 0)
+        .filter(val => !!val).length
+    },
+    hasBacklogItems () {
+      return this.numBackLogItems > 0
+    }
+  },
+  watch: {
+    hasBacklogItems (newValue) {
+      this.showBacklog = newValue
     }
   },
   mounted () {
-    // show backlog on first load if there's anything in it
-    this.hasBacklogItems = Object.keys(this.orphanedData)
-      .map(key => this.orphanedData[key].length > 0)
-      .filter(val => !!val).length > 0
-
     this.showBacklog = this.hasBacklogItems
   },
   methods: {
@@ -640,5 +470,9 @@ export default {
 
 #backlog-header.active-backlog .icon.dropdown {
   transform: rotate(0deg);
+}
+
+.backlog-entry-title {
+  margin-bottom: 1rem;
 }
 </style>
