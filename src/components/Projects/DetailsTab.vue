@@ -116,10 +116,10 @@ export default {
   },
   data () {
     return {
-      currentReleaseId: 'nothing',
-      currentSprintId: 'nothing',
-      currentFeatureId: 'nothing',
-      removeTargetId: 'nothing',
+      currentReleaseId: '',
+      currentSprintId: '',
+      currentFeatureId: '',
+      removeTargetId: '',
       modals: {}
     }
   },

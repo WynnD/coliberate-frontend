@@ -259,10 +259,14 @@ export default {
         tasks: Object.keys(this.selectedTasks).filter(id => this.selectedTasks[id])
       }
       storyData.name = storyData.name || storyData.id
-      console.debug(storyData, this.associatedFeatures, this.associatedSprints)
+      const associatedData = {
+        features: this.associatedFeatures.filter(id => !!id),
+        sprints: this.associatedSprints.filter(id => !!id)
+      }
+      console.debug(storyData, associatedData)
 
       try {
-        const result = await this.register(storyData, this.associatedFeatures, this.associatedSprints)
+        const result = await this.register(storyData, associatedData)
         console.debug(result)
         if (result === 'OK') {
           this.$form.modal('hide')
@@ -279,19 +283,19 @@ export default {
       }
       this.$form.removeClass('loading')
     },
-    async register (data = {}, associatedFeatures, associatedSprints) {
+    async register (data = {}, associatedData) {
       this.$form.addClass('loading')
-      const response = await this.sendRegisterData(data, associatedFeatures, associatedSprints)
+      const response = await this.sendRegisterData(data, associatedData)
       // eslint-disable-next-line
       console.debug('register', { response })
       return response
     },
-    sendRegisterData (storyData, associatedFeatures, associatedSprints) {
+    sendRegisterData (storyData, associatedData) {
       const apiUrl = `api/projects/${this.projectId}/stories`
       const payload = {
         storyData,
-        associatedFeatures,
-        associatedSprints,
+        associatedFeatures: associatedData.features,
+        associatedSprints: associatedData.sprints,
         memberID: this.currentUser.id,
         projectID: this.projectId
       }
