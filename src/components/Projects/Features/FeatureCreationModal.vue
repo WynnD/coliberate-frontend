@@ -257,7 +257,7 @@ export default {
       console.debug(featureData, this.feature.associatedReleases)
 
       try {
-        const result = await this.register(featureData, this.feature.associatedReleases)
+        const result = await this.register(featureData, this.feature.associatedReleases.filter(id => !!id))
         console.debug(result)
         if (result === 'OK') {
           this.$form.modal('hide')
