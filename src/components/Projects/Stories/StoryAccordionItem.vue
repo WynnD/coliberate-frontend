@@ -105,6 +105,14 @@ export default {
       default: true
     }
   },
+  watch: {
+    showingBoolean (doShow) {
+      setTimeout(() => {
+        console.debug('changestory', this.story.id)
+        this.$emit('changestory', doShow ? this.story.id : '')
+      }, doShow ? 100 : 25)
+    }
+  },
   methods: {
     handleToggleAccordionState (name) {
       this.$emit('toggle-accordion-state', name)

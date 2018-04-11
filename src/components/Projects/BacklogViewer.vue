@@ -63,6 +63,7 @@
         :name="`backlog-features-${featureId}`"
         :stories="project.stories"
         :tasks="project.tasks"
+        @showmodal="showModal"
       />
     </div>
 
@@ -249,6 +250,8 @@
         :name="`story-list-${storyId}`"
         :story="project.stories[storyId]"
         :tasks="project.tasks"
+        @changestory="changeStory"
+        @showmodal="showModal"
         :showing-boolean="activeSubAccordion === `story-list-${storyId}`"
       />
     </div>
@@ -447,6 +450,12 @@ export default {
     getSprintStories (sprintId) {
       return this.project.sprints[sprintId].stories
         .map(id => this.project.stories[id])
+    },
+    showModal (data) {
+      this.$emit('showmodal', data)
+    },
+    changeStory (data) {
+      this.$emit('changestory', data)
     }
   }
 }

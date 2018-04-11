@@ -22,6 +22,7 @@
         :stories="stories"
         :tasks="tasks"
         @showmodal="showModal"
+        @changestory="changeStory"
       />
     </div>
   </div>
@@ -86,6 +87,9 @@ export default {
     },
     showModal (type) {
       this.$emit('showmodal', type)
+    },
+    changeStory (data) {
+      this.$emit('changestory', data)
     }
   }
 }

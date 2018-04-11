@@ -59,6 +59,7 @@
             :show-buttons="showButtons"
             :showing-boolean="activeSubAccordion === `${feature.id}-list-${story.id}`"
             @showmodal="showModal"
+            @changestory="changeStory"
           />
         </div>
       </div>
@@ -137,6 +138,9 @@ export default {
     },
     showModal (data) {
       this.$emit('showmodal', data)
+    },
+    changeStory (data) {
+      this.$emit('changestory', data)
     }
   }
 }

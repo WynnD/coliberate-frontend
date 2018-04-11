@@ -52,6 +52,7 @@
       :project-members="project.members"
       :initial-sprint="currentSprintId"
       :initial-feature="currentFeatureId"
+      :initial-story="currentStoryId"
       :project-id="project.id || ''"
       @update="handleNewTask"
     />
@@ -72,6 +73,7 @@
         :features="project.features"
         :stories="project.stories"
         :tasks="project.tasks"
+        @changestory="handleStoryChange"
         @changefeature="handleFeatureChange"
       />
     </div>
@@ -85,12 +87,14 @@
         :stories="project.stories"
         :tasks="project.tasks"
         :initial-sprint="currentSprintId"
+        @changestory="handleStoryChange"
         @changesprint="handleSprintChange"
       />
     </div>
     <div class="column sixteen wide">
       <backlog-viewer
         @showmodal="showModal"
+        @changestory="handleStoryChange"
         :project="project"/>
     </div>
   </div>
@@ -139,6 +143,7 @@ export default {
       currentSprintId: 'nothing',
       currentFeatureId: 'nothing',
       removeTargetId: 'nothing',
+      currentStoryId: 'nothing',
       modals: {}
     }
   },
@@ -184,6 +189,10 @@ export default {
     handleFeatureChange (featureId) {
       console.debug({ featureId })
       this.currentFeatureId = featureId
+    },
+    handleStoryChange (storyId) {
+      console.debug({ storyId })
+      this.currentStoryId = storyId
     },
     handleNewRelease (newRelease) {
       this.currentReleaseId = newRelease || ''
