@@ -175,7 +175,7 @@ export default {
     numTasks () {
       return Object.keys(this.tasks).length
     },
-    ...mapGetters(['newProjectId', 'currentUser'])
+    ...mapGetters(['isDevelopmentMode', 'currentUser'])
   },
   watch: {
     initialRelease () {
