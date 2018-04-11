@@ -76,15 +76,18 @@
           :showing-boolean="activeAccordion === 'sprint-extra-tasks'"
           :assigned-task-list="currentSprint.tasks"
           :all-tasks="tasks"
+          @showmodal="showModal"
         />
         <story-accordion-item
           v-for="story in sprintStories"
           :key="story.id"
           @toggle-accordion-state="toggleAccordionState"
-          :name="`sprint-${story.id}`"
-          :showing-boolean="activeAccordion === `sprint-${story.id}`"
+          :name="`sprint-story-${story.id}`"
+          :showing-boolean="activeAccordion === `sprint-story-${story.id}`"
           :story="story"
           :tasks="tasks"
+          @changestory="changeStory"
+          @showmodal="showModal"
         />
       </div>
     </div>
@@ -221,6 +224,12 @@ export default {
     sprintRemoveHandler (sprintId) {
       console.debug('Clicked remove for', sprintId)
       this.$emit('showmodal', `sprint-remove|${sprintId}`)
+    },
+    showModal (data) {
+      this.$emit('showmodal', data)
+    },
+    changeStory (data) {
+      this.$emit('changestory', data)
     }
   }
 }

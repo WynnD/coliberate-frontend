@@ -43,6 +43,19 @@
       :project-id="project.id || ''"
       @update="handleNewStory"
     />
+    <task-creation-modal
+      id="task-creation-modal"
+      :stories="project.stories"
+      :tasks="project.tasks"
+      :features="project.features"
+      :sprints="project.sprints"
+      :project-members="project.members"
+      :initial-sprint="currentSprintId"
+      :initial-feature="currentFeatureId"
+      :initial-story="currentStoryId"
+      :project-id="project.id || ''"
+      @update="handleNewTask"
+    />
 
     <div class="column sixteen wide">
       <release-selector
@@ -60,6 +73,7 @@
         :features="project.features"
         :stories="project.stories"
         :tasks="project.tasks"
+        @changestory="handleStoryChange"
         @changefeature="handleFeatureChange"
       />
     </div>
@@ -73,12 +87,14 @@
         :stories="project.stories"
         :tasks="project.tasks"
         :initial-sprint="currentSprintId"
+        @changestory="handleStoryChange"
         @changesprint="handleSprintChange"
       />
     </div>
     <div class="column sixteen wide">
       <backlog-viewer
         @showmodal="showModal"
+        @changestory="handleStoryChange"
         :project="project"/>
     </div>
   </div>
@@ -86,14 +102,20 @@
 
 <script>
 import BacklogViewer from '@/components/Projects/BacklogViewer'
+
 import ReleaseCreationModal from '@/components/Projects/Releases/ReleaseCreationModal'
 import ReleaseSelector from '@/components/Projects/Releases/ReleaseSelector'
+
 import FeatureCreationModal from '@/components/Projects/Features/FeatureCreationModal'
 import FeatureListing from '@/components/Projects/Features/FeatureListing'
+
 import SprintCreationModal from '@/components/Projects/Sprints/SprintCreationModal'
 import SprintViewer from '@/components/Projects/Sprints/SprintViewer'
 import SprintRemovalModal from '@/components/Projects/Sprints/SprintRemovalModal'
+
 import StoryCreationModal from '@/components/Projects/Stories/StoryCreationModal'
+
+import TaskCreationModal from '@/components/Projects/Tasks/TaskCreationModal'
 
 /* global $ */
 export default {
@@ -106,7 +128,8 @@ export default {
     'sprint-creation-modal': SprintCreationModal,
     'sprint-viewer': SprintViewer,
     'sprint-removal-modal': SprintRemovalModal,
-    'story-creation-modal': StoryCreationModal
+    'story-creation-modal': StoryCreationModal,
+    'task-creation-modal': TaskCreationModal
   },
   props: {
     project: {
@@ -120,6 +143,7 @@ export default {
       currentSprintId: '',
       currentFeatureId: '',
       removeTargetId: '',
+      currentStoryId: '',
       modals: {}
     }
   },
@@ -148,6 +172,10 @@ export default {
     this.modals['story-create'] = $(this.$el).find('#story-creation-modal')
       .modal('setting', 'closable', false)
       .modal('hide')
+
+    this.modals['task-create'] = $(this.$el).find('#task-creation-modal')
+      .modal('setting', 'closable', false)
+      .modal('hide')
   },
   methods: {
     handleReleaseChange (releaseId) {
@@ -161,6 +189,10 @@ export default {
     handleFeatureChange (featureId) {
       console.debug({ featureId })
       this.currentFeatureId = featureId
+    },
+    handleStoryChange (storyId) {
+      console.debug({ storyId })
+      this.currentStoryId = storyId
     },
     handleNewRelease (newRelease) {
       this.currentReleaseId = newRelease || ''
@@ -187,6 +219,9 @@ export default {
       console.debug('handled new feature')
     },
     handleNewStory () {
+      this.$emit('update')
+    },
+    handleNewTask () {
       this.$emit('update')
     },
     showModal (type) {
