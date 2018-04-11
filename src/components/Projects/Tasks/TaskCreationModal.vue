@@ -97,34 +97,25 @@
               </div>
             </div>
 
+            <div class="sixteen wide column">
+              <div class="ui checkbox">
+                <input
+                  v-model="takeTask"
+                  type="checkbox">
+                <label>Take This Task</label>
+              </div>
+            </div>
+
+            <div class="sixteen wide column">
+              <div class="ui error message">
+                <div class="header">Error</div>
+                <p>An error has occurred</p>
+              </div>
+            </div>
+
           </div>
         </div>
 
-        <div
-          id="selection-section"
-          class="ui segment">
-          <div class="ui header">Member Selector</div>
-          <!-- Work in Progress...
-          {{ selectedMembers }} -->
-          <select
-            name="members"
-            multiple=""
-            v-model="selectedMembers"
-            class="ui fluid search dropdown">
-            <option value="">Members</option>
-            <option
-              v-for="memberInfo in projectMembers"
-              :key="memberInfo.id"
-              :value="memberInfo.id"
-            >
-              {{ getMemberName(memberInfo.id) }} ({{ memberInfo.role }})
-            </option>
-          </select>
-          <div class="ui error message">
-            <div class="header">Error</div>
-            <p>An error has occurred</p>
-          </div>
-        </div>
       </div>
     </div>
     <div class="actions">
@@ -195,14 +186,15 @@ export default {
       associatedFeatures: [],
       associatedSprints: [],
       associatedStories: [],
-      selectedMembers: [],
+      takeTask: false,
       $form: null,
       dropdowns: {
         features: null,
         sprints: null,
         stories: null,
         members: null
-      }
+      },
+      lastModified: ''
     }
   },
   computed: {
@@ -211,20 +203,20 @@ export default {
   watch: {
     initialFeature (newValue) {
       if (this.dropdowns.features) {
-        this.dropdowns.features.dropdown('set exactly', [newValue])
-        this.setDropdownValues(this.dropdowns.features, [newValue])
+        this.lastModified = 'initialFeature'
+        this.resetInitialAssociatedValues()
       }
     },
     initialSprint (newValue) {
       if (this.dropdowns.sprints) {
-        this.dropdowns.sprints.dropdown('set exactly', [newValue])
-        this.setDropdownValues(this.dropdowns.sprints, [newValue])
+        this.lastModified = 'initialSprint'
+        this.resetInitialAssociatedValues()
       }
     },
     initialStory (newValue) {
       if (this.dropdowns.stories) {
-        this.dropdowns.stories.dropdown('set exactly', [newValue])
-        this.setDropdownValues(this.dropdowns.stories, [newValue])
+        this.lastModified = 'initialStory'
+        this.resetInitialAssociatedValues()
       }
     }
   },
@@ -245,7 +237,6 @@ export default {
     this.dropdowns.features = $(this.$el).find('.ui.dropdown[name="features"]').dropdown()
     this.dropdowns.sprints = $(this.$el).find('.ui.dropdown[name="sprints"]').dropdown()
     this.dropdowns.stories = $(this.$el).find('.ui.dropdown[name="stories"]').dropdown()
-    this.dropdowns.members = $(this.$el).find('.ui.dropdown[name="members"]').dropdown()
 
     // this.updateButtons()
     this.resetTaskData()
@@ -266,14 +257,61 @@ export default {
         description: this.task.description.trim(),
         points: this.task.points,
         status: 'TODO',
-        takenBy: this.selectedMembers
+        takenBy: this.takeTask ? [this.currentUser.id] : []
       }
       taskData.name = taskData.name || taskData.id
-      console.debug(taskData, {
-        features: this.associatedFeatures,
-        sprints: this.associatedSprints,
-        stories: this.associatedStories
+      const dataToSend = {
+        taskData,
+        // only filter out entries that are empty; validation is server-side
+        features: this.associatedFeatures.filter(id => !!id),
+        sprints: this.associatedSprints.filter(id => !!id),
+        stories: this.associatedStories.filter(id => !!id)
+      }
+      try {
+        const result = await this.register(dataToSend)
+        console.debug(result)
+        if (result === 'OK') {
+          this.$form.modal('hide')
+          this.$emit('update')
+          this.resetTaskData()
+        } else {
+          console.debug('Register failed!')
+          this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
+        }
+      } catch (err) {
+        console.debug('Register failed', err)
+        const message = `${err.status}: ${err.statusText}`
+        this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
+      }
+      this.$form.removeClass('loading')
+    },
+    async register (data) {
+      this.$form.addClass('loading')
+      const response = await this.sendRegisterData(data)
+      // eslint-disable-next-line
+      console.debug('register', { response })
+      return response
+    },
+    sendRegisterData (data) {
+      const apiUrl = `api/projects/${this.projectId}/tasks`
+      const payload = {
+        taskData: data.taskData,
+        associatedFeatures: data.features,
+        associatedSprints: data.sprints,
+        associatedStories: data.stories,
+        memberID: this.currentUser.id,
+        projectID: this.projectId
+      }
+      console.debug('sending register data', { payload, apiUrl })
+      return new Promise((resolve, reject) => {
+        const url = this.isDevelopmentMode ? 'http://localhost' : ''
+        $.post(`${url}/${apiUrl}`, payload)
+          .done(resolve).fail(reject)
       })
+    },
+    notifyError (message = 'An error occurred while trying to register') {
+      this.$form.find('.ui.message p').text(message)
+      this.$form.addClass('error')
     },
     resetTaskData () {
       const defaults = {
@@ -286,11 +324,30 @@ export default {
         .forEach(field => {
           this.task[field] = defaults[field]
         })
-      this.associatedFeatures = [this.initialFeature]
-      this.associatedSprints = [this.initialSprint]
-      this.associatedStories = [this.initialStory]
-      this.selectedMembers = [this.currentUser.id]
-      this.setDropdownValues(this.dropdowns.members, this.selectedMembers)
+      this.resetInitialAssociatedValues()
+      this.takeTask = false
+    },
+    resetInitialAssociatedValues () {
+      try {
+        this.resetDropdowns()
+        if (this.lastModified === 'initialFeature' && this.dropdowns.features) {
+          this.setDropdownValues(this.dropdowns.features, [this.initialFeature])
+        } else if (this.lastModified === 'initialSprint' && this.dropdowns.sprints) {
+          this.setDropdownValues(this.dropdowns.sprints, [this.initialSprint])
+        } else if (this.lastModified === 'initialStory' && this.dropdowns.stories) {
+          this.setDropdownValues(this.dropdowns.stories, [this.initialStory])
+        }
+      } catch (err) {
+        console.debug(err)
+      }
+    },
+    resetDropdowns () {
+      this.associatedFeatures = []
+      this.associatedSprints = []
+      this.associatedStories = []
+      Object.values(this.dropdowns)
+        .filter(d => !!d)
+        .forEach(d => { this.setDropdownValues(d, []) })
     },
     getMemberName (id) {
       if (id === this.currentUser.id) {

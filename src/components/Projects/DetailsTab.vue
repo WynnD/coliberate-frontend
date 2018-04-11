@@ -139,11 +139,11 @@ export default {
   },
   data () {
     return {
-      currentReleaseId: 'nothing',
-      currentSprintId: 'nothing',
-      currentFeatureId: 'nothing',
-      removeTargetId: 'nothing',
-      currentStoryId: 'nothing',
+      currentReleaseId: '',
+      currentSprintId: '',
+      currentFeatureId: '',
+      removeTargetId: '',
+      currentStoryId: '',
       modals: {}
     }
   },
