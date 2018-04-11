@@ -179,13 +179,10 @@ export default {
       console.debug('handled new sprint')
     },
     handleNewFeature (releases = []) {
-      // don't need to do anything
-      if (releases.length === 0 || releases.indexOf(this.currentReleaseId) > -1) {
-        return
+      if (!(releases.length === 0 || releases.indexOf(this.currentReleaseId) > -1)) {
+        // set to first release in list
+        this.currentReleaseId = releases[0]
       }
-
-      // set to first release in list
-      this.currentReleaseId = releases[0]
       this.$emit('update')
       console.debug('handled new feature')
     },
