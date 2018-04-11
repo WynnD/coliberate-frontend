@@ -94,6 +94,7 @@
     <div class="column sixteen wide">
       <backlog-viewer
         @showmodal="showModal"
+        @changefeature="handleFeatureChange"
         @changestory="handleStoryChange"
         :project="project"/>
     </div>

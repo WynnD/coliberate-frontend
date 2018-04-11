@@ -63,6 +63,8 @@
         :name="`backlog-features-${featureId}`"
         :stories="project.stories"
         :tasks="project.tasks"
+        @click.native="$emit('changefeature', featureId)"
+        @changestory="changeStory"
         @showmodal="showModal"
       />
     </div>
