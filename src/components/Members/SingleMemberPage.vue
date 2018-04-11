@@ -34,6 +34,7 @@
 
 <script>
 import ProjectCard from '@/components/Projects/ProjectCard'
+import { mapGetters } from 'vuex'
 
 /* global $ */
 export default {
@@ -49,10 +50,11 @@ export default {
   computed: {
     memberID () {
       return this.$route.params.id
-    }
+    },
+    ...mapGetters(['currentUser'])
   },
   async mounted () {
-    this.accountData = this.$store.state.memberData[this.memberID.toString()]
+    this.accountData = this.memberById()(this.memberID.toString())
     await this.getAccountData(this.memberID)
 
     this.sharedProjects = await this.getSharedProjects(this.accountData.id)
@@ -87,19 +89,22 @@ export default {
     },
     async getSharedProjects (theirID) {
       let yourProjects
-      const yourID = this.$store.state.accountData.id
+      const yourID = this.currentUser.id
 
       try {
         yourProjects = await this.getProjectList(yourID)
       } catch (err) { return }
 
+      console.debug('your projects', yourProjects, yourID, theirID)
+
       const sharedProjects = yourProjects
         // eslint-disable-next-line
-        .filter(p => p.members.filter(m => m.memberID == theirID).length > 0)
+        .filter(p => Object.keys(p.members).filter(id => id === theirID).length > 0)
 
       console.debug('shared projects', sharedProjects)
       return sharedProjects
-    }
+    },
+    ...mapGetters(['memberById'])
   }
 }
 </script>
