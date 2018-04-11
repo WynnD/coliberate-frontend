@@ -104,8 +104,22 @@
           id="selection-section"
           class="ui segment">
           <div class="ui header">Member Selector</div>
-          Work in Progress...
-          {{ selectedMembers }}
+          <!-- Work in Progress...
+          {{ selectedMembers }} -->
+          <select
+            name="members"
+            multiple=""
+            v-model="selectedMembers"
+            class="ui fluid search dropdown">
+            <option value="">Members</option>
+            <option
+              v-for="memberInfo in projectMembers"
+              :key="memberInfo.id"
+              :value="memberInfo.id"
+            >
+              {{ getMemberName(memberInfo.id) }} ({{ memberInfo.role }})
+            </option>
+          </select>
           <div class="ui error message">
             <div class="header">Error</div>
             <p>An error has occurred</p>
@@ -231,7 +245,7 @@ export default {
     this.dropdowns.features = $(this.$el).find('.ui.dropdown[name="features"]').dropdown()
     this.dropdowns.sprints = $(this.$el).find('.ui.dropdown[name="sprints"]').dropdown()
     this.dropdowns.stories = $(this.$el).find('.ui.dropdown[name="stories"]').dropdown()
-    // this.dropdowns.members = $(this.$el).find('.ui.dropdown[name="members"]').dropdown()
+    this.dropdowns.members = $(this.$el).find('.ui.dropdown[name="members"]').dropdown()
 
     // this.updateButtons()
     this.resetTaskData()
@@ -276,6 +290,15 @@ export default {
       this.associatedSprints = [this.initialSprint]
       this.associatedStories = [this.initialStory]
       this.selectedMembers = [this.currentUser.id]
+      this.setDropdownValues(this.dropdowns.members, this.selectedMembers)
+    },
+    getMemberName (id) {
+      if (id === this.currentUser.id) {
+        return this.currentUser.name
+      }
+      const member = this.memberById()(id)
+      console.debug('member info', id, member)
+      return member.name
     },
     ...mapGetters(['memberById', 'generateUniqueId'])
   }
