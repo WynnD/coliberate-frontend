@@ -59,13 +59,19 @@ export default {
   },
   watch: {
     roles (newValue) {
-      this.$emit('rolechange', { id: this.member.id, roles: newValue })
+      this.emitRoleChange()
+    },
+    member () {
+      this.emitRoleChange()
     }
   },
   mounted () {
-    this.$emit('rolechange', { id: this.member.id, roles: this.roles })
+    this.emitRoleChange()
   },
   methods: {
+    emitRoleChange () {
+      this.$emit('rolechange', { id: this.member.id, roles: this.roles })
+    },
     isRoleActive (role) {
       return this.roles.indexOf(role) > -1
     },

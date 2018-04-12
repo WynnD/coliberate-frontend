@@ -3,6 +3,7 @@
     <release-creation-modal
       @update="handleNewRelease"
       id="release-creation-modal"
+      :features="project.features"
       :project="project"/>
     <feature-creation-modal
       id="feature-creation-modal"
