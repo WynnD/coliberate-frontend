@@ -3,6 +3,7 @@
     :id="`feature-list-${feature.id}`"
     @toggle-accordion-state="toggleAccordionState"
     :name="`feature-list-${feature.id}`"
+    @click.native="$emit('changefeature', feature.id)"
     :showing-boolean="activeAccordion === `feature-list-${feature.id}`">
     <section slot="title">
       <i class="dropdown icon"/>
@@ -33,7 +34,7 @@
           <span class="ui header medium">Tasks and Stories</span>
           <a
             v-if="showButtons"
-            @click="$emit('showmodal', 'story-create')"
+            @click="showModal('story-create')"
             class="ui right floated compact icon button">
             <i class="plus icon"/>
             Add Story
@@ -137,6 +138,7 @@ export default {
       }
     },
     showModal (data) {
+      this.$emit('changefeature', this.feature.id)
       this.$emit('showmodal', data)
     },
     changeStory (data) {

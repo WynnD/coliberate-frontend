@@ -22,6 +22,7 @@
         :stories="stories"
         :tasks="tasks"
         @showmodal="showModal"
+        @changefeature="changeFeature"
         @changestory="changeStory"
       />
     </div>
@@ -68,13 +69,6 @@ export default {
   watch: {
     release () {
       this.activeAccordion = ''
-    },
-    activeAccordion (newValue = '') {
-      let featureId = ''
-      if (newValue.indexOf('feature-list') > -1) {
-        featureId = newValue.split('feature-list-')[1]
-      }
-      this.$emit('changefeature', featureId)
     }
   },
   methods: {
@@ -90,6 +84,9 @@ export default {
     },
     changeStory (data) {
       this.$emit('changestory', data)
+    },
+    changeFeature (featureId) {
+      this.$emit('changefeature', !this.activeAccordion ? '' : featureId)
     }
   }
 }

@@ -10,7 +10,7 @@
       :tasks="project.tasks"
       :features="project.features"
       :releases="project.releases"
-      :initial-release="currentReleaseId"
+      :initial-release="!isSandbox ? currentReleaseId : sandboxData.currentReleaseId"
       :project-id="project.id || ''"
       @update="handleNewFeature"
     />
@@ -18,7 +18,7 @@
       @update="handleNewSprint"
       id="sprint-creation-modal"
       :releases="project.releases"
-      :initial-release="currentReleaseId"
+      :initial-release="!isSandbox ? currentReleaseId : sandboxData.currentReleaseId"
       :sprints="project.sprints"
       :stories="project.stories"
       :tasks="project.tasks"
@@ -38,8 +38,8 @@
       :tasks="project.tasks"
       :features="project.features"
       :sprints="project.sprints"
-      :initial-sprint="currentSprintId"
-      :initial-feature="currentFeatureId"
+      :initial-sprint="!isSandbox ? currentSprintId : sandboxData.currentSprintId"
+      :initial-feature="!isSandbox ? currentFeatureId : sandboxData.currentFeatureId"
       :project-id="project.id || ''"
       @update="handleNewStory"
     />
@@ -50,9 +50,9 @@
       :features="project.features"
       :sprints="project.sprints"
       :project-members="project.members"
-      :initial-sprint="currentSprintId"
-      :initial-feature="currentFeatureId"
-      :initial-story="currentStoryId"
+      :initial-sprint="!isSandbox ? currentSprintId : sandboxData.currentSprintId"
+      :initial-feature="!isSandbox ? currentFeatureId : sandboxData.currentFeatureId"
+      :initial-story="!isSandbox ? currentStoryId : sandboxData.currentStoryId"
       :project-id="project.id || ''"
       @update="handleNewTask"
     />
@@ -93,9 +93,9 @@
     </div>
     <div class="column sixteen wide">
       <backlog-viewer
-        @showmodal="showModal"
-        @changefeature="handleFeatureChange"
-        @changestory="handleStoryChange"
+        @showmodal="showSandboxModal"
+        @changefeature="handleFeatureChange($event, true)"
+        @changestory="handleStoryChange($event, true)"
         :project="project"/>
     </div>
   </div>
@@ -145,6 +145,13 @@ export default {
       currentFeatureId: '',
       removeTargetId: '',
       currentStoryId: '',
+      isSandbox: false,
+      sandboxData: {
+        currentReleaseId: '',
+        currentSprintId: '',
+        currentFeatureId: '',
+        currentStoryId: ''
+      },
       modals: {}
     }
   },
@@ -179,20 +186,32 @@ export default {
       .modal('hide')
   },
   methods: {
-    handleReleaseChange (releaseId) {
-      console.debug({ releaseId })
+    handleReleaseChange (releaseId, isSandbox = false) {
+      console.debug({ releaseId, isSandbox })
+      if (isSandbox) {
+        this.sandboxData.currentReleaseId = releaseId
+      }
       this.currentReleaseId = releaseId
     },
-    handleSprintChange (sprintId) {
-      console.debug({ sprintId })
+    handleSprintChange (sprintId, isSandbox = false) {
+      console.debug({ sprintId, isSandbox })
+      if (isSandbox) {
+        this.sandboxData.currentSprintId = sprintId
+      }
       this.currentSprintId = sprintId
     },
-    handleFeatureChange (featureId) {
-      console.debug({ featureId })
+    handleFeatureChange (featureId, isSandbox = false) {
+      console.debug({ featureId, isSandbox })
+      if (isSandbox) {
+        this.sandboxData.currentFeatureId = featureId
+      }
       this.currentFeatureId = featureId
     },
-    handleStoryChange (storyId) {
-      console.debug({ storyId })
+    handleStoryChange (storyId, isSandbox = false) {
+      console.debug({ storyId, isSandbox })
+      if (isSandbox) {
+        this.sandboxData.currentStoryId = storyId
+      }
       this.currentStoryId = storyId
     },
     handleNewRelease (newRelease) {
@@ -209,6 +228,8 @@ export default {
         this.currentSprintId = sprint || ''
       }, 50)
       this.$emit('update')
+      this.sandboxData.currentSprintId = ''
+      this.sandboxData.currentReleaseId = ''
       console.debug('handled new sprint')
     },
     handleNewFeature (releases = []) {
@@ -225,8 +246,12 @@ export default {
     handleNewTask () {
       this.$emit('update')
     },
-    showModal (type) {
-      console.debug({type}, this.modals[type])
+    showSandboxModal (type) {
+      this.showModal(type, true)
+    },
+    showModal (type, isSandbox = false) {
+      this.isSandbox = isSandbox
+      console.debug({type, isSandbox}, this.modals[type])
       const isRemoveCommand = type.indexOf('remove') > -1 && type.indexOf('|') > -1
       if (this.modals[type] && !isRemoveCommand) {
         this.modals[type].modal('show')

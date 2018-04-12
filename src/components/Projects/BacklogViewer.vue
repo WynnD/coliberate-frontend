@@ -227,7 +227,7 @@
       <div class="backlog-entry-title">
         <span class="ui medium header">Stories</span>
         <a
-          @click="$emit('showmodal', 'story-create')"
+          @click="showStoryModalNoFeature"
           class="ui right floated compact icon button">
           <i class="plus icon"/>
           Add Story
@@ -264,7 +264,7 @@
       <div class="backlog-entry-title">
         <span class="ui medium header">Tasks</span>
         <a
-          @click="$emit('showmodal', 'task-create')"
+          @click="showTaskModalNoStory"
           class="ui right floated compact icon button">
           <i class="plus icon"/>
           Add Task
@@ -452,6 +452,14 @@ export default {
     getSprintStories (sprintId) {
       return this.project.sprints[sprintId].stories
         .map(id => this.project.stories[id])
+    },
+    showStoryModalNoFeature () {
+      this.$emit('changefeature', '')
+      this.$emit('showmodal', 'story-create')
+    },
+    showTaskModalNoStory () {
+      this.changeStory('')
+      this.showModal('task-create')
     },
     showModal (data) {
       this.$emit('showmodal', data)
