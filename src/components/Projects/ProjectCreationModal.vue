@@ -28,24 +28,44 @@
         </div>
 
         <div class="ui segment">
-          <div class="ui header">Group Members</div>
-          <div class="meta">
-            Group and Role Selectors still in development
+          <div class="ui segments">
+            <div class="ui segment">
+              <div class="ui header">Member Selector</div>
+              <select
+                v-model="selectedMembers"
+                multiple=""
+                name="members"
+                class="ui fluid search dropdown">
+                <option value="">Members</option>
+                <option
+                  v-for="member in memberList"
+                  :key="`select-${member.id}`"
+                  :value="member.id">
+                  {{ member.name }}
+                </option>
+              </select>
+            </div>
+            <div
+              id="role-selector-area"
+              class="ui segment">
+              <div class="ui header">Role Selector</div>
+              <div class="ui grid">
+                <div
+                  id="role-grid-title"
+                  class="center aligned row">
+                  <div class="three wide column">Name</div>
+                  <div class="two wide column">Interests</div>
+                  <div class="two wide column">Experience</div>
+                  <div class="nine wide column">Roles</div>
+                </div>
+                <member-selection-item
+                  v-for="memberId in selectedMembers.filter(id => id)"
+                  :key="`role-${memberId}`"
+                  @rolechange="handleRoleChange"
+                  :member="memberById()(memberId) || {}"/>
+              </div>
+            </div>
           </div>
-          <ul>
-            <li
-              v-for="member in project.members"
-              :key="member.id">
-              <b v-if="member.id === currentUser.id || +member.id === currentUser.id">
-                {{ currentUser.name }}
-              </b>
-              <b v-else-if="memberById(member.id)">
-                {{ memberById(member.id).name }}
-              </b>
-              <b v-else>{{ member.id }}</b>
-              - {{ member.role }}
-            </li>
-          </ul>
         </div>
 
         <div class="ui segment">
@@ -100,11 +120,14 @@
 </template>
 
 <script>
-
+import ProjectMemberSelectionItem from '@/components/Projects/ProjectMemberSelectorItem'
 import { mapMutations, mapGetters } from 'vuex'
 
 /* global $ */
 export default {
+  components: {
+    'member-selection-item': ProjectMemberSelectionItem
+  },
   data () {
     return {
       project: {
@@ -115,6 +138,9 @@ export default {
         defaultSprintLength: 14,
         members: {}
       },
+      selectedMembers: [],
+      roleData: {},
+      memberDropdown: null,
       $form: null
     }
   },
@@ -129,17 +155,19 @@ export default {
       const date = new Date(new Date(this.defaultStartDate).valueOf() + this.project.defaultSprintLength * 2 * oneDay)
       return this.getFormattedDate(date)
     },
+    memberList () {
+      const otherMembers = Object.values(this.$store.state.members).filter(m => m.id !== this.currentUser.id)
+      return [this.currentUser, ...otherMembers]
+    },
     ...mapGetters(['newProjectId', 'currentUser'])
   },
-
   mounted () {
-    this.resetProjectData()
-
     this.$form = $(this.$el)
     this.$form.submit((e) => {
       e.preventDefault()
       this.registerHandler()
     })
+    this.memberDropdown = this.$form.find('.ui.dropdown[name="members"]').dropdown()
 
     // add support for submitting by pressing enter
     // should we have this? It seems like this could be easy to accidentally press
@@ -150,8 +178,8 @@ export default {
       }
     })
     */
+    this.resetProjectData()
   },
-
   methods: {
     getFormattedDate (date) {
       let [year, month, day] = [
@@ -161,17 +189,27 @@ export default {
       ]
       return `${year}-${month}-${day}`
     },
+    handleRoleChange (data) {
+      console.debug('role change', data)
+      const {id, roles} = data
+      this.roleData[id] = {
+        id, role: roles.join('/')
+      }
+    },
     async registerHandler () {
       const projectData = {
         // could be overwritten in backend, don't worry about it too much
         id: Math.floor(Math.random() * 10000).toString().padStart(4, '0'),
         name: this.project.name.trim(),
         description: this.project.description.trim(),
-        members: this.project.members,
+        members: {},
         startDate: this.project.startDate.trim(),
         endDate: this.project.endDate.trim(),
         defaultSprintLength: this.project.defaultSprintLength
       }
+      this.selectedMembers.forEach(memberId => {
+        projectData.members[memberId] = this.roleData[memberId]
+      })
       // eslint-disable-next-line
       console.debug("Sending register info:", projectData)
 
@@ -204,7 +242,6 @@ export default {
       }
       this.$form.removeClass('loading')
     },
-
     sendRegisterData (projectData) {
       const apiUrl = 'api/projects'
       const payload = {
@@ -217,7 +254,6 @@ export default {
           .done(resolve).fail(reject)
       })
     },
-
     async register (projectData = {}) {
       const textFields = ['name', 'description', 'startDate', 'endDate']
       let errorMessage
@@ -227,6 +263,12 @@ export default {
           errorMessage = { responseJSON: { error: `${f} field is empty` } }
         }
       })
+
+      const hasInvalidRoles = Object.values(projectData.members).filter(m => !m.role).length > 0
+
+      if (!errorMessage && hasInvalidRoles) {
+        errorMessage = { responseJSON: { error: 'Every member must have at least one role' } }
+      }
 
       if (errorMessage) {
         return errorMessage
@@ -238,7 +280,6 @@ export default {
       console.debug('register', { response })
       return response
     },
-
     getProjectList (id) {
       return new Promise((resolve, reject) => {
         const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
@@ -261,20 +302,24 @@ export default {
         name: '',
         description: '',
         defaultSprintLength: 14,
-        startDate: '1970-12-31',
-        endDate: '1970-12-31',
+        startDate: this.defaultStartDate,
+        endDate: this.defaultEndDate,
         members: {}
       }
       Object.keys(defaults)
         .forEach(field => {
           this.project[field] = defaults[field]
         })
-
-      this.project.startDate = this.defaultStartDate
-      this.project.endDate = this.defaultEndDate
       this.project.members[this.currentUser.id] = {
         id: this.currentUser.id,
         role: 'Scrum Master'
+      }
+      this.selectedMembers = [this.currentUser.id]
+      if (this.memberDropdown) {
+        this.memberDropdown.dropdown('set exactly', this.selectedMembers)
+      }
+      if (this.$form) {
+        this.$form.removeClass('error')
       }
     },
     ...mapMutations(['addProject']),
@@ -282,3 +327,9 @@ export default {
   }
 }
 </script>
+
+<style>
+#role-selector-area #role-grid-title {
+  font-weight: bold;
+}
+</style>

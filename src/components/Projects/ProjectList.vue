@@ -65,6 +65,12 @@ export default {
     } catch (err) {
       console.error('Error getting project data', err)
     }
+
+    try {
+      await this.getMembers()
+    } catch (err) {
+      console.errror('Error trying to get member list', err)
+    }
   },
   methods: {
     showModal () {
@@ -89,8 +95,7 @@ export default {
         const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
         $.get(`${url}/api/members`)
           .done(response => {
-            const userID = this.$store.state.accountData.id
-            const members = response.data.filter(m => m.id !== userID)
+            const members = response.data
 
             const memberObject = {}
             members.forEach(m => {

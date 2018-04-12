@@ -78,6 +78,7 @@ export default {
         } else {
           const accountData = result.data
           this.$store.commit('login', accountData)
+          this.$form.removeClass('error')
           this.$router.push({ path: '/projects' })
         }
       } catch (err) {
@@ -161,8 +162,8 @@ export default {
 #login-form {
   position: relative;
   z-index: 102; /* one above top navbar */
-  padding-top: 2.85em;
-  margin-top: -2.85em;
+  padding-top: 5.5em;
+  margin-top: -5.5em;
   background-color: white;
   width: 100%;
 }

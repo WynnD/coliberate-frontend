@@ -27,7 +27,7 @@
     </div>
     <div class="extra content">
       <slot>
-        Maybe make status more prominent here?
+        Maybe have button to take/drop task here?
       </slot>
     </div>
   </div>

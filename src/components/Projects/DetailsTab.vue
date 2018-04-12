@@ -3,6 +3,7 @@
     <release-creation-modal
       @update="handleNewRelease"
       id="release-creation-modal"
+      :features="project.features"
       :project="project"/>
     <feature-creation-modal
       id="feature-creation-modal"
@@ -10,7 +11,7 @@
       :tasks="project.tasks"
       :features="project.features"
       :releases="project.releases"
-      :initial-release="currentReleaseId"
+      :initial-release="!isSandbox ? currentReleaseId : sandboxData.currentReleaseId"
       :project-id="project.id || ''"
       @update="handleNewFeature"
     />
@@ -18,7 +19,7 @@
       @update="handleNewSprint"
       id="sprint-creation-modal"
       :releases="project.releases"
-      :initial-release="currentReleaseId"
+      :initial-release="!isSandbox ? currentReleaseId : sandboxData.currentReleaseId"
       :sprints="project.sprints"
       :stories="project.stories"
       :tasks="project.tasks"
@@ -38,10 +39,23 @@
       :tasks="project.tasks"
       :features="project.features"
       :sprints="project.sprints"
-      :initial-sprint="currentSprintId"
-      :initial-feature="currentFeatureId"
+      :initial-sprint="!isSandbox ? currentSprintId : sandboxData.currentSprintId"
+      :initial-feature="!isSandbox ? currentFeatureId : sandboxData.currentFeatureId"
       :project-id="project.id || ''"
       @update="handleNewStory"
+    />
+    <task-creation-modal
+      id="task-creation-modal"
+      :stories="project.stories"
+      :tasks="project.tasks"
+      :features="project.features"
+      :sprints="project.sprints"
+      :project-members="project.members"
+      :initial-sprint="!isSandbox ? currentSprintId : sandboxData.currentSprintId"
+      :initial-feature="!isSandbox ? currentFeatureId : sandboxData.currentFeatureId"
+      :initial-story="!isSandbox ? currentStoryId : sandboxData.currentStoryId"
+      :project-id="project.id || ''"
+      @update="handleNewTask"
     />
 
     <div class="column sixteen wide">
@@ -60,6 +74,7 @@
         :features="project.features"
         :stories="project.stories"
         :tasks="project.tasks"
+        @changestory="handleStoryChange"
         @changefeature="handleFeatureChange"
       />
     </div>
@@ -73,12 +88,15 @@
         :stories="project.stories"
         :tasks="project.tasks"
         :initial-sprint="currentSprintId"
+        @changestory="handleStoryChange"
         @changesprint="handleSprintChange"
       />
     </div>
     <div class="column sixteen wide">
       <backlog-viewer
-        @showmodal="showModal"
+        @showmodal="showSandboxModal"
+        @changefeature="handleFeatureChange($event, true)"
+        @changestory="handleStoryChange($event, true)"
         :project="project"/>
     </div>
   </div>
@@ -86,14 +104,20 @@
 
 <script>
 import BacklogViewer from '@/components/Projects/BacklogViewer'
+
 import ReleaseCreationModal from '@/components/Projects/Releases/ReleaseCreationModal'
 import ReleaseSelector from '@/components/Projects/Releases/ReleaseSelector'
+
 import FeatureCreationModal from '@/components/Projects/Features/FeatureCreationModal'
 import FeatureListing from '@/components/Projects/Features/FeatureListing'
+
 import SprintCreationModal from '@/components/Projects/Sprints/SprintCreationModal'
 import SprintViewer from '@/components/Projects/Sprints/SprintViewer'
 import SprintRemovalModal from '@/components/Projects/Sprints/SprintRemovalModal'
+
 import StoryCreationModal from '@/components/Projects/Stories/StoryCreationModal'
+
+import TaskCreationModal from '@/components/Projects/Tasks/TaskCreationModal'
 
 /* global $ */
 export default {
@@ -106,7 +130,8 @@ export default {
     'sprint-creation-modal': SprintCreationModal,
     'sprint-viewer': SprintViewer,
     'sprint-removal-modal': SprintRemovalModal,
-    'story-creation-modal': StoryCreationModal
+    'story-creation-modal': StoryCreationModal,
+    'task-creation-modal': TaskCreationModal
   },
   props: {
     project: {
@@ -120,6 +145,14 @@ export default {
       currentSprintId: '',
       currentFeatureId: '',
       removeTargetId: '',
+      currentStoryId: '',
+      isSandbox: false,
+      sandboxData: {
+        currentReleaseId: '',
+        currentSprintId: '',
+        currentFeatureId: '',
+        currentStoryId: ''
+      },
       modals: {}
     }
   },
@@ -148,19 +181,39 @@ export default {
     this.modals['story-create'] = $(this.$el).find('#story-creation-modal')
       .modal('setting', 'closable', false)
       .modal('hide')
+
+    this.modals['task-create'] = $(this.$el).find('#task-creation-modal')
+      .modal('setting', 'closable', false)
+      .modal('hide')
   },
   methods: {
-    handleReleaseChange (releaseId) {
-      console.debug({ releaseId })
+    handleReleaseChange (releaseId, isSandbox = false) {
+      console.debug({ releaseId, isSandbox })
+      if (isSandbox) {
+        this.sandboxData.currentReleaseId = releaseId
+      }
       this.currentReleaseId = releaseId
     },
-    handleSprintChange (sprintId) {
-      console.debug({ sprintId })
+    handleSprintChange (sprintId, isSandbox = false) {
+      console.debug({ sprintId, isSandbox })
+      if (isSandbox) {
+        this.sandboxData.currentSprintId = sprintId
+      }
       this.currentSprintId = sprintId
     },
-    handleFeatureChange (featureId) {
-      console.debug({ featureId })
+    handleFeatureChange (featureId, isSandbox = false) {
+      console.debug({ featureId, isSandbox })
+      if (isSandbox) {
+        this.sandboxData.currentFeatureId = featureId
+      }
       this.currentFeatureId = featureId
+    },
+    handleStoryChange (storyId, isSandbox = false) {
+      console.debug({ storyId, isSandbox })
+      if (isSandbox) {
+        this.sandboxData.currentStoryId = storyId
+      }
+      this.currentStoryId = storyId
     },
     handleNewRelease (newRelease) {
       this.currentReleaseId = newRelease || ''
@@ -176,24 +229,30 @@ export default {
         this.currentSprintId = sprint || ''
       }, 50)
       this.$emit('update')
+      this.sandboxData.currentSprintId = ''
+      this.sandboxData.currentReleaseId = ''
       console.debug('handled new sprint')
     },
     handleNewFeature (releases = []) {
-      // don't need to do anything
-      if (releases.length === 0 || releases.indexOf(this.currentReleaseId) > -1) {
-        return
+      if (!(releases.length === 0 || releases.indexOf(this.currentReleaseId) > -1)) {
+        // set to first release in list
+        this.currentReleaseId = releases[0]
       }
-
-      // set to first release in list
-      this.currentReleaseId = releases[0]
       this.$emit('update')
       console.debug('handled new feature')
     },
     handleNewStory () {
       this.$emit('update')
     },
-    showModal (type) {
-      console.debug({type}, this.modals[type])
+    handleNewTask () {
+      this.$emit('update')
+    },
+    showSandboxModal (type) {
+      this.showModal(type, true)
+    },
+    showModal (type, isSandbox = false) {
+      this.isSandbox = isSandbox
+      console.debug({type, isSandbox}, this.modals[type])
       const isRemoveCommand = type.indexOf('remove') > -1 && type.indexOf('|') > -1
       if (this.modals[type] && !isRemoveCommand) {
         this.modals[type].modal('show')

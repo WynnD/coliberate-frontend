@@ -63,6 +63,9 @@
         :name="`backlog-features-${featureId}`"
         :stories="project.stories"
         :tasks="project.tasks"
+        @click.native="$emit('changefeature', featureId)"
+        @changestory="changeStory"
+        @showmodal="showModal"
       />
     </div>
 
@@ -224,7 +227,7 @@
       <div class="backlog-entry-title">
         <span class="ui medium header">Stories</span>
         <a
-          @click="$emit('showmodal', 'story-create')"
+          @click="showStoryModalNoFeature"
           class="ui right floated compact icon button">
           <i class="plus icon"/>
           Add Story
@@ -249,6 +252,8 @@
         :name="`story-list-${storyId}`"
         :story="project.stories[storyId]"
         :tasks="project.tasks"
+        @changestory="changeStory"
+        @showmodal="showModal"
         :showing-boolean="activeSubAccordion === `story-list-${storyId}`"
       />
     </div>
@@ -258,7 +263,9 @@
       class="ui segment">
       <div class="backlog-entry-title">
         <span class="ui medium header">Tasks</span>
-        <a class="ui right floated compact icon button">
+        <a
+          @click="showTaskModalNoStory"
+          class="ui right floated compact icon button">
           <i class="plus icon"/>
           Add Task
         </a>
@@ -445,6 +452,20 @@ export default {
     getSprintStories (sprintId) {
       return this.project.sprints[sprintId].stories
         .map(id => this.project.stories[id])
+    },
+    showStoryModalNoFeature () {
+      this.$emit('changefeature', '')
+      this.$emit('showmodal', 'story-create')
+    },
+    showTaskModalNoStory () {
+      this.changeStory('')
+      this.showModal('task-create')
+    },
+    showModal (data) {
+      this.$emit('showmodal', data)
+    },
+    changeStory (data) {
+      this.$emit('changestory', data)
     }
   }
 }

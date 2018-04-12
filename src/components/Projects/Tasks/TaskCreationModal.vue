@@ -1,8 +1,8 @@
 <template>
   <div class="ui modal form">
-    <div class="header">Add a Story</div>
+    <div class="header">Add a Task</div>
     <div
-      id="story-modal-content"
+      id="task-modal-content"
       class="scrolling content">
       <div class="ui segments">
         <div class="ui segment">
@@ -12,28 +12,31 @@
               <div class="ui fluid labeled input">
                 <div class="ui label">Name</div>
                 <input
-                  v-model="story.name"
+                  v-model="task.name"
                   type="text"
-                  placeholder="Story Name">
+                  placeholder="Task Name">
               </div>
             </div>
+
             <div class="eight wide column">
               <div class="ui fluid labeled input">
-                <div class="ui label">Business Value</div>
+                <div class="ui label">Points</div>
                 <input
-                  v-model="story.businessValue"
+                  v-model="task.points"
                   type="number"
-                  placeholder="Story Business Value">
+                  placeholder="Task Points">
               </div>
             </div>
+
             <div class="sixteen wide column">
               <div class="ui label">Description</div>
               <div class="ui fluid input">
                 <textarea
-                  v-model="story.description"
-                  placeholder="Story Description"/>
+                  v-model="task.description"
+                  placeholder="Task Description"/>
               </div>
             </div>
+
             <div class="sixteen wide column">
               <div class="ui fluid labeled input">
                 <div class="ui label">Associated Features</div>
@@ -53,6 +56,7 @@
                 </select>
               </div>
             </div>
+
             <div class="sixteen wide column">
               <div class="ui fluid labeled input">
                 <div class="ui label">Associated Sprints</div>
@@ -72,40 +76,46 @@
                 </select>
               </div>
             </div>
+
+            <div class="sixteen wide column">
+              <div class="ui fluid labeled input">
+                <div class="ui label">Associated Stories</div>
+                <select
+                  name="stories"
+                  multiple=""
+                  v-model="associatedStories"
+                  class="ui fluid dropdown">
+                  <option value="">Stories</option>
+                  <option
+                    v-for="story in stories"
+                    :key="story.id"
+                    :value="story.id"
+                  >
+                    {{ story.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="sixteen wide column">
+              <div class="ui checkbox">
+                <input
+                  v-model="takeTask"
+                  type="checkbox">
+                <label>Take This Task</label>
+              </div>
+            </div>
+
+            <div class="sixteen wide column">
+              <div class="ui error message">
+                <div class="header">Error</div>
+                <p>An error has occurred</p>
+              </div>
+            </div>
+
           </div>
         </div>
 
-        <div
-          id="selection-section"
-          class="ui segment">
-          <div class="ui header">
-            <span>Task Selection</span>
-            <span>({{ numSelectedTasks }}/{{ numTasks }} added)</span>
-          </div>
-          <div class="ui three column stackable grid">
-            <div
-              v-for="task in tasks"
-              :key="task.id"
-              class="column">
-              <task-card :task="task">
-                <div
-                  id="toggle-btn"
-                  @click="toggleTask(task.id)"
-                  class="ui fluid button checkbox">
-                  <input
-                    type="checkbox"
-                    :value="task.id"
-                    v-model="selectedTasks[task.id]">
-                  <label>Add to story</label>
-                </div>
-              </task-card>
-            </div>
-          </div>
-          <div class="ui error message">
-            <div class="header">Error</div>
-            <p>An error has occurred</p>
-          </div>
-        </div>
       </div>
     </div>
     <div class="actions">
@@ -121,14 +131,10 @@
 </template>
 
 <script>
-import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
 import { mapGetters } from 'vuex'
 
 /* global $ */
 export default {
-  components: {
-    'task-card': SingleTaskCard
-  },
   props: {
     stories: {
       required: true,
@@ -146,12 +152,21 @@ export default {
       required: true,
       type: Object
     },
+    projectMembers: {
+      required: true,
+      type: Object
+    },
     initialFeature: {
       required: false,
       type: String,
       default: ''
     },
     initialSprint: {
+      required: false,
+      type: String,
+      default: ''
+    },
+    initialStory: {
       required: false,
       type: String,
       default: ''
@@ -163,35 +178,45 @@ export default {
   },
   data () {
     return {
-      story: {
+      task: {
         name: '',
         description: '',
-        businessValue: 5
+        points: 5
       },
       associatedFeatures: [],
       associatedSprints: [],
-      selectedTasks: {},
-      numSelectedTasks: 0,
+      associatedStories: [],
+      takeTask: false,
       $form: null,
-      featureDropdown: null,
-      sprintDropdown: null
+      dropdowns: {
+        features: null,
+        sprints: null,
+        stories: null,
+        members: null
+      },
+      lastModified: ''
     }
   },
   computed: {
-    numTasks () {
-      return Object.keys(this.tasks).length
-    },
     ...mapGetters(['currentUser', 'isDevelopmentMode'])
   },
   watch: {
     initialFeature (newValue) {
-      if (this.featureDropdown) {
-        this.featureDropdown.dropdown('set exactly', [newValue])
+      if (this.dropdowns.features) {
+        this.lastModified = 'initialFeature'
+        this.resetInitialAssociatedValues()
       }
     },
     initialSprint (newValue) {
-      if (this.sprintDropdown) {
-        this.sprintDropdown.dropdown('set exactly', [newValue])
+      if (this.dropdowns.sprints) {
+        this.lastModified = 'initialSprint'
+        this.resetInitialAssociatedValues()
+      }
+    },
+    initialStory (newValue) {
+      if (this.dropdowns.stories) {
+        this.lastModified = 'initialStory'
+        this.resetInitialAssociatedValues()
       }
     }
   },
@@ -209,41 +234,16 @@ export default {
     //   }
     // })
 
-    this.featureDropdown = $(this.$el).find('.ui.dropdown[name="features"]').dropdown()
-    this.sprintDropdown = $(this.$el).find('.ui.dropdown[name="sprints"]').dropdown()
+    this.dropdowns.features = $(this.$el).find('.ui.dropdown[name="features"]').dropdown()
+    this.dropdowns.sprints = $(this.$el).find('.ui.dropdown[name="sprints"]').dropdown()
+    this.dropdowns.stories = $(this.$el).find('.ui.dropdown[name="stories"]').dropdown()
 
-    this.initCheckboxes()
-    this.updateButtons()
-    this.resetStoryData()
+    // this.updateButtons()
+    this.resetTaskData()
   },
   methods: {
-    initCheckboxes () {
-      $(this.$el).find('.ui.checkbox').checkbox()
-    },
-    updateButtons () {
-      $(this.$el).find('#selection-section #toggle-btn')
-        .each(function () {
-          const button = $(this)
-          const label = button.find('label')
-
-          if (button.hasClass('checked')) {
-            button.addClass('red inverted')
-            label.text('Remove from feature')
-          } else {
-            button.removeClass('red inverted')
-            label.text('Add to feature')
-          }
-        })
-    },
-    toggleTask (id) {
-      this.selectedTasks[id] = !this.selectedTasks[id]
-      this.numSelectedTasks = Object.keys(this.selectedTasks)
-        .filter(t => this.selectedTasks[t])
-        .length
-
-      setTimeout(() => {
-        this.updateButtons()
-      }, 50)
+    setDropdownValues (dropdown, newValue = []) {
+      dropdown.dropdown('set exactly', newValue)
     },
     getDateRange (sprint) {
       const startDate = new Date(sprint.startDate)
@@ -251,27 +251,29 @@ export default {
       return `${startDate.toDateString()} to ${endDate.toDateString()}`
     },
     async registerHandler () {
-      const storyData = {
-        id: this.generateUniqueId()(this.stories, 'story-', 4),
-        name: this.story.name.trim(),
-        description: this.story.description,
-        businessValue: this.story.businessValue,
-        tasks: Object.keys(this.selectedTasks).filter(id => this.selectedTasks[id])
+      const taskData = {
+        id: this.generateUniqueId()(this.tasks, 'task-', 4),
+        name: this.task.name.trim(),
+        description: this.task.description.trim(),
+        points: this.task.points,
+        status: 'TODO',
+        takenBy: this.takeTask ? [this.currentUser.id] : []
       }
-      storyData.name = storyData.name || storyData.id
-      const associatedData = {
+      taskData.name = taskData.name || taskData.id
+      const dataToSend = {
+        taskData,
+        // only filter out entries that are empty; validation is server-side
         features: this.associatedFeatures.filter(id => !!id),
-        sprints: this.associatedSprints.filter(id => !!id)
+        sprints: this.associatedSprints.filter(id => !!id),
+        stories: this.associatedStories.filter(id => !!id)
       }
-      console.debug(storyData, associatedData)
-
       try {
-        const result = await this.register(storyData, associatedData)
+        const result = await this.register(dataToSend)
         console.debug(result)
         if (result === 'OK') {
           this.$form.modal('hide')
           this.$emit('update')
-          this.resetStoryData()
+          this.resetTaskData()
         } else {
           console.debug('Register failed!')
           this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
@@ -283,19 +285,20 @@ export default {
       }
       this.$form.removeClass('loading')
     },
-    async register (data = {}, associatedData) {
+    async register (data) {
       this.$form.addClass('loading')
-      const response = await this.sendRegisterData(data, associatedData)
+      const response = await this.sendRegisterData(data)
       // eslint-disable-next-line
       console.debug('register', { response })
       return response
     },
-    sendRegisterData (storyData, associatedData) {
-      const apiUrl = `api/projects/${this.projectId}/stories`
+    sendRegisterData (data) {
+      const apiUrl = `api/projects/${this.projectId}/tasks`
       const payload = {
-        storyData,
-        associatedFeatures: associatedData.features,
-        associatedSprints: associatedData.sprints,
+        taskData: data.taskData,
+        associatedFeatures: data.features,
+        associatedSprints: data.sprints,
+        associatedStories: data.stories,
         memberID: this.currentUser.id,
         projectID: this.projectId
       }
@@ -310,37 +313,54 @@ export default {
       this.$form.find('.ui.message p').text(message)
       this.$form.addClass('error')
     },
-    resetStoryData () {
+    resetTaskData () {
       const defaults = {
         name: '',
         description: '',
-        businessValue: 5
+        points: 5
       }
+
       Object.keys(defaults)
         .forEach(field => {
-          this.story[field] = defaults[field]
+          this.task[field] = defaults[field]
         })
-      this.associatedFeatures = [this.initialFeature]
-      this.associatedSprints = [this.initialSprint]
-      this.numSelectedTasks = 0
-      this.selectedTasks = {}
-      $(this.$el).find('#selection-section #toggle-btn').removeClass('checked')
-      setTimeout(() => {
-        this.updateButtons()
-      }, 100)
+      this.resetInitialAssociatedValues()
+      this.takeTask = false
       if (this.$form) {
         this.$form.removeClass('error')
       }
     },
-    ...mapGetters(['generateUniqueId'])
+    resetInitialAssociatedValues () {
+      try {
+        this.resetDropdowns()
+        if (this.lastModified === 'initialFeature' && this.dropdowns.features) {
+          this.setDropdownValues(this.dropdowns.features, [this.initialFeature])
+        } else if (this.lastModified === 'initialSprint' && this.dropdowns.sprints) {
+          this.setDropdownValues(this.dropdowns.sprints, [this.initialSprint])
+        } else if (this.lastModified === 'initialStory' && this.dropdowns.stories) {
+          this.setDropdownValues(this.dropdowns.stories, [this.initialStory])
+        }
+      } catch (err) {
+        console.debug(err)
+      }
+    },
+    resetDropdowns () {
+      this.associatedFeatures = []
+      this.associatedSprints = []
+      this.associatedStories = []
+      Object.values(this.dropdowns)
+        .filter(d => !!d)
+        .forEach(d => { this.setDropdownValues(d, []) })
+    },
+    getMemberName (id) {
+      if (id === this.currentUser.id) {
+        return this.currentUser.name
+      }
+      const member = this.memberById()(id)
+      console.debug('member info', id, member)
+      return member.name
+    },
+    ...mapGetters(['memberById', 'generateUniqueId'])
   }
 }
 </script>
-
-<style>
-#story-modal-content #selection-section .grid {
-  max-height: 20rem;
-  overflow-y: auto;
-  border-top: 1px solid gray;
-}
-</style>

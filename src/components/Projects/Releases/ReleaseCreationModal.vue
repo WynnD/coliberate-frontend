@@ -17,6 +17,22 @@
           </div>
         </div>
         <div class="ui segment">
+          <div class="ui header">Feature Selector</div>
+          <select
+            v-model="release.features"
+            multiple=""
+            name="features"
+            class="ui fluid search dropdown">
+            <option value="">Features</option>
+            <option
+              v-for="feature in features"
+              :key="feature.id"
+              :value="feature.id">
+              {{ feature.name }}
+            </option>
+          </select>
+        </div>
+        <div class="ui segment">
           <div class="field">
             <label>Start Date</label>
             <input
@@ -56,8 +72,12 @@ import { mapGetters } from 'vuex'
 export default {
   props: {
     project: {
-      type: Object,
-      required: true
+      required: true,
+      type: Object
+    },
+    features: {
+      required: true,
+      type: Object
     }
   },
   data () {
@@ -70,7 +90,8 @@ export default {
         features: [], // array of feature IDs
         sprints: [] // array of sprint IDs
       },
-      $form: null
+      $form: null,
+      featuresDropdown: null
     }
   },
   computed: {
@@ -100,6 +121,7 @@ export default {
     this.resetReleaseData()
 
     this.$form = $(this.$el)
+    this.featuresDropdown = this.$form.find('.ui.dropdown[name="features"]').dropdown()
   },
   methods: {
     getFormattedDate (date) {
@@ -118,7 +140,7 @@ export default {
         description: this.release.description.trim(),
         startDate: this.release.startDate,
         endDate: this.release.endDate,
-        features: this.release.features,
+        features: this.release.features.filter(id => id),
         sprints: this.release.sprints
       }
 
@@ -177,6 +199,13 @@ export default {
         .forEach(field => {
           this.release[field] = this.defaultRelease[field]
         })
+      if (this.$form) {
+        this.$form.removeClass('error')
+      }
+
+      if (this.featuresDropdown) {
+        this.featuresDropdown.dropdown('set exactly', [])
+      }
     },
     ...mapGetters(['generateUniqueId'])
   }

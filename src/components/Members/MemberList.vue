@@ -5,9 +5,8 @@
     <div
       v-if="$store.getters.isLoggedIn"
       class="ui centered cards">
-      <member-card :account-data="$store.state.accountData"/>
       <member-card
-        v-for="member in $store.state.members"
+        v-for="member in orderedMembers"
         :key="member.id"
         :account-data="member"/>
     </div>
@@ -16,11 +15,18 @@
 
 <script>
 import MemberCard from '@/components/Members/MemberCard'
-
+import { mapGetters } from 'vuex'
 /* global $ */
 export default {
   components: {
     'member-card': MemberCard
+  },
+  computed: {
+    orderedMembers () {
+      const otherMembers = Object.values(this.$store.state.members).filter(m => m.id !== this.currentUser.id)
+      return [this.currentUser, ...otherMembers]
+    },
+    ...mapGetters(['isDevelopmentMode', 'currentUser'])
   },
   mounted () {
     this.getMembers()
@@ -36,9 +42,16 @@ export default {
             const memberObject = {}
             members.forEach(m => {
               memberObject[m.id.toString()] = m
+
+              if (m.id === this.currentUser.id) {
+                console.debug('Updating current user data', {
+                  old: this.currentUser,
+                  new: m
+                })
+                this.$store.commit('login', m)
+              }
             })
             console.debug('Got member data', memberObject)
-            console.warn('TODO: Properly add updated member data')
             this.$store.commit('updateMemberData', memberObject)
             resolve()
           }).fail(reject)
