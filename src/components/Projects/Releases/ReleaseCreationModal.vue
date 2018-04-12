@@ -177,6 +177,9 @@ export default {
         .forEach(field => {
           this.release[field] = this.defaultRelease[field]
         })
+      if (this.$form) {
+        this.$form.removeClass('error')
+      }
     },
     ...mapGetters(['generateUniqueId'])
   }

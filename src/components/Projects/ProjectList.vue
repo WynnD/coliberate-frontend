@@ -65,6 +65,12 @@ export default {
     } catch (err) {
       console.error('Error getting project data', err)
     }
+
+    try {
+      await this.getMembers()
+    } catch (err) {
+      console.errror('Error trying to get member list', err)
+    }
   },
   methods: {
     showModal () {

@@ -326,6 +326,9 @@ export default {
         })
       this.resetInitialAssociatedValues()
       this.takeTask = false
+      if (this.$form) {
+        this.$form.removeClass('error')
+      }
     },
     resetInitialAssociatedValues () {
       try {

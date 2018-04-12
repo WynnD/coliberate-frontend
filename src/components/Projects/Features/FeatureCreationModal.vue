@@ -318,6 +318,9 @@ export default {
       setTimeout(() => {
         this.updateButtons()
       }, 100)
+      if (this.$form) {
+        this.$form.removeClass('error')
+      }
     },
     ...mapGetters(['generateUniqueId'])
   }

@@ -29,13 +29,12 @@
 </template>
 
 <script>
-const defaultObject = {}
 export default {
   props: {
     member: {
       required: false,
       type: Object,
-      default: defaultObject
+      default: () => {}
     }
   },
   data () {
@@ -47,9 +46,11 @@ export default {
     allRoles: () => ['Scrum Master', 'Product Owner', 'Development Team'],
     experienceMap: () => ['None', 'Low', 'High'],
     interestedSkills () {
+      if (!this.member.skills) return []
       return this.member.skills.filter(s => s.interested).map(s => s.name)
     },
     experienceSkills () {
+      if (!this.member.skills) return []
       return this.member.skills
         .filter(s => s.experience > 0)
         .sort((a, b) => b.experience - a.experience)

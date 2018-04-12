@@ -78,6 +78,7 @@ export default {
         } else {
           const accountData = result.data
           this.$store.commit('login', accountData)
+          this.$form.removeClass('error')
           this.$router.push({ path: '/projects' })
         }
       } catch (err) {

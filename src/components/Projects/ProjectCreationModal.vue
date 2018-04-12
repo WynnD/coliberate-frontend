@@ -62,7 +62,7 @@
                   v-for="memberId in selectedMembers.filter(id => id)"
                   :key="`role-${memberId}`"
                   @rolechange="handleRoleChange"
-                  :member="memberById()(memberId)"/>
+                  :member="memberById()(memberId) || {}"/>
               </div>
             </div>
           </div>
@@ -317,6 +317,9 @@ export default {
       this.selectedMembers = [this.currentUser.id]
       if (this.memberDropdown) {
         this.memberDropdown.dropdown('set exactly', this.selectedMembers)
+      }
+      if (this.$form) {
+        this.$form.removeClass('error')
       }
     },
     ...mapMutations(['addProject']),
