@@ -181,6 +181,7 @@ export default {
     this.resetProjectData()
   },
   methods: {
+    ...mapGetters(['server']),
     getFormattedDate (date) {
       let [year, month, day] = [
         date.getFullYear(),
@@ -280,17 +281,10 @@ export default {
       console.debug('register', { response })
       return response
     },
-    getProjectList (id) {
-      return new Promise((resolve, reject) => {
-        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.get(`${url}/api/projects?member_id=${id}`)
-          .done(response => {
-            const list = response
-
-            console.debug('got project response', response, list)
-            resolve(list)
-          }).fail(reject)
-      })
+    async getProjectList (id) {
+      const list = await this.server().projects.getAll(id)
+      console.debug('got project response', list)
+      return list
     },
 
     notifyError (message = 'An error occurred while trying to register') {
