@@ -3,13 +3,12 @@
 class ColiberateFrontendCore {
   setStore (store) {
     this.$store = store
-    this.isDevelopmentMode = store.state.isDevelopmentMode
   }
 
   // ex apiUrl = api/projects/sample-project-0/tasks
   postToServer ({ payload, apiUrl }) {
     return new Promise((resolve, reject) => {
-      const url = this.isDevelopmentMode ? 'http://localhost' : ''
+      const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
       $.post(`${url}/${apiUrl}`, payload)
         .done(resolve).fail(reject)
     })
