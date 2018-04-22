@@ -109,6 +109,7 @@ export default {
     },
     taskRemoveHandler () {
       console.debug('clicked remove for', this.task.id)
+      this.$emit('showmodal', `task-remove|${this.task.id}`)
     }
   }
 }
