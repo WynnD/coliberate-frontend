@@ -1,9 +1,9 @@
 /* global $ */
 
 class ColiberateFrontendCore {
-  constructor (store, isDevelopmentMode = false) {
+  setStore (store) {
     this.$store = store
-    this.isDevelopmentMode = isDevelopmentMode
+    this.isDevelopmentMode = store.state.isDevelopmentMode
   }
 
   // ex apiUrl = api/projects/sample-project-0/tasks
@@ -31,6 +31,9 @@ class ColiberateFrontendCore {
       getSingle,
       getAll,
       updateStore: async (memberId = '') => {
+        if (!this.$store) {
+          throw Error('No store specified')
+        }
         const projectList = await getAll(memberId)
         console.debug('get project list for', memberId, projectList)
         this.$store.commit('updateProjectList', projectList)
@@ -45,6 +48,9 @@ class ColiberateFrontendCore {
       getSingle,
       getAll,
       updateStore: async () => {
+        if (!this.$store) {
+          throw Error('No store specified')
+        }
         const memberList = await getAll()
         const memberObject = {}
         memberList.forEach(m => {
@@ -57,4 +63,4 @@ class ColiberateFrontendCore {
   }
 }
 
-module.exports = ColiberateFrontendCore
+export default ColiberateFrontendCore

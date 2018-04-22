@@ -61,7 +61,7 @@ function getDateDifference (older, newer) {
     }).join(', ')
 }
 
-module.exports = {
+export default {
   getDateDifference,
   getDateRange,
   getFormattedDate
