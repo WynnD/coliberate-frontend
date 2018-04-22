@@ -8,7 +8,7 @@
           <div class="twelve wide column">
             {{ task.name }}
           </div>
-          <div class="two wide column">
+          <div class="right aligned four wide column">
             <button
               id="fab"
               class="ui icon top left pointing dropdown button compact">
