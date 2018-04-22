@@ -1,7 +1,7 @@
 <template>
   <div
     id="single-task-card"
-    class="ui fluid card">
+    class="ui fluid task-card card">
     <div class="content">
       <div class="header">{{ task.name }}</div>
       <div class="header">
@@ -27,14 +27,23 @@
     </div>
     <div class="extra content">
       <slot>
-        Maybe have button to take/drop task here?
+        <button
+          v-if="!isTaken"
+          class="ui fluid button">
+          Take this task
+        </button>
+        <button
+          v-else
+          class="ui fluid button">
+          Drop this task
+        </button>
       </slot>
     </div>
   </div>
 </template>
 
 <script>
-import getters from '@/store/getters'
+import { mapGetters } from 'vuex'
 
 export default {
   props: {
@@ -44,6 +53,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['memberById', 'currentUser']),
     ribbonClass () {
       const status = this.task.status.toLowerCase()
       return {
@@ -55,8 +65,11 @@ export default {
     },
     memberNames () {
       return this.task.takenBy
-        .map(id => getters.memberById(this.$store.state)(id) || { name: `Unknown (${id})` })
+        .map(id => this.memberById(id) || { name: `Unknown (${id})` })
         .map(m => m.name)
+    },
+    isTaken () {
+      return this.task.takenBy.indexOf(this.currentUser.id) > -1
     }
   }
 }
