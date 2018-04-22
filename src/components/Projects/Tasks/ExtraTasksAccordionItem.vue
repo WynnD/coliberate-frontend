@@ -37,6 +37,7 @@
               <task-card
                 v-for="task in tasks"
                 :key="task.id"
+                @showmodal="showModal"
                 :task="task"/>
             </div>
           </div>
@@ -89,6 +90,9 @@ export default {
   methods: {
     toggleAccordionState (name) {
       this.$emit('toggle-accordion-state', name)
+    },
+    showModal (data) {
+      this.$emit('showmodal', data)
     }
   }
 }

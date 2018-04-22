@@ -64,6 +64,7 @@
               <task-card
                 v-for="taskId in story.tasks"
                 :key="taskId"
+                @showmodal="showModal"
                 :task="tasks[taskId]"/>
             </div>
           </div>
@@ -122,6 +123,9 @@ export default {
     },
     storyRemoveHandler () {
       console.debug('Clicked remove for', this.story.id)
+    },
+    showModal (data) {
+      this.$emit('showmodal', data)
     }
   }
 }

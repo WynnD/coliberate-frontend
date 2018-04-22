@@ -6,7 +6,7 @@
       class="scrolling content">
       <h3>Are you sure you want to remove "{{ targetTask.name }}"?</h3>
       <div v-if="hasAssociations">
-        <p>The following will have the task removed from their respective task list.</p>
+        <p>The following items will have the task removed from their respective task list.</p>
         <div>
           <h4>Features</h4>
           {{ associatedFeatures }}
