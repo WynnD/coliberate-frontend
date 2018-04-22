@@ -28,6 +28,8 @@ export default {
         console.debug('developmentMode', this.$store.getters.isDevelopmentMode)
       }, 1000)
     } catch (err) {}
+
+    this.$store.getters.server.setStore(this.$store)
   },
   methods: {}
 }

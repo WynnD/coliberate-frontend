@@ -26,7 +26,7 @@ class ColiberateFrontendCore {
 
   get projects () {
     const getSingle = (memberId, projectId) => this.getFromServer(`api/projects/${projectId}?member_id=${memberId}`)
-    const getAll = (memberId) => this.getFromServer(`/api/projects?member_id=${memberId}`)
+    const getAll = (memberId) => this.getFromServer(`api/projects?member_id=${memberId}`)
     return {
       getSingle,
       getAll,
@@ -43,7 +43,13 @@ class ColiberateFrontendCore {
 
   get members () {
     const getSingle = (memberId) => this.getFromServer(`api/members/${memberId}`)
-    const getAll = () => this.getFromServer('api/members')
+    const getAll = async () => {
+      const response = await this.getFromServer('api/members')
+      if (response.error) {
+        throw Error(response.error)
+      }
+      return response.data
+    }
     return {
       getSingle,
       getAll,

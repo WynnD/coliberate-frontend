@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import ProjectCard from '@/components/Projects/ProjectCard'
 import CreationModal from '@/components/Projects/ProjectCreationModal'
 
@@ -69,10 +69,11 @@ export default {
     try {
       await this.getMembers()
     } catch (err) {
-      console.errror('Error trying to get member list', err)
+      console.error('Error trying to get member list', err)
     }
   },
   methods: {
+    ...mapGetters(['server']),
     showModal () {
       this.getMembers()
       if (this.modal) {
@@ -80,33 +81,10 @@ export default {
       }
     },
     getProjectList (id) {
-      return new Promise((resolve, reject) => {
-        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.get(`${url}/api/projects?member_id=${id}`)
-          .done(response => {
-            console.debug('got project response', response)
-            this.$store.commit('updateProjectList', response)
-            resolve(response)
-          }).fail(reject)
-      })
+      return this.server().projects.updateStore(id)
     },
     getMembers () {
-      return new Promise((resolve, reject) => {
-        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.get(`${url}/api/members`)
-          .done(response => {
-            const members = response.data
-
-            const memberObject = {}
-            members.forEach(m => {
-              memberObject[m.id.toString()] = m
-            })
-            console.debug('Got member data', memberObject)
-
-            this.$store.commit('updateMemberData', memberObject)
-            resolve()
-          }).fail(reject)
-      })
+      return this.server().members.updateStore()
     }
   }
 }
