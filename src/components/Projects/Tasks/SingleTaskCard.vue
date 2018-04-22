@@ -3,7 +3,24 @@
     id="single-task-card"
     class="ui fluid task-card card">
     <div class="content">
-      <div class="header">{{ task.name }}</div>
+      <div class="header">
+        <div class="ui unstackable grid">
+          <div class="twelve wide column">
+            {{ task.name }}
+          </div>
+          <div class="two wide column">
+            <button
+              id="fab"
+              class="ui icon top left pointing dropdown button compact">
+              <i class="wrench icon"/>
+              <div class="menu">
+                <div class="item">Edit</div>
+                <div class="item">Delete</div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
       <div class="header">
         <div :class="ribbonClass">{{ task.status.toUpperCase() }}</div>
         <span class="left floated">
@@ -45,6 +62,7 @@
 <script>
 import { mapGetters } from 'vuex'
 
+/* global $ */
 export default {
   props: {
     task: {
@@ -70,6 +88,27 @@ export default {
     },
     isTaken () {
       return this.task.takenBy.indexOf(this.currentUser.id) > -1
+    }
+  },
+  mounted () {
+    $(this.$el).find('.ui.dropdown#fab').dropdown({
+      onChange: this.dropdownChangeHandler
+    })
+  },
+  methods: {
+    dropdownChangeHandler (value) {
+      console.debug('clicked', value, 'on dropdown')
+      if (value === 'edit') {
+        this.taskEditHandler()
+      } else if (value === 'delete') {
+        this.taskRemoveHandler()
+      }
+    },
+    taskEditHandler () {
+      console.debug('clicked edit for', this.task.id)
+    },
+    taskRemoveHandler () {
+      console.debug('clicked remove for', this.task.id)
     }
   }
 }
