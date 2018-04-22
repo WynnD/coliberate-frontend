@@ -42,7 +42,13 @@ class ColiberateFrontendCore {
   }
 
   get members () {
-    const getSingle = (memberId) => this.getFromServer(`api/members/${memberId}`)
+    const getSingle = async (memberId) => {
+      const response = await this.getFromServer(`api/members/${memberId}`)
+      if (response.error) {
+        throw Error(response.error)
+      }
+      return response.data
+    }
     const getAll = async () => {
       const response = await this.getFromServer('api/members')
       if (response.error) {

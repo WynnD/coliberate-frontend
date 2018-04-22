@@ -36,7 +36,6 @@
 import ProjectCard from '@/components/Projects/ProjectCard'
 import { mapGetters } from 'vuex'
 
-/* global $ */
 export default {
   components: {
     'project-card': ProjectCard
@@ -60,32 +59,18 @@ export default {
     this.sharedProjects = await this.getSharedProjects(this.accountData.id)
   },
   methods: {
-    getAccountData (id) {
-      return new Promise((resolve, reject) => {
-        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.get(`${url}/api/members/${id}`)
-          .done(response => {
-            const list = response.data
-
-            console.debug('got account response', list)
-            if (list.length === 1) {
-              this.accountData = list[0]
-              resolve()
-            }
-          }).fail(reject)
-      })
+    ...mapGetters(['server']),
+    async getAccountData (id) {
+      const memberData = await this.server().members.getSingle(id)
+      console.debug('got account response', memberData)
+      if (memberData.length === 1) {
+        this.accountData = memberData[0]
+      }
     },
-    getProjectList (id) {
-      return new Promise((resolve, reject) => {
-        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.get(`${url}/api/projects?member_id=${id}`)
-          .done(response => {
-            const list = response
-
-            console.debug('got project response', response, list)
-            resolve(list)
-          }).fail(reject)
-      })
+    async getProjectList (id) {
+      const projects = await this.server().projects.getAll(id)
+      console.debug('got project response', projects)
+      return projects
     },
     async getSharedProjects (theirID) {
       let yourProjects
