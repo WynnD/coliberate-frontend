@@ -3,13 +3,13 @@
 class ColiberateFrontendCore {
   setStore (store) {
     this.$store = store
+    this.baseUrl = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
   }
 
   // ex apiUrl = api/projects/sample-project-0/tasks
   postToServer ({ payload, apiUrl }) {
     return new Promise((resolve, reject) => {
-      const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-      $.post(`${url}/${apiUrl}`, payload)
+      $.post(`${this.baseUrl}/${apiUrl}`, payload)
         .done(resolve).fail(reject)
     })
   }
@@ -17,9 +17,18 @@ class ColiberateFrontendCore {
   // ex apiUrl = api/projects/sample-project-0?member_id=my_id
   getFromServer (apiUrl) {
     return new Promise((resolve, reject) => {
-      const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-      $.get(`${url}/${apiUrl}`)
+      $.get(`${this.baseUrl}/${apiUrl}`)
         .done(resolve).fail(reject)
+    })
+  }
+
+  // ex apiUrl = api/projects/sample-project-0?member_id=my_id
+  deleteFromServer (apiUrl) {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: `${this.baseUrl}/${apiUrl}`,
+        type: 'DELETE'
+      }).done(resolve).fail(reject)
     })
   }
 

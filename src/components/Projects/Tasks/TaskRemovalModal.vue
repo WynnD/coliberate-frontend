@@ -21,6 +21,10 @@
         </div>
       </div>
       <div v-else>This task is not associated with any feature, sprint, or story.</div>
+      <div class="ui error message">
+        <div class="header">Error</div>
+        <p>An error has occurred</p>
+      </div>
     </div>
     <div class="actions">
       <button
@@ -34,6 +38,9 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
+/* global $ */
 export default {
   props: {
     targetTaskId: {
@@ -44,6 +51,12 @@ export default {
     project: {
       required: true,
       type: Object
+    }
+  },
+  data () {
+    return {
+      isLoading: false,
+      $form: null
     }
   },
   computed: {
@@ -66,6 +79,65 @@ export default {
       return this.associatedFeatures.length > 0 ||
         this.associatedSprints.length > 0 ||
         this.associatedStories.length > 0
+    },
+    ...mapGetters(['currentUser'])
+  },
+  watch: {
+    isLoading (newValue) {
+      if (newValue) {
+        this.$form.addClass('loading')
+      } else {
+        this.$form.removeClass('loading')
+      }
+    },
+    targetTaskId () {
+      this.$form.removeClass('error')
+    }
+  },
+  mounted () {
+    this.$form = $(this.$el)
+    this.$form.submit((e) => {
+      e.preventDefault()
+      this.requestHandler()
+    })
+
+    this.$form.find('.actions .ui.red.button')
+      .on('click', (e) => {
+        e.preventDefault()
+        this.requestHandler()
+      })
+  },
+  methods: {
+    ...mapGetters(['server']),
+    async requestHandler () {
+      console.debug('Sending request to delete task', this.targetTask.id)
+      this.isLoading = true
+
+      try {
+        const result = await this.deleteTask(this.targetTask.id)
+        console.debug('result', result)
+        if (result === 'OK') {
+          this.$form.modal('hide')
+          this.$emit('update')
+        } else {
+          console.debug('Register failed!')
+          this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
+        }
+      } catch (err) {
+        console.debug('Register failed', err)
+        const message = `${err.status}: ${err.statusText}`
+        this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
+      }
+
+      this.isLoading = false
+    },
+    deleteTask (id) {
+      const apiUrl = `api/projects/${this.project.id}/tasks/${id}?member_id=${this.currentUser.id}`
+      return this.server().deleteFromServer(apiUrl)
+    },
+    notifyError (message = 'An error occurred while trying to register') {
+      this.$form.find('.ui.message p').text(message)
+      this.$form.addClass('error')
     }
   }
 }
