@@ -10,6 +10,7 @@
           </div>
           <div class="right aligned four wide column">
             <button
+              v-if="showButtons"
               id="fab"
               class="ui icon top left pointing dropdown button compact">
               <i class="wrench icon"/>
@@ -45,12 +46,12 @@
     <div class="extra content">
       <slot>
         <button
-          v-if="!isTaken"
+          v-if="showButtons && !isTaken"
           class="ui fluid button">
           Take this task
         </button>
         <button
-          v-else
+          v-else-if="showButtons"
           class="ui fluid button">
           Drop this task
         </button>
@@ -68,6 +69,11 @@ export default {
     task: {
       required: true,
       type: Object
+    },
+    showButtons: {
+      required: false,
+      type: Boolean,
+      default: true
     }
   },
   computed: {

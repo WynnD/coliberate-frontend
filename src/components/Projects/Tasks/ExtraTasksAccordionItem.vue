@@ -37,6 +37,7 @@
               <task-card
                 v-for="task in tasks"
                 :key="task.id"
+                :show-buttons="showButtons"
                 @showmodal="showModal"
                 :task="task"/>
             </div>

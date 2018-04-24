@@ -9,7 +9,19 @@
         <p>The following items will have the task removed from their respective task list.</p>
         <div>
           <h4>Features</h4>
-          {{ associatedFeatures }}
+          <feature-accordion-item
+            v-for="feature in associatedFeatures"
+            :key="`feature-${feature.id}`"
+            :id="`feature-${feature.id}`"
+            :feature="feature"
+            :active-accordion="activeAccordion"
+            @toggle-accordion-state="toggleAccordionState"
+            :name="`feature-${feature.id}`"
+            :stories="project.stories"
+            :tasks="project.tasks"
+            @click.native="refreshModal"
+            :show-buttons="false"
+          />
         </div>
         <div>
           <h4>Sprints</h4>
@@ -39,9 +51,17 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
+import FeatureAccordionItem from '@/components/Projects/Features/FeatureAccordionItem'
+import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
 
 /* global $ */
 export default {
+  components: {
+    'feature-accordion-item': FeatureAccordionItem,
+    'story-accordion-item': StoryAccordionItem,
+    'accordion-item': SegmentAccordionItem
+  },
   props: {
     targetTaskId: {
       required: false,
@@ -56,7 +76,9 @@ export default {
   data () {
     return {
       isLoading: false,
-      $form: null
+      $form: null,
+      activeAccordion: '',
+      activeSubAccordion: ''
     }
   },
   computed: {
@@ -138,6 +160,26 @@ export default {
     notifyError (message = 'An error occurred while trying to register') {
       this.$form.find('.ui.message p').text(message)
       this.$form.addClass('error')
+    },
+    toggleAccordionState (field) {
+      if (this.activeAccordion === field) {
+        this.activeAccordion = ''
+      } else {
+        this.activeAccordion = field
+      }
+      this.activeSubAccordion = ''
+    },
+    toggleAccordionSubState (field) {
+      if (this.activeSubAccordion === field) {
+        this.activeSubAccordion = ''
+      } else {
+        this.activeSubAccordion = field
+      }
+    },
+    refreshModal () {
+      setTimeout(() => {
+        this.$form.modal('refresh')
+      }, 50)
     }
   }
 }
