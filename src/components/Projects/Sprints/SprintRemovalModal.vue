@@ -117,10 +117,26 @@ export default {
       return this.dateFunctions().getDateRange()
     },
     dateDifference () {
-      if (this.targetSprint) {
-        return this.dateFunctions().getDateDifferenceMessage(this.targetSprint.startDate, this.targetSprint.endDate)
+      if (!this.targetSprint) {
+        return this.dateFunctions().getDateDifferenceMessage(new Date(), new Date())
       }
-      return this.dateFunctions().getDateDifferenceMessage(new Date(), new Date())
+      const startDate = new Date(this.targetSprint.startDate)
+      const endDate = new Date(this.targetSprint.endDate)
+      const currentDate = new Date()
+      const difference = this.dateFunctions().getDateDifferenceMessage(startDate, endDate)
+      let relativeDifferenceMessage
+      if (currentDate < startDate) {
+        const relativeDifference = this.dateFunctions().getRelativeDateDifferenceMessage(startDate, ['millisecond', 'second'])
+        relativeDifferenceMessage = `starts ${relativeDifference}`
+      } else {
+        const relativeDifference = this.dateFunctions().getRelativeDateDifferenceMessage(endDate, ['millisecond', 'second'])
+        if (currentDate < endDate) {
+          relativeDifferenceMessage = `ends ${relativeDifference}`
+        } else {
+          relativeDifferenceMessage = `ended ${relativeDifference}`
+        }
+      }
+      return `${difference} long, ${relativeDifferenceMessage}`
     },
     apiUrl () {
       return `api/projects/${this.project.id}/sprints/${this.targetSprintId}?member_id=${this.currentUser.id}`
@@ -145,13 +161,13 @@ export default {
       let relativeDifferenceMessage
       if (currentDate < startDate) {
         const relativeDifference = this.dateFunctions().getRelativeDateDifferenceMessage(startDate, ['millisecond', 'second'])
-        relativeDifferenceMessage = `starts in ${relativeDifference}`
+        relativeDifferenceMessage = `starts ${relativeDifference}`
       } else {
         const relativeDifference = this.dateFunctions().getRelativeDateDifferenceMessage(endDate, ['millisecond', 'second'])
         if (currentDate < endDate) {
           relativeDifferenceMessage = `ends ${relativeDifference}`
         } else {
-          relativeDifferenceMessage = `endeed ${relativeDifference}`
+          relativeDifferenceMessage = `ended ${relativeDifference}`
         }
       }
       return `${dateRange} (${dateDifference} long, ${relativeDifferenceMessage})`
