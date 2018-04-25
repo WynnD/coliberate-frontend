@@ -20,8 +20,39 @@
       </div>
       <hr>
       <div v-if="hasAssociations">
-        {{ associatedFeatures }}
-        {{ associatedSprints }}
+        <p>The following items will have the story removed from their respective story list.</p>
+        <div v-if="associatedFeatures.length > 0">
+          <h4>Features</h4>
+          <feature-accordion-item
+            v-for="feature in associatedFeatures"
+            :key="`feature-${feature.id}`"
+            :id="`feature-${feature.id}`"
+            :feature="feature"
+            :active-accordion="activeAccordion"
+            @toggle-accordion-state="toggleAccordionState"
+            :name="`feature-${feature.id}`"
+            :stories="project.stories"
+            :tasks="project.tasks"
+            @click.native="refreshModal"
+            :show-buttons="false"
+          />
+        </div>
+        <div v-if="associatedSprints.length > 0">
+          <h4>Sprints</h4>
+          <sprint-accordion-item
+            v-for="sprint in associatedSprints"
+            :key="`sprint-${sprint.id}`"
+            :id="`sprint-${sprint.id}`"
+            :sprint="sprint"
+            :active-accordion="activeAccordion"
+            @toggle-accordion-state="toggleAccordionState"
+            :name="`sprint-${sprint.id}`"
+            :stories="project.stories"
+            :tasks="project.tasks"
+            @click.native="refreshModal"
+            :show-buttons="false"
+          />
+        </div>
       </div>
       <div v-else>
         This story is not associated with any feature or sprint.
@@ -106,6 +137,7 @@ export default {
       }
     },
     targetStoryId () {
+      this.activeAccordion = ''
       this.$form.removeClass('error')
     }
   },
@@ -121,6 +153,28 @@ export default {
         e.preventDefault()
         this.requestHandler()
       })
+  },
+  methods: {
+    toggleAccordionState (field) {
+      if (this.activeAccordion === field) {
+        this.activeAccordion = ''
+      } else {
+        this.activeAccordion = field
+      }
+      this.activeSubAccordion = ''
+    },
+    toggleAccordionSubState (field) {
+      if (this.activeSubAccordion === field) {
+        this.activeSubAccordion = ''
+      } else {
+        this.activeSubAccordion = field
+      }
+    },
+    refreshModal () {
+      setTimeout(() => {
+        this.$form.modal('refresh')
+      }, 50)
+    }
   }
 }
 </script>

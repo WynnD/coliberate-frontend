@@ -44,12 +44,12 @@
           <story-accordion-item
             v-for="story in associatedStories"
             :key="story.id"
-            @toggle-accordion-state="toggleAccordionSubState"
+            @toggle-accordion-state="toggleAccordionState"
             :name="`story-list-${story.id}`"
             :story="story"
             :tasks="project.tasks"
             @click.native="refreshModal"
-            :showing-boolean="activeSubAccordion === `story-list-${story.id}`"
+            :showing-boolean="activeAccordion === `story-list-${story.id}`"
             :show-buttons="false"
           />
         </div>
@@ -135,6 +135,7 @@ export default {
       }
     },
     targetTaskId () {
+      this.activeAccordion = ''
       this.$form.removeClass('error')
     }
   },
