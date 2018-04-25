@@ -1,74 +1,64 @@
 <template>
-  <div class="ui modal form">
-    <div class="header">Remove Task Confirmation</div>
-    <div
-      v-if="targetTask"
-      class="scrolling content">
-      <h3>Are you sure you want to remove "{{ targetTask.name }}"?</h3>
-      <div v-if="hasAssociations">
-        <p>The following items will have the task removed from their respective task list.</p>
-        <div v-if="associatedFeatures.length > 0">
-          <h4>Features</h4>
-          <feature-accordion-item
-            v-for="feature in associatedFeatures"
-            :key="`feature-${feature.id}`"
-            :id="`feature-${feature.id}`"
-            :feature="feature"
-            :active-accordion="activeAccordion"
-            @toggle-accordion-state="toggleAccordionState"
-            :name="`feature-${feature.id}`"
-            :stories="project.stories"
-            :tasks="project.tasks"
-            @click.native="refreshModal"
-            :show-buttons="false"
-          />
+  <remove-modal
+    @update="$emit('update')"
+    :api-url="apiUrl">
+    <section slot="header">Remove Task Confirmation</section>
+    <section slot="content">
+      <div v-if="targetTask">
+        <h3>Are you sure you want to remove "{{ targetTask.name }}"?</h3>
+        <div v-if="hasAssociations">
+          <p>The following items will have the task removed from their respective task list.</p>
+          <div v-if="associatedFeatures.length > 0">
+            <h4>Features</h4>
+            <feature-accordion-item
+              v-for="feature in associatedFeatures"
+              :key="`feature-${feature.id}`"
+              :id="`feature-${feature.id}`"
+              :feature="feature"
+              :active-accordion="activeAccordion"
+              @toggle-accordion-state="toggleAccordionState"
+              :name="`feature-${feature.id}`"
+              :stories="project.stories"
+              :tasks="project.tasks"
+              @click.native="refreshModal"
+              :show-buttons="false"
+            />
+          </div>
+          <div v-if="associatedSprints.length > 0">
+            <h4>Sprints</h4>
+            <sprint-accordion-item
+              v-for="sprint in associatedSprints"
+              :key="`sprint-${sprint.id}`"
+              :id="`sprint-${sprint.id}`"
+              :sprint="sprint"
+              :active-accordion="activeAccordion"
+              @toggle-accordion-state="toggleAccordionState"
+              :name="`sprint-${sprint.id}`"
+              :stories="project.stories"
+              :tasks="project.tasks"
+              @click.native="refreshModal"
+              :show-buttons="false"
+            />
+          </div>
+          <div v-if="associatedStories.length > 0">
+            <h4>Stories</h4>
+            <story-accordion-item
+              v-for="story in associatedStories"
+              :key="story.id"
+              @toggle-accordion-state="toggleAccordionState"
+              :name="`story-list-${story.id}`"
+              :story="story"
+              :tasks="project.tasks"
+              @click.native="refreshModal"
+              :showing-boolean="activeAccordion === `story-list-${story.id}`"
+              :show-buttons="false"
+            />
+          </div>
         </div>
-        <div v-if="associatedSprints.length > 0">
-          <h4>Sprints</h4>
-          <sprint-accordion-item
-            v-for="sprint in associatedSprints"
-            :key="`sprint-${sprint.id}`"
-            :id="`sprint-${sprint.id}`"
-            :sprint="sprint"
-            :active-accordion="activeAccordion"
-            @toggle-accordion-state="toggleAccordionState"
-            :name="`sprint-${sprint.id}`"
-            :stories="project.stories"
-            :tasks="project.tasks"
-            @click.native="refreshModal"
-            :show-buttons="false"
-          />
-        </div>
-        <div v-if="associatedStories.length > 0">
-          <h4>Stories</h4>
-          <story-accordion-item
-            v-for="story in associatedStories"
-            :key="story.id"
-            @toggle-accordion-state="toggleAccordionState"
-            :name="`story-list-${story.id}`"
-            :story="story"
-            :tasks="project.tasks"
-            @click.native="refreshModal"
-            :showing-boolean="activeAccordion === `story-list-${story.id}`"
-            :show-buttons="false"
-          />
-        </div>
+        <div v-else>This task is not associated with any feature, sprint, or story.</div>
       </div>
-      <div v-else>This task is not associated with any feature, sprint, or story.</div>
-      <div class="ui error message">
-        <div class="header">Error</div>
-        <p>An error has occurred</p>
-      </div>
-    </div>
-    <div class="actions">
-      <button
-        type="submit"
-        class="ui red button">
-        Remove Task
-      </button>
-      <div class="ui grey cancel button">Cancel</div>
-    </div>
-  </div>
+    </section>
+  </remove-modal>
 </template>
 
 <script>
@@ -76,13 +66,15 @@ import { mapGetters } from 'vuex'
 import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
 import FeatureAccordionItem from '@/components/Projects/Features/FeatureAccordionItem'
 import SprintAccordionItem from '@/components/Projects/Sprints/SprintAccordionItem'
+import RemoveModal from '@/components/RemoveModal'
 
 /* global $ */
 export default {
   components: {
     'feature-accordion-item': FeatureAccordionItem,
     'story-accordion-item': StoryAccordionItem,
-    'sprint-accordion-item': SprintAccordionItem
+    'sprint-accordion-item': SprintAccordionItem,
+    'remove-modal': RemoveModal
   },
   props: {
     targetTaskId: {
@@ -97,7 +89,6 @@ export default {
   },
   data () {
     return {
-      isLoading: false,
       $form: null,
       activeAccordion: '',
       activeSubAccordion: ''
@@ -124,16 +115,12 @@ export default {
         this.associatedSprints.length > 0 ||
         this.associatedStories.length > 0
     },
+    apiUrl () {
+      return `api/projects/${this.project.id}/tasks/${this.targetTaskId}?member_id=${this.currentUser.id}`
+    },
     ...mapGetters(['currentUser'])
   },
   watch: {
-    isLoading (newValue) {
-      if (newValue) {
-        this.$form.addClass('loading')
-      } else {
-        this.$form.removeClass('loading')
-      }
-    },
     targetTaskId () {
       this.activeAccordion = ''
       this.$form.removeClass('error')
@@ -142,49 +129,8 @@ export default {
   },
   mounted () {
     this.$form = $(this.$el)
-    this.$form.submit((e) => {
-      e.preventDefault()
-      this.requestHandler()
-    })
-
-    this.$form.find('.actions .ui.red.button')
-      .on('click', (e) => {
-        e.preventDefault()
-        this.requestHandler()
-      })
   },
   methods: {
-    ...mapGetters(['server']),
-    async requestHandler () {
-      console.debug('Sending request to delete task', this.targetTask.id)
-      this.isLoading = true
-
-      try {
-        const result = await this.deleteTask(this.targetTask.id)
-        console.debug('result', result)
-        if (result === 'OK') {
-          this.$form.modal('hide')
-          this.$emit('update')
-        } else {
-          console.debug('Register failed!')
-          this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
-        }
-      } catch (err) {
-        console.debug('Register failed', err)
-        const message = `${err.status}: ${err.statusText}`
-        this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
-      }
-
-      this.isLoading = false
-    },
-    deleteTask (id) {
-      const apiUrl = `api/projects/${this.project.id}/tasks/${id}?member_id=${this.currentUser.id}`
-      return this.server().deleteFromServer(apiUrl)
-    },
-    notifyError (message = 'An error occurred while trying to register') {
-      this.$form.find('.ui.message p').text(message)
-      this.$form.addClass('error')
-    },
     toggleAccordionState (field) {
       if (this.activeAccordion === field) {
         this.activeAccordion = ''
