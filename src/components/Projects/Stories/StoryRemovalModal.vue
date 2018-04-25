@@ -34,7 +34,6 @@
               :name="`feature-${feature.id}`"
               :stories="project.stories"
               :tasks="project.tasks"
-              @click.native="refreshModal"
               :show-buttons="false"
             />
           </div>
@@ -50,7 +49,6 @@
               :name="`sprint-${sprint.id}`"
               :stories="project.stories"
               :tasks="project.tasks"
-              @click.native="refreshModal"
               :show-buttons="false"
             />
           </div>

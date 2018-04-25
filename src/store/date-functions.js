@@ -65,9 +65,23 @@ function getDateDifferenceMessage (older, newer) {
     }).join(', ')
 }
 
+function getRelativeDateDifferenceMessage (inputDate, ignoredAttributes = []) {
+  const currentDate = new Date()
+  const attributes = getDateDifference(currentDate, new Date(inputDate))
+  const msg = Object.keys(attributes)
+    .filter(attr => ignoredAttributes.indexOf(attr) === -1 && attributes[attr] > 0)
+    .map(attr => {
+      const value = attributes[attr]
+      return `${value} ${value === 1 ? attr : `${attr}s`}`
+    })
+
+  return msg[0] ? `${msg[0]} ${new Date(inputDate) - currentDate < 0 ? 'ago' : 'from now'}` : 'Now'
+}
+
 export default {
   getDateDifference,
   getDateDifferenceMessage,
+  getRelativeDateDifferenceMessage,
   getDateRange,
   getFormattedDate
 }

@@ -35,10 +35,25 @@
               :name="`story-list-${story.id}`"
               :story="story"
               :tasks="project.tasks"
-              @click.native="refreshModal"
               :showing-boolean="activeAccordion === `story-list-${story.id}`"
               :show-buttons="false"
             />
+          </div>
+        </div>
+        <div v-else>No associated stories or tasks found with this sprint</div>
+        <hr>
+        <div v-if="associatedReleases.length">
+          <p>The following release will have the sprint removed from its respective sprint list.</p>
+          <div class="ui relaxed divided list">
+            <div
+              v-for="release in associatedReleases"
+              :key="release.id"
+              class="item">
+              <div class="content">
+                <span class="header">{{ release.name }}</span>
+                <div class="description">{{ getReleaseDateRange(release) }}</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -120,6 +135,26 @@ export default {
       } else {
         this.activeAccordion = field
       }
+    },
+    getReleaseDateRange (release) {
+      const startDate = new Date(release.startDate)
+      const endDate = new Date(release.endDate)
+      const currentDate = new Date()
+      const dateRange = this.dateFunctions().getDateRange(startDate, endDate)
+      const dateDifference = this.dateFunctions().getDateDifferenceMessage(release.startDate, release.endDate)
+      let relativeDifferenceMessage
+      if (currentDate < startDate) {
+        const relativeDifference = this.dateFunctions().getRelativeDateDifferenceMessage(startDate, ['millisecond', 'second'])
+        relativeDifferenceMessage = `starts in ${relativeDifference}`
+      } else {
+        const relativeDifference = this.dateFunctions().getRelativeDateDifferenceMessage(endDate, ['millisecond', 'second'])
+        if (currentDate < endDate) {
+          relativeDifferenceMessage = `ends ${relativeDifference}`
+        } else {
+          relativeDifferenceMessage = `endeed ${relativeDifference}`
+        }
+      }
+      return `${dateRange} (${dateDifference} long, ${relativeDifferenceMessage})`
     }
   }
 }
