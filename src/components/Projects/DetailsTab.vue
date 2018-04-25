@@ -57,6 +57,12 @@
       :project-id="project.id || ''"
       @update="handleNewTask"
     />
+    <task-removal-modal
+      id="task-removal-modal"
+      :target-task-id="removeTargetId"
+      :project="project"
+      @update="$emit('update')"
+    />
 
     <div class="column sixteen wide">
       <release-selector
@@ -118,6 +124,7 @@ import SprintRemovalModal from '@/components/Projects/Sprints/SprintRemovalModal
 import StoryCreationModal from '@/components/Projects/Stories/StoryCreationModal'
 
 import TaskCreationModal from '@/components/Projects/Tasks/TaskCreationModal'
+import TaskRemovalModal from '@/components/Projects/Tasks/TaskRemovalModal'
 
 /* global $ */
 export default {
@@ -131,7 +138,8 @@ export default {
     'sprint-viewer': SprintViewer,
     'sprint-removal-modal': SprintRemovalModal,
     'story-creation-modal': StoryCreationModal,
-    'task-creation-modal': TaskCreationModal
+    'task-creation-modal': TaskCreationModal,
+    'task-removal-modal': TaskRemovalModal
   },
   props: {
     project: {
@@ -183,6 +191,10 @@ export default {
       .modal('hide')
 
     this.modals['task-create'] = $(this.$el).find('#task-creation-modal')
+      .modal('setting', 'closable', false)
+      .modal('hide')
+
+    this.modals['task-remove'] = $(this.$el).find('#task-removal-modal')
       .modal('setting', 'closable', false)
       .modal('hide')
   },

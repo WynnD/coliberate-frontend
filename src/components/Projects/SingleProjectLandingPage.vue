@@ -45,7 +45,6 @@ import { mapGetters } from 'vuex'
 import GeneralTab from '@/components/Projects/GeneralTab'
 import DetailsTab from '@/components/Projects/DetailsTab'
 
-/* global $ */
 export default {
   components: {
     'general-tab': GeneralTab,
@@ -79,37 +78,17 @@ export default {
     console.debug(this.project)
   },
   methods: {
-    getProjectData () {
+    async getProjectData () {
       const id = this.currentUser().id
-      return new Promise((resolve, reject) => {
-        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.get(`${url}/api/projects/${this.projectId}?member_id=${id}`)
-          .done(response => {
-            console.debug('got project response', response)
-            this.project = response
-            resolve(this.project)
-          }).fail(reject)
-      })
+      const projectData = await this.server().projects.getSingle(id, this.projectId)
+      console.debug('got project data', projectData)
+      this.project = projectData
+      return projectData
     },
     getMembers () {
-      return new Promise((resolve, reject) => {
-        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.get(`${url}/api/members`)
-          .done(response => {
-            const members = response.data
-
-            const memberObject = {}
-            members.forEach(m => {
-              memberObject[m.id.toString()] = m
-            })
-            console.debug('Got member data', memberObject)
-
-            this.$store.commit('updateMemberData', memberObject)
-            resolve()
-          }).fail(reject)
-      })
+      return this.server().members.updateStore()
     },
-    ...mapGetters(['projectById', 'currentUser'])
+    ...mapGetters(['projectById', 'currentUser', 'server'])
   }
 }
 </script>

@@ -1,9 +1,27 @@
 <template>
   <div
     id="single-task-card"
-    class="ui fluid card">
+    class="ui fluid task-card card">
     <div class="content">
-      <div class="header">{{ task.name }}</div>
+      <div class="header">
+        <div class="ui unstackable grid">
+          <div class="twelve wide column">
+            {{ task.name }}
+          </div>
+          <div class="right aligned four wide column">
+            <button
+              v-if="showButtons"
+              id="fab"
+              class="ui icon top left pointing dropdown button compact">
+              <i class="wrench icon"/>
+              <div class="menu">
+                <div class="item">Edit</div>
+                <div class="item">Delete</div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
       <div class="header">
         <div :class="ribbonClass">{{ task.status.toUpperCase() }}</div>
         <span class="left floated">
@@ -27,23 +45,39 @@
     </div>
     <div class="extra content">
       <slot>
-        Maybe have button to take/drop task here?
+        <button
+          v-if="showButtons && !isTaken"
+          class="ui fluid button">
+          Take this task
+        </button>
+        <button
+          v-else-if="showButtons"
+          class="ui fluid button">
+          Drop this task
+        </button>
       </slot>
     </div>
   </div>
 </template>
 
 <script>
-import getters from '@/store/getters'
+import { mapGetters } from 'vuex'
 
+/* global $ */
 export default {
   props: {
     task: {
       required: true,
       type: Object
+    },
+    showButtons: {
+      required: false,
+      type: Boolean,
+      default: true
     }
   },
   computed: {
+    ...mapGetters(['memberById', 'currentUser']),
     ribbonClass () {
       const status = this.task.status.toLowerCase()
       return {
@@ -55,8 +89,33 @@ export default {
     },
     memberNames () {
       return this.task.takenBy
-        .map(id => getters.memberById(this.$store.state)(id) || { name: `Unknown (${id})` })
+        .map(id => this.memberById(id) || { name: `Unknown (${id})` })
         .map(m => m.name)
+    },
+    isTaken () {
+      return this.task.takenBy.indexOf(this.currentUser.id) > -1
+    }
+  },
+  mounted () {
+    $(this.$el).find('.ui.dropdown#fab').dropdown({
+      onChange: this.dropdownChangeHandler
+    })
+  },
+  methods: {
+    dropdownChangeHandler (value) {
+      console.debug('clicked', value, 'on dropdown')
+      if (value === 'edit') {
+        this.taskEditHandler()
+      } else if (value === 'delete') {
+        this.taskRemoveHandler()
+      }
+    },
+    taskEditHandler () {
+      console.debug('clicked edit for', this.task.id)
+    },
+    taskRemoveHandler () {
+      console.debug('clicked remove for', this.task.id)
+      this.$emit('showmodal', `task-remove|${this.task.id}`)
     }
   }
 }

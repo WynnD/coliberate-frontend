@@ -46,13 +46,24 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 /* global $ */
 export default {
   data () {
     return {
       username: 'johnsmith@company.com',
       password: 'password',
-      $form: undefined
+      $form: undefined,
+      isLoading: false
+    }
+  },
+  watch: {
+    isLoading (newValue) {
+      if (newValue) {
+        this.$form.addClass('loading')
+      } else {
+        this.$form.removeClass('loading')
+      }
     }
   },
   mounted () {
@@ -64,16 +75,18 @@ export default {
     })
   },
   methods: {
+    ...mapGetters(['server']),
     async loginHandler () {
       // eslint-disable-next-line
       console.debug("Sending login info:", this.username, this.password)
+      this.isLoading = true
 
       try {
         const result = await this.login(this.username, this.password)
-
+        console.debug('login result', result)
         if (result.status !== 200) {
           // eslint-disable-next-line
-          console.debug("Login failed!", result);
+          console.debug("Login failed!");
           this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
         } else {
           const accountData = result.data
@@ -87,21 +100,12 @@ export default {
         const message = `${err.status}: ${err.statusText}`
         this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
       }
-      this.$form.removeClass('loading')
+      this.isLoading = false
     },
-    sendLoginData (username, password) {
-      return new Promise((resolve, reject) => {
-        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.post(`${url}/api/login`, { username, password })
-          .done(resolve).fail(reject)
-      })
-    },
-    async login (username, password) {
-      this.$form.addClass('loading')
-      const data = await this.sendLoginData(username, password)
-      // eslint-disable-next-line
-      console.debug('login', {data})
-      return data
+    login (username, password) {
+      const apiUrl = 'api/login'
+      const payload = { username, password }
+      return this.server().postToServer({ apiUrl, payload })
     },
     notifyError (message = 'An error occurred while trying to login') {
       this.$form.find('.ui.message p').text(message)
@@ -127,32 +131,31 @@ export default {
         const message = `${err.status}: ${err.statusText}`
         this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
       }
-      this.$form.removeClass('loading')
+      this.isLoading = false
     },
     async debugLogin (username, password) {
-      this.$form.addClass('loading')
+      console.debug('using debug login')
+      this.isLoading = true
       const simulateDelay = (msDelay) => {
         return new Promise((resolve, reject) => {
           setTimeout(resolve, msDelay)
         })
       }
-      return simulateDelay(1500)
-        .then(() => {
-          if (username !== 'johnsmith@company.com' || password !== 'password') {
-            return { error: 'Invalid login' }
-          }
+      await simulateDelay(1500)
+      if (username !== 'johnsmith@company.com' || password !== 'password') {
+        return { error: 'Invalid login' }
+      }
 
-          return {
-            status: 200,
-            data: {
-              id: 1,
-              name: 'John Smith',
-              email: 'johnsmith@company.com',
-              password: 'password',
-              username: 'johnsmith@company.com'
-            }
-          }
-        })
+      return {
+        status: 200,
+        data: {
+          id: 1,
+          name: 'John Smith',
+          email: 'johnsmith@company.com',
+          password: 'password',
+          username: 'johnsmith@company.com'
+        }
+      }
     }
   }
 }
