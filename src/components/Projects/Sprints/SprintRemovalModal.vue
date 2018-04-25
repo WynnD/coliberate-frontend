@@ -32,6 +32,7 @@
                     <task-card
                       v-for="task in sprintTasks"
                       :key="task.id"
+                      :show-buttons="false"
                       :task="task"/>
                   </div>
                 </div>

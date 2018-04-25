@@ -7,7 +7,7 @@
       <h3>Are you sure you want to remove "{{ targetTask.name }}"?</h3>
       <div v-if="hasAssociations">
         <p>The following items will have the task removed from their respective task list.</p>
-        <div>
+        <div v-if="associatedFeatures.length > 0">
           <h4>Features</h4>
           <feature-accordion-item
             v-for="feature in associatedFeatures"
@@ -23,9 +23,21 @@
             :show-buttons="false"
           />
         </div>
-        <div>
+        <div v-if="associatedSprints.length > 0">
           <h4>Sprints</h4>
-          {{ associatedSprints }}
+          <sprint-accordion-item
+            v-for="sprint in associatedSprints"
+            :key="`sprint-${sprint.id}`"
+            :id="`sprint-${sprint.id}`"
+            :sprint="sprint"
+            :active-accordion="activeAccordion"
+            @toggle-accordion-state="toggleAccordionState"
+            :name="`sprint-${sprint.id}`"
+            :stories="project.stories"
+            :tasks="project.tasks"
+            @click.native="refreshModal"
+            :show-buttons="false"
+          />
         </div>
         <div>
           <h4>Stories</h4>
@@ -53,14 +65,14 @@
 import { mapGetters } from 'vuex'
 import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
 import FeatureAccordionItem from '@/components/Projects/Features/FeatureAccordionItem'
-import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
+import SprintAccordionItem from '@/components/Projects/Sprints/SprintAccordionItem'
 
 /* global $ */
 export default {
   components: {
     'feature-accordion-item': FeatureAccordionItem,
     'story-accordion-item': StoryAccordionItem,
-    'accordion-item': SegmentAccordionItem
+    'sprint-accordion-item': SprintAccordionItem
   },
   props: {
     targetTaskId: {

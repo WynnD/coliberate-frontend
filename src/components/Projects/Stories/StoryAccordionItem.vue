@@ -64,6 +64,7 @@
               <task-card
                 v-for="taskId in story.tasks"
                 :key="taskId"
+                :show-buttons="showButtons"
                 @showmodal="showModal"
                 :task="tasks[taskId]"/>
             </div>
