@@ -15,6 +15,12 @@
       :project-id="project.id || ''"
       @update="handleNewFeature"
     />
+    <feature-removal-modal
+      id="feature-removal-modal"
+      :target-feature-id="removeTargetId"
+      :project="project"
+      @update="$emit('update')"
+    />
     <sprint-creation-modal
       @update="handleNewSprint"
       id="sprint-creation-modal"
@@ -120,6 +126,7 @@ import ReleaseSelector from '@/components/Projects/Releases/ReleaseSelector'
 
 import FeatureCreationModal from '@/components/Projects/Features/FeatureCreationModal'
 import FeatureListing from '@/components/Projects/Features/FeatureListing'
+import FeatureRemovalModal from '@/components/Projects/Features/FeatureRemovalModal'
 
 import SprintCreationModal from '@/components/Projects/Sprints/SprintCreationModal'
 import SprintViewer from '@/components/Projects/Sprints/SprintViewer'
@@ -139,6 +146,7 @@ export default {
     'release-selector': ReleaseSelector,
     'feature-creation-modal': FeatureCreationModal,
     'feature-listing': FeatureListing,
+    'feature-removal-modal': FeatureRemovalModal,
     'sprint-creation-modal': SprintCreationModal,
     'sprint-viewer': SprintViewer,
     'sprint-removal-modal': SprintRemovalModal,
@@ -180,6 +188,7 @@ export default {
       'sprint-create': '#sprint-creation-modal',
       'sprint-remove': '#sprint-removal-modal',
       'feature-create': '#feature-creation-modal',
+      'feature-remove': '#feature-removal-modal',
       'release-create': '#release-creation-modal',
       'story-create': '#story-creation-modal',
       'story-remove': '#story-removal-modal',

@@ -126,6 +126,7 @@ export default {
     },
     featureRemoveHandler () {
       console.debug('Clicked remove for', this.feature.id)
+      this.$emit('showmodal', `feature-remove|${this.feature.id}`)
     },
     toggleAccordionState (name) {
       this.$emit('toggle-accordion-state', name)

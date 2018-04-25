@@ -56,6 +56,7 @@
             </div>
           </div>
         </div>
+        <div v-else>No releases have this sprint.</div>
       </div>
     </section>
   </remove-modal>
