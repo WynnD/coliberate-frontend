@@ -139,6 +139,7 @@ export default {
     targetStoryId () {
       this.activeAccordion = ''
       this.$form.removeClass('error')
+      this.refreshModal()
     }
   },
   mounted () {
