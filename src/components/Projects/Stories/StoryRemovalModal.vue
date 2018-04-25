@@ -156,6 +156,37 @@ export default {
       })
   },
   methods: {
+    ...mapGetters(['server']),
+    async requestHandler () {
+      console.debug('Sending request to delete task', this.targetStory.id)
+      this.isLoading = true
+
+      try {
+        const result = await this.deleteStory(this.targetStory.id)
+        console.debug('result', result)
+        if (result === 'OK') {
+          this.$form.modal('hide')
+          this.$emit('update')
+        } else {
+          console.debug('Register failed!')
+          this.notifyError(result.responseJSON ? result.responseJSON.error : (result.statusText || result.error))
+        }
+      } catch (err) {
+        console.debug('Register failed', err)
+        const message = `${err.status}: ${err.statusText}`
+        this.notifyError(err.responseJSON ? err.responseJSON.error : (err.statusText || message))
+      }
+
+      this.isLoading = false
+    },
+    deleteStory (id) {
+      const apiUrl = `api/projects/${this.project.id}/stories/${id}?member_id=${this.currentUser.id}`
+      return this.server().deleteFromServer(apiUrl)
+    },
+    notifyError (message = 'An error occurred while trying to register') {
+      this.$form.find('.ui.message p').text(message)
+      this.$form.addClass('error')
+    },
     toggleAccordionState (field) {
       if (this.activeAccordion === field) {
         this.activeAccordion = ''
