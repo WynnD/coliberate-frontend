@@ -103,9 +103,6 @@ export default {
       return this.targetSprint.tasks
         .map(id => this.project.tasks[id])
     },
-    numUnfinishedTasks () {
-      return this.sprintTasks.filter(task => task.status !== 'done').length
-    },
     associatedReleases () {
       return Object.values(this.project.releases)
         .filter(r => r.sprints.includes(this.targetSprintId))
