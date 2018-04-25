@@ -125,6 +125,7 @@ export default {
     },
     sprintRemoveHandler () {
       console.debug('Clicked remove for', this.sprint.id)
+      this.$emit('showmodal', `sprint-remove|${this.sprint.id}`)
     },
     toggleAccordionState (name) {
       this.$emit('toggle-accordion-state', name)
