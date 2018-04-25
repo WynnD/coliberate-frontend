@@ -176,35 +176,27 @@ export default {
     }
   },
   mounted () {
-    this.modals['sprint-create'] = $(this.$el).find('#sprint-creation-modal')
-      .modal('setting', 'closable', false)
-      .modal('hide')
+    const modalMapping = {
+      'sprint-create': '#sprint-creation-modal',
+      'sprint-remove': '#sprint-removal-modal',
+      'feature-create': '#feature-creation-modal',
+      'release-create': '#release-creation-modal',
+      'story-create': '#story-creation-modal',
+      'story-remove': '#story-removal-modal',
+      'task-create': '#task-creation-modal',
+      'task-remove': '#task-removal-modal'
+    }
 
-    this.modals['sprint-remove'] = $(this.$el).find('#sprint-removal-modal')
-      .modal('setting', 'closable', false)
-      .modal('hide')
-
-    this.modals['feature-create'] = $(this.$el).find('#feature-creation-modal')
-      .modal('setting', 'closable', false)
-      .modal('hide')
-
-    this.modals['release-create'] = $(this.$el).find('#release-creation-modal')
-      .modal('setting', 'closable', false)
-      .modal('hide')
-
-    this.modals['story-create'] = $(this.$el).find('#story-creation-modal')
-      .modal('setting', 'closable', false)
-      .modal('hide')
-    this.modals['story-remove'] = $(this.$el).find('#story-removal-modal')
-      .modal('setting', 'closable', false)
-      .modal('hide')
-
-    this.modals['task-create'] = $(this.$el).find('#task-creation-modal')
-      .modal('setting', 'closable', false)
-      .modal('hide')
-    this.modals['task-remove'] = $(this.$el).find('#task-removal-modal')
-      .modal('setting', 'closable', false)
-      .modal('hide')
+    Object.keys(modalMapping)
+      .forEach(modalType => {
+        this.modals[modalType] = $(this.$el).find(modalMapping[modalType])
+          .modal({
+            closable: false,
+            onVisible () {
+              $(this).modal('refresh')
+            }
+          }).modal('hide')
+      })
   },
   methods: {
     handleReleaseChange (releaseId, isSandbox = false) {
