@@ -39,9 +39,19 @@
             :show-buttons="false"
           />
         </div>
-        <div>
+        <div v-if="associatedStories.length > 0">
           <h4>Stories</h4>
-          {{ associatedStories }}
+          <story-accordion-item
+            v-for="story in associatedStories"
+            :key="story.id"
+            @toggle-accordion-state="toggleAccordionSubState"
+            :name="`story-list-${story.id}`"
+            :story="story"
+            :tasks="project.tasks"
+            @click.native="refreshModal"
+            :showing-boolean="activeSubAccordion === `story-list-${story.id}`"
+            :show-buttons="false"
+          />
         </div>
       </div>
       <div v-else>This task is not associated with any feature, sprint, or story.</div>
