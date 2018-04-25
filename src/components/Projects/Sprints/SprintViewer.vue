@@ -185,20 +185,28 @@ export default {
     }
   },
   watch: {
-    currentSprint (newValue) {
-      // reset accordion states on new sprint selection
-      this.activeAccordion = ''
-      this.$emit('changesprint', this.currentSprintId)
+    currentSprintId (newValue) {
+      console.debug('currentSprintId', newValue)
+      this.$emit('changesprint', newValue)
+    },
+    initialSprint (newValue) {
+      console.debug('initial sprint', newValue)
+      this.currentSprintId = newValue
+      $(this.$el).find('.ui.dropdown')
+        .dropdown('set exactly', newValue)
+    },
+    sprints () {
+      const currentSprintId = this.currentSprintId
+      console.debug('sprints updated', currentSprintId)
+      $(this.$el).find('.ui.dropdown')
+        .dropdown('set exactly', this.currentSprintId)
+      setTimeout(() => {
+        this.currentSprintId = currentSprintId
+      }, 50)
     },
     release () {
       this.currentSprintId = ''
       $(this.$el).find('.ui.dropdown').dropdown('restore defaults')
-    },
-    initialSprint (newValue) {
-      console.debug({ newValue })
-      this.currentSprintId = newValue
-      $(this.$el).find('.ui.dropdown')
-        .dropdown('set exactly', newValue)
     }
   },
   mounted () {
