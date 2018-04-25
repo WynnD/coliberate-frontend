@@ -48,6 +48,7 @@
       id="story-removal-modal"
       :target-story-id="removeTargetId"
       :project="project"
+      @update="$emit('update')"
     />
     <task-creation-modal
       id="task-creation-modal"
