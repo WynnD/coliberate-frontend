@@ -295,12 +295,6 @@ export default {
         this.activeSubAccordion = field
       }
     },
-    featureEditHandler (featureId) {
-      console.debug('Clicked edit for', featureId)
-    },
-    featureRemoveHandler (featureId) {
-      console.debug('Clicked remove for', featureId)
-    },
     getFeatureTasks (featureId) {
       return this.project.features[featureId].tasks
         .map(id => this.project.tasks[id])
@@ -312,19 +306,6 @@ export default {
     getFeatureStories (featureId) {
       return this.project.features[featureId].stories
         .map(id => this.project.stories[id])
-    },
-    storyEditHandler (storyId) {
-      console.debug('Clicked edit for', storyId)
-    },
-    storyRemoveHandler (storyId) {
-      console.debug('Clicked remove for', storyId)
-    },
-    sprintEditHandler (sprintId) {
-      console.debug('Clicked edit for', sprintId)
-    },
-    sprintRemoveHandler (sprintId) {
-      console.debug('Clicked remove for', sprintId)
-      this.$emit('showmodal', `sprint-remove|${sprintId}`)
     },
     getSprintTasks (sprintId) {
       return this.project.sprints[sprintId].tasks

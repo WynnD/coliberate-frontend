@@ -44,6 +44,11 @@
       :project-id="project.id || ''"
       @update="handleNewStory"
     />
+    <story-removal-modal
+      id="story-removal-modal"
+      :target-story-id="removeTargetId"
+      :project="project"
+    />
     <task-creation-modal
       id="task-creation-modal"
       :stories="project.stories"
@@ -121,6 +126,7 @@ import SprintViewer from '@/components/Projects/Sprints/SprintViewer'
 import SprintRemovalModal from '@/components/Projects/Sprints/SprintRemovalModal'
 
 import StoryCreationModal from '@/components/Projects/Stories/StoryCreationModal'
+import StoryRemovalModal from '@/components/Projects/Stories/StoryRemovalModal'
 
 import TaskCreationModal from '@/components/Projects/Tasks/TaskCreationModal'
 import TaskRemovalModal from '@/components/Projects/Tasks/TaskRemovalModal'
@@ -137,6 +143,7 @@ export default {
     'sprint-viewer': SprintViewer,
     'sprint-removal-modal': SprintRemovalModal,
     'story-creation-modal': StoryCreationModal,
+    'story-removal-modal': StoryRemovalModal,
     'task-creation-modal': TaskCreationModal,
     'task-removal-modal': TaskRemovalModal
   },
@@ -188,11 +195,13 @@ export default {
     this.modals['story-create'] = $(this.$el).find('#story-creation-modal')
       .modal('setting', 'closable', false)
       .modal('hide')
+    this.modals['story-remove'] = $(this.$el).find('#story-removal-modal')
+      .modal('setting', 'closable', false)
+      .modal('hide')
 
     this.modals['task-create'] = $(this.$el).find('#task-creation-modal')
       .modal('setting', 'closable', false)
       .modal('hide')
-
     this.modals['task-remove'] = $(this.$el).find('#task-removal-modal')
       .modal('setting', 'closable', false)
       .modal('hide')

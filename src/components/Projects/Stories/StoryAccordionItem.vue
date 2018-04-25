@@ -124,6 +124,7 @@ export default {
     },
     storyRemoveHandler () {
       console.debug('Clicked remove for', this.story.id)
+      this.$emit('showmodal', `story-remove|${this.story.id}`)
     },
     showModal (data) {
       this.$emit('showmodal', data)
