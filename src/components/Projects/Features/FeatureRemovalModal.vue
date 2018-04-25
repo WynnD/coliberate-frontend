@@ -81,7 +81,7 @@ export default {
       type: Object
     }
   },
-  date () {
+  data () {
     return {
       activeAccordion: ''
     }
