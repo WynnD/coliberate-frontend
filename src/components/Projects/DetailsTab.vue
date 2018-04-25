@@ -61,6 +61,7 @@
       id="task-removal-modal"
       :target-task-id="removeTargetId"
       :project="project"
+      @update="$emit('update')"
     />
 
     <div class="column sixteen wide">
