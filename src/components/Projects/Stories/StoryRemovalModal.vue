@@ -1,5 +1,7 @@
 <template>
-  <remove-modal :api-url="apiUrl">
+  <remove-modal
+    @update="$emit('update')"
+    :api-url="apiUrl">
     <section slot="header">Remove Story Confirmation</section>
     <section slot="content">
       <div v-if="targetStory">
