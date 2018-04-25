@@ -1,103 +1,44 @@
 <template>
-  <div class="ui modal form">
-    <div class="header">Remove Sprint Confirmation</div>
-    <div
-      v-if="targetSprint"
-      class="scrolling content">
-      <h3>Are you sure you want to remove {{ targetSprint.name }}?</h3>
-      <p><b>Date Range: </b> {{ getDateRange(targetSprint) }}</p>
-      <div v-if="targetSprint.stories.length > 0 || targetSprint.tasks.length > 0">
-        <p>The following will be put into the backlog if they aren't associated with anything else</p>
-        <accordion-item
-          v-if="targetSprint.tasks.length > 0"
-          @toggle-accordion-state="toggleAccordionState"
-          :name="`${targetSprint.id}-extra-tasks`"
-          :showing-boolean="activeAccordion === `${targetSprint.id}-extra-tasks`">
-          <section slot="title">
-            <i class="dropdown icon"/>
-            <span>Tasks</span>
-          </section>
-          <section slot="content">
-            <div class="ui fluid container grid">
-              <div class="row">
-                <div class="sixteen wide column">
-                  <span class="ui small header">
-                    Tasks ({{ numUnfinishedTasks }}/{{ sprintTasks.length }} Remaining)
-                  </span>
-                </div>
-              </div>
-              <div class="row">
-                <div class="sixteen wide column">
-                  <div class="ui three stackable cards">
-                    <task-card
-                      v-for="task in sprintTasks"
-                      :key="task.id"
-                      :show-buttons="false"
-                      :task="task"/>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        </accordion-item>
-        <div v-if="targetSprint.stories.length > 0">
-          <story-accordion-item
-            v-for="story in sprintStories"
-            :key="story.id"
-            @toggle-accordion-state="toggleAccordionState"
-            :story="story"
-            :tasks="tasks"
-            :name="`${targetSprintId}-list-${story.id}`"
-            :show-buttons="false"
-            :showing-boolean="activeAccordion === `${targetSprintId}-list-${story.id}`"
-          />
-        </div>
+  <remove-modal
+    @update="$emit('update')"
+    :api-url="apiUrl">
+    <section slot="header">Remove Sprint Confirmation</section>
+    <section slot="content">
+      <div v-if="targetSprint">
+        <h3>Are you sure you want to remove "{{ targetSprint.name }}"?</h3>
+        <p>
+          <b>Date Range: </b>
+          <span>{{ dateRange }}</span>
+          <span v-if="dateDifference">
+            ({{ dateDifference }})
+          </span>
+        </p>
       </div>
-      <div v-else>
-        <p>No associated stories or tasks found with this sprint.</p>
-      </div>
-    </div>
-    <div class="actions">
-      <button
-        type="submit"
-        class="ui red button">
-        Remove Sprint
-      </button>
-      <div class="ui grey cancel button">Cancel</div>
-    </div>
-  </div>
+    </section>
+  </remove-modal>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
 import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
 import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
+import RemoveModal from '@/components/RemoveModal'
 
 export default {
   components: {
     'task-card': SingleTaskCard,
     'accordion-item': SegmentAccordionItem,
-    'story-accordion-item': StoryAccordionItem
+    'story-accordion-item': StoryAccordionItem,
+    'remove-modal': RemoveModal
   },
   props: {
-    releases: {
-      required: true,
-      type: Object
-    },
     targetSprintId: {
       required: false,
       type: String,
       default: ''
     },
-    sprints: {
-      required: true,
-      type: Object
-    },
-    stories: {
-      required: true,
-      type: Object
-    },
-    tasks: {
+    project: {
       required: true,
       type: Object
     }
@@ -109,26 +50,38 @@ export default {
   },
   computed: {
     targetSprint () {
-      return this.sprints[this.targetSprintId]
+      return this.project.sprints[this.targetSprintId]
     },
     sprintStories () {
       return this.targetSprint.stories
-        .map(id => this.stories[id])
+        .map(id => this.project.stories[id])
     },
     sprintTasks () {
       return this.targetSprint.tasks
-        .map(id => this.tasks[id])
+        .map(id => this.project.tasks[id])
     },
     numUnfinishedTasks () {
       return this.sprintTasks.filter(task => task.status !== 'done').length
-    }
+    },
+    dateRange () {
+      if (this.targetSprint) {
+        return this.dateFunctions().getDateRange(this.targetSprint.startDate, this.targetSprint.endDate)
+      }
+      return this.dateFunctions().getDateRange()
+    },
+    dateDifference () {
+      if (this.targetSprint) {
+        return this.dateFunctions().getDateDifferenceMessage(this.targetSprint.startDate, this.targetSprint.endDate)
+      }
+      return this.dateFunctions().getDateDifferenceMessage(new Date(), new Date())
+    },
+    apiUrl () {
+      return `api/projects/${this.project.id}/sprints/${this.targetSprintId}?member_id=${this.currentUser.id}`
+    },
+    ...mapGetters(['currentUser'])
   },
   methods: {
-    getDateRange (sprint) {
-      const startDate = new Date(sprint.startDate)
-      const endDate = new Date(sprint.endDate)
-      return `${startDate.toDateString()} to ${endDate.toDateString()}`
-    },
+    ...mapGetters(['server', 'dateFunctions']),
     toggleAccordionState (field) {
       if (this.activeAccordion === field) {
         this.activeAccordion = ''

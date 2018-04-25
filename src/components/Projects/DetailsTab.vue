@@ -27,11 +27,9 @@
     />
     <sprint-removal-modal
       id="sprint-removal-modal"
-      :releases="project.releases"
       :target-sprint-id="removeTargetId"
-      :sprints="project.sprints"
-      :stories="project.stories"
-      :tasks="project.tasks"
+      :project="project"
+      @update="$emit('update')"
     />
     <story-creation-modal
       id="story-creation-modal"

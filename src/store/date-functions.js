@@ -17,7 +17,7 @@ function getFormattedDate (date) {
 }
 
 function getDateDifference (older, newer) {
-  const difference = new Date(Math.abs(newer - older))
+  const difference = new Date(Math.abs(new Date(newer) - new Date(older)))
   const attributes = {
     day: 0,
     hour: 0,
@@ -52,7 +52,11 @@ function getDateDifference (older, newer) {
         total = remainder
       }
     })
+  return attributes
+}
 
+function getDateDifferenceMessage (older, newer) {
+  const attributes = getDateDifference(older, newer)
   return Object.keys(attributes)
     .filter(attr => attributes[attr] > 0)
     .map(attr => {
@@ -63,6 +67,7 @@ function getDateDifference (older, newer) {
 
 export default {
   getDateDifference,
+  getDateDifferenceMessage,
   getDateRange,
   getFormattedDate
 }
