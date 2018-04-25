@@ -13,6 +13,34 @@
             ({{ dateDifference }})
           </span>
         </p>
+
+        <div v-if="sprintStories.length > 0 || sprintTasks.length > 0">
+          <p>The following will be put into the backlog if they aren't associated with anything else.</p>
+          <div v-if="sprintTasks.length > 0">
+            <h4>Tasks</h4>
+            <div class="ui three stackable cards">
+              <task-card
+                v-for="task in sprintTasks"
+                :key="task.id"
+                :show-buttons="false"
+                :task="task"/>
+            </div>
+          </div>
+          <div v-if="sprintStories.length > 0">
+            <h4>Stories</h4>
+            <story-accordion-item
+              v-for="story in sprintStories"
+              :key="story.id"
+              @toggle-accordion-state="toggleAccordionState"
+              :name="`story-list-${story.id}`"
+              :story="story"
+              :tasks="project.tasks"
+              @click.native="refreshModal"
+              :showing-boolean="activeAccordion === `story-list-${story.id}`"
+              :show-buttons="false"
+            />
+          </div>
+        </div>
       </div>
     </section>
   </remove-modal>
@@ -62,6 +90,10 @@ export default {
     },
     numUnfinishedTasks () {
       return this.sprintTasks.filter(task => task.status !== 'done').length
+    },
+    associatedReleases () {
+      return Object.values(this.project.releases)
+        .filter(r => r.sprints.includes(this.targetSprintId))
     },
     dateRange () {
       if (this.targetSprint) {

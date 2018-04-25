@@ -7,7 +7,7 @@
       <div v-if="targetStory">
         <h3>Are you sure you want to remove "{{ targetStory.name }}"?</h3>
         <div v-if="storyTasks.length > 0">
-          <p>The following tasks will be put into the backlog if they aren't associated with anything else</p>
+          <p>The following tasks will be put into the backlog if they aren't associated with anything else.</p>
           <div class="ui three stackable cards">
             <task-card
               v-for="task in storyTasks"
