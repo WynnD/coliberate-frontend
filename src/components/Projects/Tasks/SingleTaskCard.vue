@@ -23,7 +23,31 @@
         </div>
       </div>
       <div class="header">
-        <div :class="ribbonClass">{{ task.status.toUpperCase() }}</div>
+        <div :class="ribbonClass">
+          <div
+            id="status"
+            class="ui right pointing dropdown">
+            <div class="text">{{ task.status.toUpperCase() }}</div>
+            <i class="dropdown icon"/>
+            <div class="menu">
+              <div
+                value="todo"
+                class="item">
+                TODO
+              </div>
+              <div
+                value="in-progress"
+                class="item">
+                IN-PROGRESS
+              </div>
+              <div
+                value="done"
+                class="item">
+                DONE
+              </div>
+            </div>
+          </div>
+        </div>
         <span class="left floated">
           ({{ task.points }} points)
         </span>
@@ -113,10 +137,29 @@ export default {
     $(this.$el).find('.ui.dropdown#fab').dropdown({
       onChange: this.dropdownChangeHandler
     })
+
+    $(this.$el).find('.ui.dropdown#status').dropdown({
+      action: 'select',
+      onChange: this.statusChangeHandler
+    })
   },
   methods: {
+    async statusChangeHandler (value) {
+      console.debug('clicked', value, 'on status dropdown')
+      if (!value) {
+        return
+      }
+      try {
+        await this.sendEdit({
+          ...(this.task),
+          status: value
+        })
+      } catch (err) {
+        console.error(err)
+      }
+    },
     dropdownChangeHandler (value) {
-      console.debug('clicked', value, 'on dropdown')
+      console.debug('clicked', value, 'on fab dropdown')
       if (value === 'edit') {
         this.taskEditHandler()
       } else if (value === 'delete') {
