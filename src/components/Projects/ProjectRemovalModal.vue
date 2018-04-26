@@ -1,6 +1,6 @@
 <template>
   <remove-modal
-    @update="updateProjectStore"
+    @update="$emit('update')"
     :api-url="apiUrl">
     <section slot="header">Remove Project Confirmation</section>
     <section slot="content">
@@ -28,7 +28,7 @@ export default {
   data () {
     return {
       $form: null,
-      project: null,
+      project: null
     }
   },
   computed: {
@@ -37,17 +37,28 @@ export default {
       return `api/projects/${this.targetProjectId}?member_id=${this.currentUser.id}`
     }
   },
-  async mounted () {
-    this.getProjectData()
-  },
   watch: {
-    targetProjectId () {
+    async targetProjectId (newValue) {
+      this.activeAccordion = ''
+      this.$form.removeClass('error')
+      this.refreshModal()
       this.project = null
-      this.getProjectData()
+      await this.getProjectData()
+      this.refreshModal()
     }
+  },
+  async mounted () {
+    this.$form = $(this.$el)
+    await this.getProjectData()
+    this.refreshModal()
   },
   methods: {
     async getProjectData () {
+      if (!this.targetProjectId) {
+        console.debug('target project ID is empty')
+        this.project = null
+        return
+      }
       this.project = this.projectById(this.targetProjectId)
 
       // case when project ID is a number
@@ -61,16 +72,21 @@ export default {
       } catch (err) {
         console.error(err)
       }
-      console.debug(this.project)
+      console.debug({ project: this.project, id: this.targetProjectId })
     },
-    async getProjectDataFromServer (id) {
-      const projectData = await this.server.projects.getSingle(id, this.projectId)
+    async getProjectDataFromServer (accountId) {
+      const projectData = await this.server.projects.getSingle(accountId, this.targetProjectId)
       console.debug('got project data', projectData)
       this.project = projectData
       return projectData
     },
     getMembers () {
       return this.server.members.updateStore()
+    },
+    refreshModal () {
+      setTimeout(() => {
+        this.$form.modal('refresh')
+      }, 50)
     }
   }
 }
