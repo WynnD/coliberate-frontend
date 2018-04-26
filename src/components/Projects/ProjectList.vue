@@ -39,7 +39,7 @@ export default {
   },
   data () {
     return {
-      modal: null
+      modals: {}
     }
   },
   computed: mapState([
@@ -55,7 +55,7 @@ export default {
     // eslint-disable-next-line
     //console.debug(this.projects);
 
-    this.modal = $('#projects-page #project-creation-modal')
+    this.modals['project-create'] = $('#projects-page #project-creation-modal')
       .modal('setting', 'closable', false)
       .modal('hide')
 
@@ -76,8 +76,8 @@ export default {
     ...mapGetters(['server']),
     showModal () {
       this.getMembers()
-      if (this.modal) {
-        this.modal.modal('show')
+      if (this.modals['project-create']) {
+        this.modals['project-create'].modal('show')
       }
     },
     getProjectList (id) {
