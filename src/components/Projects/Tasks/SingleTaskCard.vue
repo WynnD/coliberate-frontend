@@ -59,6 +59,9 @@
         </button>
       </slot>
     </div>
+    <div class="ui inverted dimmer">
+      <div class="ui loader"/>
+    </div>
   </div>
 </template>
 
@@ -134,6 +137,8 @@ export default {
     async sendEdit (task) {
       const url = this.generateApiUrl(task)
       console.debug('sending task edit', { url, task })
+      const loader = $(this.$el).find('.ui.dimmer')
+      loader.addClass('active')
       try {
         const result = await this.server.putToServer(url)
         console.debug('result', result)
@@ -142,6 +147,8 @@ export default {
         }
       } catch (err) {
         console.debug('edit failed', err)
+      } finally {
+        loader.removeClass('active')
       }
     },
     async takeTaskHandler () {
@@ -155,8 +162,6 @@ export default {
       const newTakenBy = this.task.takenBy.slice()
       newTakenBy.push(this.currentUser.id)
       console.debug('would\'ve taken task with takenBy', newTakenBy)
-      const buttons = $(this.$el).find('.ui.button')
-      buttons.addClass('loading')
       try {
         await this.sendEdit({
           ...(this.task),
@@ -164,8 +169,6 @@ export default {
         })
       } catch (err) {
         console.error(err)
-      } finally {
-        buttons.removeClass('loading')
       }
     },
     async dropTaskHandler () {
@@ -178,8 +181,6 @@ export default {
 
       const newTakenBy = this.task.takenBy.filter(id => id !== this.currentUser.id)
       console.debug('would\'ve taken task with takenBy', newTakenBy)
-      const buttons = $(this.$el).find('.ui.button')
-      buttons.addClass('loading')
       try {
         await this.sendEdit({
           ...(this.task),
@@ -187,8 +188,6 @@ export default {
         })
       } catch (err) {
         console.error(err)
-      } finally {
-        buttons.removeClass('loading')
       }
     }
   }
