@@ -78,8 +78,9 @@ export default {
       default: true
     },
     projectId: {
-      required: true,
-      type: String
+      required: false,
+      type: String,
+      default: ''
     }
   },
   computed: {
@@ -102,7 +103,7 @@ export default {
       return this.task.takenBy.indexOf(this.currentUser.id) > -1
     },
     baseApiUrl () {
-      return `api/projects/${this.projectId}/tasks/${this.targetTaskId}?member_id=${this.currentUser.id}`
+      return `api/projects/${this.projectId}/tasks/${this.task.id}?member_id=${this.currentUser.id}`
     }
   },
   mounted () {
@@ -126,11 +127,15 @@ export default {
       console.debug('clicked remove for', this.task.id)
       this.$emit('showmodal', `task-remove|${this.task.id}`)
     },
+    generateApiUrl (task = {}) {
+      const taskDataUrl = encodeURIComponent(JSON.stringify(task))
+      return `${this.baseApiUrl}&task=${taskDataUrl}`
+    },
     takeTaskHandler () {
-      console.debug('would\'ve taken task', this.task.id)
+      console.debug('would\'ve taken task with url', this.generateApiUrl(this.task))
     },
     dropTaskHandler () {
-      console.debug('would\'ve dropped task', this.task.id)
+      console.debug('would\'ve dropped task with url', this.generateApiUrl(this.task))
     }
   }
 }
