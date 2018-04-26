@@ -149,6 +149,7 @@ export default {
     },
     releaseRemoveHandler (releaseId) {
       console.debug('Clicked remove for', releaseId)
+      this.$emit('showmodal', `release-remove|${releaseId}`)
     }
   }
 }

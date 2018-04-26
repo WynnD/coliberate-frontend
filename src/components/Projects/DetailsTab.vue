@@ -5,6 +5,12 @@
       id="release-creation-modal"
       :features="project.features"
       :project="project"/>
+    <release-removal-modal
+      id="release-removal-modal"
+      :target-release-id="removeTargetId"
+      :project="project"
+      @update="$emit('update')"
+    />
     <feature-creation-modal
       id="feature-creation-modal"
       :stories="project.stories"
@@ -123,6 +129,7 @@ import BacklogViewer from '@/components/Projects/BacklogViewer'
 
 import ReleaseCreationModal from '@/components/Projects/Releases/ReleaseCreationModal'
 import ReleaseSelector from '@/components/Projects/Releases/ReleaseSelector'
+import ReleaseRemovalModal from '@/components/Projects/Releases/ReleaseRemovalModal'
 
 import FeatureCreationModal from '@/components/Projects/Features/FeatureCreationModal'
 import FeatureListing from '@/components/Projects/Features/FeatureListing'
@@ -144,6 +151,7 @@ export default {
     'backlog-viewer': BacklogViewer,
     'release-creation-modal': ReleaseCreationModal,
     'release-selector': ReleaseSelector,
+    'release-removal-modal': ReleaseRemovalModal,
     'feature-creation-modal': FeatureCreationModal,
     'feature-listing': FeatureListing,
     'feature-removal-modal': FeatureRemovalModal,
@@ -185,11 +193,12 @@ export default {
   },
   mounted () {
     const modalMapping = {
-      'sprint-create': '#sprint-creation-modal',
-      'sprint-remove': '#sprint-removal-modal',
+      'release-create': '#release-creation-modal',
+      'release-remove': '#release-removal-modal',
       'feature-create': '#feature-creation-modal',
       'feature-remove': '#feature-removal-modal',
-      'release-create': '#release-creation-modal',
+      'sprint-create': '#sprint-creation-modal',
+      'sprint-remove': '#sprint-removal-modal',
       'story-create': '#story-creation-modal',
       'story-remove': '#story-removal-modal',
       'task-create': '#task-creation-modal',
