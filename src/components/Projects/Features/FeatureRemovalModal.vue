@@ -59,14 +59,12 @@
 <script>
 import { mapGetters } from 'vuex'
 import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
-import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
 import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
 import RemoveModal from '@/components/RemoveModal'
 
 export default {
   components: {
     'task-card': SingleTaskCard,
-    'accordion-item': SegmentAccordionItem,
     'story-accordion-item': StoryAccordionItem,
     'remove-modal': RemoveModal
   },
