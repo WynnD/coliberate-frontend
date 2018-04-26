@@ -15,6 +15,16 @@ class ColiberateFrontendCore {
   }
 
   // ex apiUrl = api/projects/sample-project-0?member_id=my_id
+  putToServer (apiUrl) {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: `${this.baseUrl}/${apiUrl}`,
+        type: 'PUT'
+      }).done(resolve).fail(reject)
+    })
+  }
+
+  // ex apiUrl = api/projects/sample-project-0?member_id=my_id
   getFromServer (apiUrl) {
     return new Promise((resolve, reject) => {
       $.get(`${this.baseUrl}/${apiUrl}`)

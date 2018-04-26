@@ -46,13 +46,15 @@
     <div class="extra content">
       <slot>
         <button
-          v-if="showButtons && !isTaken"
+          v-show="showButtons && !isTaken"
+          @click="takeTaskHandler"
           class="ui fluid button">
           Take this task
         </button>
         <button
-          v-else-if="showButtons"
-          class="ui fluid button">
+          v-show="showButtons && isTaken"
+          @click="dropTaskHandler"
+          class="ui fluid inverted red button">
           Drop this task
         </button>
       </slot>
@@ -74,10 +76,14 @@ export default {
       required: false,
       type: Boolean,
       default: true
+    },
+    projectId: {
+      required: true,
+      type: String
     }
   },
   computed: {
-    ...mapGetters(['memberById', 'currentUser']),
+    ...mapGetters(['memberById', 'currentUser', 'server']),
     ribbonClass () {
       const status = this.task.status.toLowerCase()
       return {
@@ -94,6 +100,9 @@ export default {
     },
     isTaken () {
       return this.task.takenBy.indexOf(this.currentUser.id) > -1
+    },
+    baseApiUrl () {
+      return `api/projects/${this.projectId}/tasks/${this.targetTaskId}?member_id=${this.currentUser.id}`
     }
   },
   mounted () {
@@ -116,6 +125,12 @@ export default {
     taskRemoveHandler () {
       console.debug('clicked remove for', this.task.id)
       this.$emit('showmodal', `task-remove|${this.task.id}`)
+    },
+    takeTaskHandler () {
+      console.debug('would\'ve taken task', this.task.id)
+    },
+    dropTaskHandler () {
+      console.debug('would\'ve dropped task', this.task.id)
     }
   }
 }
