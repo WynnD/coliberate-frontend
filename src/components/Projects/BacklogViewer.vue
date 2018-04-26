@@ -167,7 +167,9 @@
         <task-card
           v-for="taskId in orphanedData.tasks"
           :key="taskId"
+          :project-id="project.id"
           @showmodal="showModal"
+          @update="$emit('update')"
           :task="project.tasks[taskId]"/>
       </div>
     </div>

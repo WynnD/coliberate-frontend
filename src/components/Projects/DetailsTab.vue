@@ -117,6 +117,7 @@
     <div class="column sixteen wide">
       <backlog-viewer
         @showmodal="showSandboxModal"
+        @update="$emit('update')"
         @changefeature="handleFeatureChange($event, true)"
         @changestory="handleStoryChange($event, true)"
         :project="project"/>

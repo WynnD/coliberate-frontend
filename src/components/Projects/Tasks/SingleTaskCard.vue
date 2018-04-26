@@ -131,11 +131,65 @@ export default {
       const taskDataUrl = encodeURIComponent(JSON.stringify(task))
       return `${this.baseApiUrl}&task=${taskDataUrl}`
     },
-    takeTaskHandler () {
-      console.debug('would\'ve taken task with url', this.generateApiUrl(this.task))
+    async sendEdit (task) {
+      const url = this.generateApiUrl(task)
+      console.debug('sending task edit', { url, task })
+      try {
+        const result = await this.server.putToServer(url)
+        console.debug('result', result)
+        if (result === 'OK') {
+          this.$emit('update')
+        }
+      } catch (err) {
+        console.debug('edit failed', err)
+      }
     },
-    dropTaskHandler () {
-      console.debug('would\'ve dropped task with url', this.generateApiUrl(this.task))
+    async takeTaskHandler () {
+      if (!this.projectId) {
+        throw Error('project ID not specified')
+      }
+      if (this.task.takenBy.includes(this.currentUser.id)) {
+        return
+      }
+
+      const newTakenBy = this.task.takenBy.slice()
+      newTakenBy.push(this.currentUser.id)
+      console.debug('would\'ve taken task with takenBy', newTakenBy)
+      const buttons = $(this.$el).find('.ui.button')
+      buttons.addClass('loading')
+      try {
+        await this.sendEdit({
+          ...(this.task),
+          takenBy: newTakenBy
+        })
+      } catch (err) {
+        console.error(err)
+      } finally {
+        buttons.removeClass('loading')
+      }
+    },
+    async dropTaskHandler () {
+      if (!this.projectId) {
+        throw Error('project ID not specified')
+      }
+      if (!this.task.takenBy.includes(this.currentUser.id)) {
+        return
+      }
+
+      const newTakenBy = this.task.takenBy.filter(id => id !== this.currentUser.id)
+      console.debug('would\'ve taken task with takenBy', newTakenBy)
+      const buttons = $(this.$el).find('.ui.button')
+      buttons.addClass('loading')
+      try {
+        await this.sendEdit({
+          ...(this.task),
+          takenBy: newTakenBy
+        })
+      } catch (err) {
+        console.error(err)
+      } finally {
+        buttons.removeClass('loading')
+      }
     }
   }
 }
