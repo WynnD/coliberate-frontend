@@ -2,7 +2,18 @@
   <div class="ui project card">
     <div class="content">
       <div class="header">
-        <p>{{ name }}</p>
+        <div class="ui unstackable grid">
+          <div class="twelve wide column">
+            {{ name }}
+          </div>
+          <div class="right aligned four wide column">
+            <button
+              @click="deleteHandler"
+              class="ui icon basic button compact">
+              <i class="close icon"/>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <div class="content">
@@ -63,6 +74,12 @@ export default {
         return new Date(this.project.auditLog[this.project.auditLog.length - 1].date).toDateString()
       }
       return new Date().toDateString()
+    }
+  },
+  methods: {
+    deleteHandler () {
+      console.debug('clicked remove for', this.project.id)
+      this.$emit('showmodal', `project-remove|${this.project.id}`)
     }
   }
 }
