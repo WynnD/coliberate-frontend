@@ -68,6 +68,7 @@ import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
 import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
 import RemoveModal from '@/components/RemoveModal'
 
+/* global $ */
 export default {
   components: {
     'task-card': SingleTaskCard,
@@ -139,6 +140,16 @@ export default {
     },
     ...mapGetters(['currentUser'])
   },
+  watch: {
+    targetSprintId () {
+      this.activeAccordion = ''
+      this.$form.removeClass('error')
+      this.refreshModal()
+    }
+  },
+  mounted () {
+    this.$form = $(this.$el)
+  },
   methods: {
     ...mapGetters(['server', 'dateFunctions']),
     toggleAccordionState (field) {
@@ -167,6 +178,11 @@ export default {
         }
       }
       return `${dateRange} (${dateDifference} long, ${relativeDifferenceMessage})`
+    },
+    refreshModal () {
+      setTimeout(() => {
+        this.$form.modal('refresh')
+      }, 50)
     }
   }
 }
