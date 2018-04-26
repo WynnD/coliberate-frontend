@@ -4,7 +4,20 @@
     :api-url="apiUrl">
     <section slot="header">Remove Project Confirmation</section>
     <section slot="content">
-      {{ project }}
+      <div v-if="project">
+        <h3>Are you sure you want to remove "{{ project.name }}"?</h3>
+        <p><b>Start Date: </b> {{ startDate }} ({{ dateDifference }})</p>
+        <p><b>Description: </b> {{ project.description }}</p>
+        <p><b>Member List: </b></p>
+        <ul>
+          <li
+            v-for="member in project.members"
+            :key="member.id"
+          >
+            {{ getMember(member.id).name }} - {{ member.role }}
+          </li>
+        </ul>
+      </div>
     </section>
   </remove-modal>
 </template>
@@ -32,7 +45,16 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['projectById', 'currentUser', 'server']),
+    ...mapGetters(['projectById', 'currentUser', 'server', 'dateFunctions', 'memberById']),
+    startDate () {
+      if (this.project && this.project.auditLog) {
+        return new Date(this.project.auditLog[this.project.auditLog.length - 1].date).toLocaleString()
+      }
+      return new Date().toLocaleString()
+    },
+    dateDifference () {
+      return this.dateFunctions.getRelativeDateDifferenceMessage(new Date(this.startDate), ['millisecond'])
+    },
     apiUrl () {
       return `api/projects/${this.targetProjectId}?member_id=${this.currentUser.id}`
     }
@@ -82,6 +104,9 @@ export default {
     },
     getMembers () {
       return this.server.members.updateStore()
+    },
+    getMember (id) {
+      return this.memberById(id)
     },
     refreshModal () {
       setTimeout(() => {
