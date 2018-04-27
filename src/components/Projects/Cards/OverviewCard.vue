@@ -7,9 +7,10 @@
       id="tasks-progress"
       class="content">
       <p class="ui sub header">Tasks</p>
-      <div class="ui green progress">
-        <div class="bar finished"/>
-      </div>
+      <progress-bar
+        :done-count="finishedTasks.length"
+        :in-progress-count="inProgressTasks.length"
+        :total-count="allTasks.length"/>
       <p class="ui sub header aligned right">
         {{ finishedTasks.length }}/{{ allTasks.length }} Completed
       </p>
@@ -44,9 +45,13 @@
 </template>
 
 <script>
+import ProgressBar from '@/components/Projects/ProgressBar'
 
 /* global $ */
 export default {
+  components: {
+    'progress-bar': ProgressBar
+  },
   props: {
     project: {
       required: true,
@@ -56,6 +61,9 @@ export default {
   computed: {
     allTasks () {
       return Object.values(this.project.tasks)
+    },
+    inProgressTasks () {
+      return this.allTasks.filter(t => t.status === 'in-progress')
     },
     finishedTasks () {
       return this.allTasks.filter(t => t.status === 'done')
