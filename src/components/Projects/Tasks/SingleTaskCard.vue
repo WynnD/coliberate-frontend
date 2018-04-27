@@ -24,8 +24,10 @@
       </div>
       <div class="header">
         <div :class="ribbonClass">
+          <span v-show="!projectId">{{ task.status.toUpperCase() }}</span>
           <div
             id="status"
+            v-show="!!projectId"
             class="ui right pointing dropdown">
             <div class="text">{{ task.status.toUpperCase() }}</div>
             <i class="dropdown icon"/>

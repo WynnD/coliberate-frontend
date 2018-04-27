@@ -50,7 +50,7 @@
       <div v-else>
         <div class="ui message negative">
           <div class="header">Unassociated Features Found</div>
-          <p><b>Suggested Action:</b> Edit these features so that they belong to a release.</p>
+          <p><b>Suggested Action:</b> Edit these features so that they belong to a release or create a release that contains these features.</p>
         </div>
       </div>
       <feature-accordion-item
@@ -85,7 +85,7 @@
       <div v-else>
         <div class="ui message negative">
           <div class="header">Unassociated Sprints Found</div>
-          <p><b>Suggested Action:</b> Edit these sprints so that they belong to a release.</p>
+          <p><b>Suggested Action:</b> Edit these sprints so that they belong to a release or create a release that contains these sprints.</p>
         </div>
       </div>
       <sprint-accordion-item
@@ -126,7 +126,7 @@
       <div v-else>
         <div class="ui message negative">
           <div class="header">Unassociated Stories Found</div>
-          <p><b>Suggested Action:</b> Edit these stories so that they belong to a sprint.</p>
+          <p><b>Suggested Action:</b> Edit these stories so that they belong to a sprint or create a sprint that contains these stories.</p>
         </div>
       </div>
       <story-accordion-item
@@ -165,7 +165,7 @@
       <div v-else>
         <div class="ui message negative">
           <div class="header">Unassociated Tasks Found</div>
-          <p><b>Suggested Action:</b> Edit these tasks so that they belong to a story or a sprint.</p>
+          <p><b>Suggested Action:</b> Edit these tasks so that they belong to a story or a sprint or create a story or sprint that contains these tasks.</p>
         </div>
       </div>
       <br>
@@ -272,8 +272,8 @@ export default {
     },
     numBackLogItems () {
       return Object.keys(this.orphanedData)
-        .map(key => this.orphanedData[key].length > 0)
-        .filter(val => !!val).length
+        .map(key => this.orphanedData[key].length)
+        .reduce((acc, val) => acc + val, 0)
     },
     hasBacklogItems () {
       return this.numBackLogItems > 0
