@@ -46,6 +46,8 @@
             :assigned-task-list="sprint.tasks"
             :all-tasks="tasks"
             :show-buttons="showButtons"
+            :project-id="projectId"
+            @update="$emit('update')"
             @toggle-accordion-state="toggleAccordionSubState"
             @showmodal="showModal"
           />
@@ -57,6 +59,8 @@
             :story="story"
             :tasks="tasks"
             :show-buttons="showButtons"
+            :project-id="projectId"
+            @update="$emit('update')"
             :showing-boolean="activeSubAccordion === `${sprint.id}-list-${story.id}`"
             @showmodal="showModal"
             @changestory="changeStory"
@@ -99,6 +103,11 @@ export default {
       required: false,
       type: Boolean,
       default: true
+    },
+    projectId: {
+      required: false,
+      type: String,
+      default: ''
     }
   },
   data () {
@@ -119,7 +128,20 @@ export default {
         .map(id => this.stories[id])
     }
   },
+  watch: {
+    projectId () {
+      this.checkProjectId()
+    }
+  },
+  mounted () {
+    this.checkProjectId()
+  },
   methods: {
+    checkProjectId () {
+      if (this.showButtons && !this.projectId) {
+        console.warn('no project id specified')
+      }
+    },
     sprintEditHandler () {
       console.debug('Clicked edit for', this.sprint.id)
     },

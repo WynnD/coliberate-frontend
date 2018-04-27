@@ -38,7 +38,9 @@
                 v-for="task in tasks"
                 :key="task.id"
                 :show-buttons="showButtons"
+                :project-id="projectId"
                 @showmodal="showModal"
+                @update="$emit('update')"
                 :task="task"/>
             </div>
           </div>
@@ -78,6 +80,11 @@ export default {
       required: false,
       type: Boolean,
       default: true
+    },
+    projectId: {
+      required: false,
+      type: String,
+      default: ''
     }
   },
   computed: {
@@ -88,7 +95,20 @@ export default {
       return this.tasks.filter(task => task.status !== 'done').length
     }
   },
+  watch: {
+    projectId () {
+      this.checkProjectId()
+    }
+  },
+  mounted () {
+    this.checkProjectId()
+  },
   methods: {
+    checkProjectId () {
+      if (this.showButtons && !this.projectId) {
+        console.warn('no project id specified')
+      }
+    },
     toggleAccordionState (name) {
       this.$emit('toggle-accordion-state', name)
     },

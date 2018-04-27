@@ -47,8 +47,10 @@
             :assigned-task-list="feature.tasks"
             :all-tasks="tasks"
             :show-buttons="showButtons"
+            :project-id="projectId"
             @toggle-accordion-state="toggleAccordionSubState"
             @showmodal="showModal"
+            @update="$emit('update')"
           />
           <story-accordion-item
             v-for="story in featureStories"
@@ -58,8 +60,10 @@
             :story="story"
             :tasks="tasks"
             :show-buttons="showButtons"
+            :project-id="projectId"
             :showing-boolean="activeSubAccordion === `${feature.id}-list-${story.id}`"
             @showmodal="showModal"
+            @update="$emit('update')"
             @changestory="changeStory"
           />
         </div>
@@ -100,6 +104,11 @@ export default {
       required: false,
       type: Boolean,
       default: true
+    },
+    projectId: {
+      required: false,
+      type: String,
+      default: ''
     }
   },
   data () {
@@ -120,7 +129,20 @@ export default {
         .map(id => this.stories[id])
     }
   },
+  watch: {
+    projectId () {
+      this.checkProjectId()
+    }
+  },
+  mounted () {
+    this.checkProjectId()
+  },
   methods: {
+    checkProjectId () {
+      if (this.showButtons && !this.projectId) {
+        console.warn('no project id specified')
+      }
+    },
     featureEditHandler () {
       console.debug('Clicked edit for', this.feature.id)
     },
@@ -148,3 +170,9 @@ export default {
   }
 }
 </script>
+
+<style>
+#task-story-listing>.header {
+  margin-bottom: 1rem;
+}
+</style>

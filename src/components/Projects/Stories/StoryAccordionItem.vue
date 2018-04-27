@@ -65,7 +65,9 @@
                 v-for="taskId in story.tasks"
                 :key="taskId"
                 :show-buttons="showButtons"
+                :project-id="projectId"
                 @showmodal="showModal"
+                @update="$emit('update')"
                 :task="tasks[taskId]"/>
             </div>
           </div>
@@ -105,6 +107,11 @@ export default {
       required: false,
       type: Boolean,
       default: true
+    },
+    projectId: {
+      required: false,
+      type: String,
+      default: ''
     }
   },
   watch: {
@@ -113,9 +120,20 @@ export default {
         console.debug('changestory', this.story.id)
         this.$emit('changestory', doShow ? this.story.id : '')
       }, doShow ? 100 : 25)
+    },
+    projectId () {
+      this.checkProjectId()
     }
   },
+  mounted () {
+    this.checkProjectId()
+  },
   methods: {
+    checkProjectId () {
+      if (this.showButtons && !this.projectId) {
+        console.warn('no project id specified')
+      }
+    },
     handleToggleAccordionState (name) {
       this.$emit('toggle-accordion-state', name)
     },

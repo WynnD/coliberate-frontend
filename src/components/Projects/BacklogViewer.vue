@@ -63,9 +63,11 @@
         :name="`backlog-features-${featureId}`"
         :stories="project.stories"
         :tasks="project.tasks"
+        :project-id="project.id"
         @click.native="$emit('changefeature', featureId)"
         @changestory="changeStory"
         @showmodal="showModal"
+        @update="$emit('update')"
       />
     </div>
 
@@ -96,6 +98,8 @@
         :name="`backlog-sprints-${sprintId}`"
         :stories="project.stories"
         :tasks="project.tasks"
+        :project-id="project.id"
+        @update="$emit('update')"
         @changestory="changeStory"
         @showmodal="showModal"
       />
@@ -134,7 +138,9 @@
         :tasks="project.tasks"
         @changestory="changeStory"
         @showmodal="showModal"
+        :project-id="project.id"
         :showing-boolean="activeSubAccordion === `story-list-${storyId}`"
+        @update="$emit('update')"
       />
     </div>
 

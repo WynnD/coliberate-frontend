@@ -242,9 +242,3 @@ export default {
   }
 }
 </script>
-
-<style>
-#task-story-listing>.header {
-  margin-bottom: 1rem;
-}
-</style>

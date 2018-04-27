@@ -150,6 +150,9 @@ export default {
         return
       }
       try {
+        if (!this.projectId) {
+          throw Error('project ID not specified')
+        }
         await this.sendEdit({
           ...(this.task),
           status: value
