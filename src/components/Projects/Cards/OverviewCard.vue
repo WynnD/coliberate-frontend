@@ -19,9 +19,10 @@
       id="stories-progress"
       class="content">
       <p class="ui sub header">Stories</p>
-      <div class="ui green progress">
-        <div class="bar finished"/>
-      </div>
+      <progress-bar
+        :done-count="finishedStories.length"
+        :in-progress-count="inProgressStories.length"
+        :total-count="allStories.length"/>
       <p class="ui sub header aligned right">
         {{ finishedStories.length }}/{{ allStories.length }} Completed
       </p>
@@ -70,6 +71,9 @@ export default {
     },
     allStories () {
       return Object.values(this.project.stories)
+    },
+    inProgressStories () {
+      return this.allStories.filter(s => s.status === 'in-progress')
     },
     finishedStories () {
       return this.allStories.filter(s => s.status === 'done')
