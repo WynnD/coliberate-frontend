@@ -96,6 +96,8 @@
         :features="project.features"
         :stories="project.stories"
         :tasks="project.tasks"
+        :project-id="project.id"
+        @update="$emit('update')"
         @changestory="handleStoryChange"
         @changefeature="handleFeatureChange"
       />
