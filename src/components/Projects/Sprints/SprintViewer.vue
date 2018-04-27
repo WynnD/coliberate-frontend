@@ -76,6 +76,8 @@
           :showing-boolean="activeAccordion === 'sprint-extra-tasks'"
           :assigned-task-list="currentSprint.tasks"
           :all-tasks="tasks"
+          :project-id="projectId"
+          @update="$emit('update')"
           @showmodal="showModal"
         />
         <story-accordion-item
@@ -86,6 +88,8 @@
           :showing-boolean="activeAccordion === `sprint-story-${story.id}`"
           :story="story"
           :tasks="tasks"
+          :project-id="projectId"
+          @update="$emit('update')"
           @changestory="changeStory"
           @showmodal="showModal"
         />
@@ -126,6 +130,11 @@ export default {
       type: Object
     },
     initialSprint: {
+      required: false,
+      type: String,
+      default: ''
+    },
+    projectId: {
       required: false,
       type: String,
       default: ''
@@ -207,12 +216,21 @@ export default {
     release () {
       this.currentSprintId = ''
       $(this.$el).find('.ui.dropdown').dropdown('restore defaults')
+    },
+    projectId () {
+      this.checkProjectId()
     }
   },
   mounted () {
     $(this.$el).find('.ui.dropdown').dropdown()
+    this.checkProjectId()
   },
   methods: {
+    checkProjectId () {
+      if (!this.projectId) {
+        console.warn('no project id specified')
+      }
+    },
     toggleAccordionState (field) {
       if (this.activeAccordion === field) {
         this.activeAccordion = ''

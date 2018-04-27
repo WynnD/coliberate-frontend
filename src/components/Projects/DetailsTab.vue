@@ -112,6 +112,8 @@
         :stories="project.stories"
         :tasks="project.tasks"
         :initial-sprint="currentSprintId"
+        :project-id="project.id"
+        @update="$emit('update')"
         @changestory="handleStoryChange"
         @changesprint="handleSprintChange"
       />
