@@ -10,20 +10,20 @@
           {{ numReleases > 0 ? 'Select a Release' : 'Add a Release' }}
         </option>
         <option
-          v-for="release in releases"
+          v-for="release in sortedReleases"
           :key="release.id"
           :value="release.id">
-          {{ release.name }}
+          {{ getReleaseLabel(release) }}
         </option>
       </select>
       <span
         :class="{
           'ui left pointing label': true,
-          blue: isReleaseActive
+          blue: isCurrentReleaseActive
         }"
       >
         <b v-if="currentRelease">
-          {{ isReleaseActive ? 'ACTIVE' : 'INACTIVE' }}
+          {{ isCurrentReleaseActive ? 'ACTIVE' : 'INACTIVE' }}
         </b>
         <b v-else>
           {{ numReleases }} {{ numReleases === 1 ? 'Release' : 'Releases' }} found
@@ -59,10 +59,7 @@
           <div>{{ currentRelease.description }}</div>
         </div>
         <div class="column">
-          <div>
-            <b>{{ currentRelease.startDate }}</b> to <b>{{ currentRelease.endDate }}</b>
-          </div>
-          Release Level overview charts here
+          <p v-html="dateRangeMessage"/>
         </div>
       </div>
     </div>
@@ -70,6 +67,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 /* global $ */
 export default {
   props: {
@@ -89,6 +87,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['dateFunctions']),
     currentRelease () {
       return this.releases[this.currentReleaseId]
     },
@@ -107,7 +106,7 @@ export default {
       }
       return this.currentDate
     },
-    isReleaseActive () {
+    isCurrentReleaseActive () {
       return this.currentDate.valueOf() > this.startDate.valueOf() &&
         this.currentDate.valueOf() < this.endDate.valueOf()
     },
@@ -116,6 +115,33 @@ export default {
         return 0
       }
       return Object.keys(this.releases).length
+    },
+    dateRangeMessage () {
+      if (!this.currentRelease) {
+        return ''
+      }
+      const dateRange = this.dateFunctions.getDateRange(this.startDate, this.endDate)
+        // bold the dates
+        .split(' to ').map(d => `<b>${d}</b>`).join(' to ')
+      const dateDifference = this.dateFunctions.getDateDifferenceMessage(this.startDate, this.endDate)
+      let relativeDifferenceMessage
+      if (this.currentDate < this.startDate) {
+        const relativeDifference = this.dateFunctions.getRelativeDateDifferenceMessage(this.startDate, ['millisecond', 'second'])
+        relativeDifferenceMessage = `starts ${relativeDifference}`
+      } else {
+        const relativeDifference = this.dateFunctions.getRelativeDateDifferenceMessage(this.endDate, ['millisecond', 'second'])
+        if (this.currentDate < this.endDate) {
+          relativeDifferenceMessage = `ends ${relativeDifference}`
+        } else {
+          relativeDifferenceMessage = `ended ${relativeDifference}`
+        }
+      }
+      return `${dateRange}<br>(${dateDifference} long, ${relativeDifferenceMessage})`
+    },
+    sortedReleases () {
+      const result = Object.values(this.releases).sort((a, b) => new Date(a.startDate) - new Date(b.startDate))
+      console.debug(this.releases, result)
+      return result
     }
   },
   watch: {
@@ -130,13 +156,13 @@ export default {
       this.currentReleaseId = newValue
       console.debug('currentReleaseID', this.currentReleaseId)
     },
-    releases () {
+    releases (newValue) {
       const currentReleaseId = this.currentReleaseId
       console.debug('releases updated', currentReleaseId)
       $(this.$el).find('.ui.dropdown')
         .dropdown('set exactly', this.currentReleaseId)
       setTimeout(() => {
-        this.currentReleaseId = currentReleaseId
+        this.currentReleaseId = newValue[currentReleaseId] ? currentReleaseId : ''
       }, 50)
     }
   },
@@ -150,6 +176,15 @@ export default {
     releaseRemoveHandler (releaseId) {
       console.debug('Clicked remove for', releaseId)
       this.$emit('showmodal', `release-remove|${releaseId}`)
+    },
+    isReleaseActive (release) {
+      const startDate = new Date(release.startDate)
+      const endDate = new Date(release.endDate)
+      return this.currentDate.valueOf() > startDate.valueOf() &&
+        this.currentDate.valueOf() < endDate.valueOf()
+    },
+    getReleaseLabel (release) {
+      return `${release.name || release.id}${this.isReleaseActive(release) ? ' (Active)' : ''}`
     }
   }
 }
