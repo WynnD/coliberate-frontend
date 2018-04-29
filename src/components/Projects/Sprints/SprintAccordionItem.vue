@@ -24,7 +24,22 @@
     </section>
 
     <section slot="content">
-      {{ sprint.startDate }} to {{ sprint.endDate }}
+      <div class="ui center aligned grid">
+        <div class="eight wide column">
+          <p v-html="dateRangeMessage"/>
+        </div>
+        <div class="eight wide column">
+          <div class="ui tiny horizontal statistic">
+            <div class="value">{{ finishedTasks }} / {{ totalTasks }}</div>
+            <div class="label">Extra Tasks Completed</div>
+          </div>
+          <br>
+          <div class="ui tiny horizontal statistic">
+            <div class="value">{{ finishedStories.length }} / {{ sprintStories.length }}</div>
+            <div class="label">Stories Completed</div>
+          </div>
+        </div>
+      </div>
       <hr>
       <div
         id="task-story-listing"
@@ -72,6 +87,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
 import ExtraTasksAccordionItem from '@/components/Projects/Tasks/ExtraTasksAccordionItem'
 import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
@@ -116,16 +132,48 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['dateFunctions']),
     sprintTasks () {
       return this.sprint.tasks
         .map(id => this.tasks[id])
     },
-    numUnfinishedTasks () {
-      return this.sprintTasks.filter(task => task.status !== 'done').length
+    finishedTasks () {
+      return this.sprintTasks.filter(task => task.status === 'done').length
+    },
+    totalTasks () {
+      return this.sprintTasks.length
     },
     sprintStories () {
       return this.sprint.stories
         .map(id => this.stories[id])
+    },
+    finishedStories () {
+      return this.sprintStories.filter(s => s.status === 'done')
+    },
+    dateRangeMessage () {
+      if (!this.sprint) {
+        return ''
+      }
+      const startDate = new Date(this.sprint.startDate)
+      const endDate = new Date(this.sprint.endDate)
+      const currentDate = new Date()
+      const dateRange = this.dateFunctions.getDateRange(startDate, endDate)
+        // bold the dates
+        .split(' to ').map(d => `<b>${d}</b>`).join(' to ')
+      const dateDifference = this.dateFunctions.getDateDifferenceMessage(startDate, endDate)
+      let relativeDifferenceMessage
+      if (currentDate < startDate) {
+        const relativeDifference = this.dateFunctions.getRelativeDateDifferenceMessage(startDate, ['millisecond', 'second'])
+        relativeDifferenceMessage = `starts ${relativeDifference}`
+      } else {
+        const relativeDifference = this.dateFunctions.getRelativeDateDifferenceMessage(endDate, ['millisecond', 'second'])
+        if (currentDate < endDate) {
+          relativeDifferenceMessage = `ends ${relativeDifference}`
+        } else {
+          relativeDifferenceMessage = `ended ${relativeDifference}`
+        }
+      }
+      return `${dateRange}<br>(${dateDifference} long, ${relativeDifferenceMessage})`
     }
   },
   watch: {

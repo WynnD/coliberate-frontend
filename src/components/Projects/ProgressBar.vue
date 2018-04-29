@@ -47,10 +47,10 @@ export default {
       if (this.doneCount < 1) {
         return 0
       }
-      return (this.doneCount / this.totalCount) * 100
+      return ((this.doneCount / this.totalCount) * 100) || 0
     },
     inProgressPercent () {
-      return (this.inProgressCount / this.totalCount) * 100
+      return ((this.inProgressCount / this.totalCount) * 100) || 0
     }
   },
   watch: {
