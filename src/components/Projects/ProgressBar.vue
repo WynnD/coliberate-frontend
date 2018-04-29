@@ -50,9 +50,6 @@ export default {
       return (this.doneCount / this.totalCount) * 100
     },
     inProgressPercent () {
-      if (this.doneCount < 1) {
-        return 0
-      }
       return (this.inProgressCount / this.totalCount) * 100
     }
   },
@@ -70,7 +67,9 @@ export default {
   mounted () {
     this.doneBar = $(this.$el).find('.ui.progress#done').progress()
 
-    this.inProgressBar = $(this.$el).find('.ui.progress#in-progress').progress()
+    this.inProgressBar = $(this.$el).find('.ui.progress#in-progress').progress({
+      autoSuccess: false
+    })
 
     setTimeout(() => {
       this.updateProgress()
@@ -92,6 +91,24 @@ export default {
           percent: this.inProgressCount.toString()
         }
       })
+
+      if (this.donePercent + this.inProgressPercent >= 95) {
+        let successfulRemoves = 0
+        const removeSuccess = () => {
+          // console.debug('checking for success class')
+          if (this.inProgressBar.hasClass('success')) {
+            // console.debug('removing success class')
+            this.inProgressBar.progress('set success', false)
+            this.inProgressBar.removeClass('success')
+            successfulRemoves = 0
+          }
+
+          if (successfulRemoves++ < 6) {
+            setTimeout(removeSuccess, 100 * successfulRemoves)
+          }
+        }
+        setTimeout(removeSuccess, 250)
+      }
     }
   }
 }
