@@ -1,5 +1,7 @@
 <template>
-  <div class="ui modal form">
+  <div
+    @click="refreshModal"
+    class="ui modal form">
     <div class="header">Add a Project</div>
     <div class="scrolling content">
       <div class="ui segments">
@@ -315,6 +317,12 @@ export default {
       if (this.$form) {
         this.$form.removeClass('error')
       }
+    },
+    refreshModal () {
+      setTimeout(() => {
+        // console.debug('refreshing modal')
+        this.$form.modal('refresh')
+      }, 50)
     },
     ...mapMutations(['addProject']),
     ...mapGetters(['memberById'])
