@@ -6,7 +6,7 @@
     <remove-modal
       id="project-remove-modal"
       :target-project-id="removeTargetId"
-      @update="getProjectList"
+      @update="getProjectList($store.state.accountData.id)"
     />
     <div
       v-if="$store.getters.isLoggedIn"
