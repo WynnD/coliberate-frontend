@@ -5,7 +5,7 @@
     :showing-boolean="showingBoolean">
     <section slot="title">
       <i class="dropdown icon"/>
-      <span>{{ story.name }}</span>
+      <span>{{ story.name }} ({{ story.businessValue }} pts)</span>
       <div
         :class="{
           'ui left pointing label story-status': true,
