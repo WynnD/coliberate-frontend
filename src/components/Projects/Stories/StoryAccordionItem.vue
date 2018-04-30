@@ -5,7 +5,7 @@
     :showing-boolean="showingBoolean">
     <section slot="title">
       <i class="dropdown icon"/>
-      <span>{{ story.name }}</span>
+      <span>{{ story.name }} ({{ story.businessValue }} pts)</span>
       <div
         :class="{
           'ui left pointing label story-status': true,
@@ -39,7 +39,13 @@
             {{ story.description }}
           </div>
           <div class="eight wide column">
-            {{ story.name }} stats here
+            <progress-bar
+              :done-count="finishedTasks.length"
+              :in-progress-count="inProgressTasks.length"
+              :total-count="storyTasks.length"/>
+            <p class="ui sub header aligned right">
+              {{ finishedTasks.length }}/{{ storyTasks.length }} Completed
+            </p>
           </div>
         </div>
         <div class="row">
@@ -62,9 +68,13 @@
               v-else
               class="ui three stackable cards">
               <task-card
-                v-for="taskId in story.tasks"
-                :key="taskId"
-                :task="tasks[taskId]"/>
+                v-for="task in storyTasks"
+                :key="task.id"
+                :show-buttons="showButtons"
+                :project-id="projectId"
+                @showmodal="showModal"
+                @update="$emit('update')"
+                :task="task"/>
             </div>
           </div>
         </div>
@@ -76,11 +86,13 @@
 <script>
 import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
 import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
+import ProgressBar from '@/components/Projects/ProgressBar'
 
 export default {
   components: {
     'task-card': SingleTaskCard,
-    'accordion-item': SegmentAccordionItem
+    'accordion-item': SegmentAccordionItem,
+    'progress-bar': ProgressBar
   },
   props: {
     story: {
@@ -103,6 +115,22 @@ export default {
       required: false,
       type: Boolean,
       default: true
+    },
+    projectId: {
+      required: false,
+      type: String,
+      default: ''
+    }
+  },
+  computed: {
+    storyTasks () {
+      return this.story.tasks.map(id => this.tasks[id])
+    },
+    finishedTasks () {
+      return this.storyTasks.filter(t => t.status === 'done')
+    },
+    inProgressTasks () {
+      return this.storyTasks.filter(t => t.status === 'in-progress')
     }
   },
   watch: {
@@ -111,9 +139,20 @@ export default {
         console.debug('changestory', this.story.id)
         this.$emit('changestory', doShow ? this.story.id : '')
       }, doShow ? 100 : 25)
+    },
+    projectId () {
+      this.checkProjectId()
     }
   },
+  mounted () {
+    this.checkProjectId()
+  },
   methods: {
+    checkProjectId () {
+      if (this.showButtons && !this.projectId) {
+        console.warn('no project id specified')
+      }
+    },
     handleToggleAccordionState (name) {
       this.$emit('toggle-accordion-state', name)
     },
@@ -122,6 +161,10 @@ export default {
     },
     storyRemoveHandler () {
       console.debug('Clicked remove for', this.story.id)
+      this.$emit('showmodal', `story-remove|${this.story.id}`)
+    },
+    showModal (data) {
+      this.$emit('showmodal', data)
     }
   }
 }

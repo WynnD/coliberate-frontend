@@ -16,7 +16,7 @@
 <script>
 import MemberCard from '@/components/Members/MemberCard'
 import { mapGetters } from 'vuex'
-/* global $ */
+
 export default {
   components: {
     'member-card': MemberCard
@@ -32,30 +32,23 @@ export default {
     this.getMembers()
   },
   methods: {
-    getMembers () {
-      return new Promise((resolve, reject) => {
-        const url = this.$store.getters.isDevelopmentMode ? 'http://localhost' : ''
-        $.get(`${url}/api/members`)
-          .done(response => {
-            const members = response.data
+    ...mapGetters(['server']),
+    async getMembers () {
+      const members = await this.server().members.getAll()
+      const memberObject = {}
+      members.forEach(m => {
+        memberObject[m.id.toString()] = m
 
-            const memberObject = {}
-            members.forEach(m => {
-              memberObject[m.id.toString()] = m
-
-              if (m.id === this.currentUser.id) {
-                console.debug('Updating current user data', {
-                  old: this.currentUser,
-                  new: m
-                })
-                this.$store.commit('login', m)
-              }
-            })
-            console.debug('Got member data', memberObject)
-            this.$store.commit('updateMemberData', memberObject)
-            resolve()
-          }).fail(reject)
+        if (m.id === this.currentUser.id) {
+          console.debug('Updating current user data', {
+            old: this.currentUser,
+            new: m
+          })
+          this.$store.commit('login', m)
+        }
       })
+      console.debug('Got member data', memberObject)
+      this.$store.commit('updateMemberData', memberObject)
     }
   }
 }

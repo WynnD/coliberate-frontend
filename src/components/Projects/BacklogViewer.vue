@@ -50,7 +50,7 @@
       <div v-else>
         <div class="ui message negative">
           <div class="header">Unassociated Features Found</div>
-          <p><b>Suggested Action:</b> Edit these features so that they belong to a release.</p>
+          <p><b>Suggested Action:</b> Edit these features so that they belong to a release or create a release that contains these features.</p>
         </div>
       </div>
       <feature-accordion-item
@@ -63,9 +63,11 @@
         :name="`backlog-features-${featureId}`"
         :stories="project.stories"
         :tasks="project.tasks"
+        :project-id="project.id"
         @click.native="$emit('changefeature', featureId)"
         @changestory="changeStory"
         @showmodal="showModal"
+        @update="$emit('update')"
       />
     </div>
 
@@ -83,142 +85,24 @@
       <div v-else>
         <div class="ui message negative">
           <div class="header">Unassociated Sprints Found</div>
-          <p><b>Suggested Action:</b> Edit these sprints so that they belong to a release.</p>
+          <p><b>Suggested Action:</b> Edit these sprints so that they belong to a release or create a release that contains these sprints.</p>
         </div>
       </div>
-      <accordion-item
+      <sprint-accordion-item
         v-for="sprintId in orphanedData.sprints"
         :key="sprintId"
         :id="`backlog-sprints-${sprintId}`"
+        :sprint="project.sprints[sprintId]"
+        :active-accordion="activeAccordion"
         @toggle-accordion-state="toggleAccordionState"
         :name="`backlog-sprints-${sprintId}`"
-        :showing-boolean="activeAccordion === `backlog-sprints-${sprintId}`">
-        <section slot="title">
-          <i class="dropdown icon"/>
-          <span>{{ project.sprints[sprintId].name }}</span>
-          <div class="ui buttons right floated compact">
-            <button
-              @click.stop="sprintEditHandler(sprintId)"
-              class="ui inverted violet icon button">
-              <i class="icon edit"/>
-            </button>
-            <button
-              @click.stop="sprintRemoveHandler(sprintId)"
-              class="ui inverted red icon button">
-              <i class="icon trash"/>
-            </button>
-          </div>
-        </section>
-
-        <section slot="content">
-          {{ project.sprints[sprintId].startDate }} to {{ project.sprints[sprintId].endDate }}
-          <hr>
-          <div
-            id="task-story-listing"
-            class="ui segment">
-            <div class="header">
-              <span class="ui header medium">Tasks and Stories</span>
-            </div>
-            <div>
-              <accordion-item
-                @toggle-accordion-state="toggleAccordionSubState"
-                :name="`backlog-sprints-${sprintId}-extra-tasks`"
-                :showing-boolean="activeSubAccordion === `backlog-sprints-${sprintId}-extra-tasks`">
-                <section slot="title">
-                  <i class="dropdown icon"/>
-                  <span>Extra Tasks</span>
-                </section>
-                <section slot="content">
-                  <div class="ui fluid container grid">
-                    <div class="row">
-                      <div class="sixteen wide column">
-                        <span class="ui small header">
-                          Tasks
-                        </span>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="sixteen wide column">
-                        <div class="ui three stackable cards">
-                          <task-card
-                            v-for="task in getSprintTasks(sprintId)"
-                            :key="task.id"
-                            :task="task"/>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              </accordion-item>
-              <accordion-item
-                v-for="story in getSprintStories(sprintId)"
-                :key="story.id"
-                @toggle-accordion-state="toggleAccordionSubState"
-                :name="`sprint-${sprintId}-list-${story.id}`"
-                :showing-boolean="activeSubAccordion === `sprint-${sprintId}-list-${story.id}`">
-                <section slot="title">
-                  <i class="dropdown icon"/>
-                  <span>{{ story.name }}</span>
-                  <div
-                    :class="{
-                      'ui left pointing label story-status': true,
-                      yellow: story.status === 'in-progress',
-                      green: story.status === 'done',
-                      red: story.status === 'todo'
-                    }"
-                  >
-                    {{ story.status.toUpperCase() }}
-                  </div>
-                  <div class="ui buttons right floated compact">
-                    <button
-                      @click.stop="storyEditHandler(story.id)"
-                      class="ui inverted violet icon button">
-                      <i class="icon edit"/>
-                    </button>
-                    <button
-                      @click.stop="storyRemoveHandler(story.id)"
-                      class="ui inverted red icon button">
-                      <i class="icon trash"/>
-                    </button>
-                  </div>
-                </section>
-
-                <section slot="content">
-                  <div class="ui fluid container grid">
-                    <div class="row">
-                      <div class="eight wide column">
-                        {{ story.description }}
-                      </div>
-                      <div class="eight wide column">
-                        {{ story.name }} stats here
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="sixteen wide column">
-                        <hr>
-                        <span class="ui small header">Tasks ({{ story.tasks.length }})</span>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="sixteen wide column">
-                        <span v-if="story.tasks.length === 0">No tasks found</span>
-                        <div
-                          v-else
-                          class="ui three stackable cards">
-                          <task-card
-                            v-for="taskId in story.tasks"
-                            :key="taskId"
-                            :task="tasks[taskId]"/>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </section>
-              </accordion-item>
-            </div>
-          </div>
-        </section>
-      </accordion-item>
+        :stories="project.stories"
+        :tasks="project.tasks"
+        :project-id="project.id"
+        @update="$emit('update')"
+        @changestory="changeStory"
+        @showmodal="showModal"
+      />
     </div>
 
     <div
@@ -242,7 +126,7 @@
       <div v-else>
         <div class="ui message negative">
           <div class="header">Unassociated Stories Found</div>
-          <p><b>Suggested Action:</b> Edit these stories so that they belong to a sprint.</p>
+          <p><b>Suggested Action:</b> Edit these stories so that they belong to a sprint or create a sprint that contains these stories.</p>
         </div>
       </div>
       <story-accordion-item
@@ -254,7 +138,9 @@
         :tasks="project.tasks"
         @changestory="changeStory"
         @showmodal="showModal"
+        :project-id="project.id"
         :showing-boolean="activeSubAccordion === `story-list-${storyId}`"
+        @update="$emit('update')"
       />
     </div>
 
@@ -279,7 +165,7 @@
       <div v-else>
         <div class="ui message negative">
           <div class="header">Unassociated Tasks Found</div>
-          <p><b>Suggested Action:</b> Edit these tasks so that they belong to a story or a sprint.</p>
+          <p><b>Suggested Action:</b> Edit these tasks so that they belong to a story or a sprint or create a story or sprint that contains these tasks.</p>
         </div>
       </div>
       <br>
@@ -287,6 +173,9 @@
         <task-card
           v-for="taskId in orphanedData.tasks"
           :key="taskId"
+          :project-id="project.id"
+          @showmodal="showModal"
+          @update="$emit('update')"
           :task="project.tasks[taskId]"/>
       </div>
     </div>
@@ -297,14 +186,14 @@
 import SingleTaskCard from '@/components/Projects/Tasks/SingleTaskCard'
 import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
 import FeatureAccordionItem from '@/components/Projects/Features/FeatureAccordionItem'
-import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
+import SprintAccordionItem from '@/components/Projects/Sprints/SprintAccordionItem'
 
 export default {
   components: {
     'task-card': SingleTaskCard,
     'feature-accordion-item': FeatureAccordionItem,
     'story-accordion-item': StoryAccordionItem,
-    'accordion-item': SegmentAccordionItem
+    'sprint-accordion-item': SprintAccordionItem
   },
   props: {
     project: {
@@ -383,8 +272,8 @@ export default {
     },
     numBackLogItems () {
       return Object.keys(this.orphanedData)
-        .map(key => this.orphanedData[key].length > 0)
-        .filter(val => !!val).length
+        .map(key => this.orphanedData[key].length)
+        .reduce((acc, val) => acc + val, 0)
     },
     hasBacklogItems () {
       return this.numBackLogItems > 0
@@ -414,12 +303,6 @@ export default {
         this.activeSubAccordion = field
       }
     },
-    featureEditHandler (featureId) {
-      console.debug('Clicked edit for', featureId)
-    },
-    featureRemoveHandler (featureId) {
-      console.debug('Clicked remove for', featureId)
-    },
     getFeatureTasks (featureId) {
       return this.project.features[featureId].tasks
         .map(id => this.project.tasks[id])
@@ -431,19 +314,6 @@ export default {
     getFeatureStories (featureId) {
       return this.project.features[featureId].stories
         .map(id => this.project.stories[id])
-    },
-    storyEditHandler (storyId) {
-      console.debug('Clicked edit for', storyId)
-    },
-    storyRemoveHandler (storyId) {
-      console.debug('Clicked remove for', storyId)
-    },
-    sprintEditHandler (sprintId) {
-      console.debug('Clicked edit for', sprintId)
-    },
-    sprintRemoveHandler (sprintId) {
-      console.debug('Clicked remove for', sprintId)
-      this.$emit('showmodal', `sprint-remove|${sprintId}`)
     },
     getSprintTasks (sprintId) {
       return this.project.sprints[sprintId].tasks

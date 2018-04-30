@@ -21,6 +21,8 @@
         @toggle-accordion-state="toggleAccordionState"
         :stories="stories"
         :tasks="tasks"
+        :project-id="projectId"
+        @update="handleFeatureEdit"
         @showmodal="showModal"
         @changefeature="changeFeature"
         @changestory="changeStory"
@@ -54,11 +56,17 @@ export default {
     tasks: {
       required: true,
       type: Object
+    },
+    projectId: {
+      required: false,
+      type: String,
+      default: ''
     }
   },
   data () {
     return {
-      activeAccordion: ''
+      activeAccordion: '',
+      waitingFeatureUpdate: false
     }
   },
   computed: {
@@ -68,10 +76,24 @@ export default {
   },
   watch: {
     release () {
-      this.activeAccordion = ''
+      if (!this.waitingFeatureUpdate) {
+        this.activeAccordion = ''
+      }
+      this.waitingFeatureUpdate = false
+    },
+    projectId () {
+      this.checkProjectId()
     }
   },
+  mounted () {
+    this.checkProjectId()
+  },
   methods: {
+    checkProjectId () {
+      if (this.showButtons && !this.projectId) {
+        console.warn('no project id specified')
+      }
+    },
     toggleAccordionState (field) {
       if (this.activeAccordion === field) {
         this.activeAccordion = ''
@@ -87,6 +109,10 @@ export default {
     },
     changeFeature (featureId) {
       this.$emit('changefeature', !this.activeAccordion ? '' : featureId)
+    },
+    handleFeatureEdit () {
+      this.waitingFeatureUpdate = true
+      this.$emit('update')
     }
   }
 }

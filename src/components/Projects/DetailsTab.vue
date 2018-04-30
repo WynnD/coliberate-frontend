@@ -5,6 +5,12 @@
       id="release-creation-modal"
       :features="project.features"
       :project="project"/>
+    <release-removal-modal
+      id="release-removal-modal"
+      :target-release-id="removeTargetId"
+      :project="project"
+      @update="$emit('update')"
+    />
     <feature-creation-modal
       id="feature-creation-modal"
       :stories="project.stories"
@@ -14,6 +20,12 @@
       :initial-release="!isSandbox ? currentReleaseId : sandboxData.currentReleaseId"
       :project-id="project.id || ''"
       @update="handleNewFeature"
+    />
+    <feature-removal-modal
+      id="feature-removal-modal"
+      :target-feature-id="removeTargetId"
+      :project="project"
+      @update="$emit('update')"
     />
     <sprint-creation-modal
       @update="handleNewSprint"
@@ -27,11 +39,9 @@
     />
     <sprint-removal-modal
       id="sprint-removal-modal"
-      :releases="project.releases"
       :target-sprint-id="removeTargetId"
-      :sprints="project.sprints"
-      :stories="project.stories"
-      :tasks="project.tasks"
+      :project="project"
+      @update="$emit('update')"
     />
     <story-creation-modal
       id="story-creation-modal"
@@ -43,6 +53,12 @@
       :initial-feature="!isSandbox ? currentFeatureId : sandboxData.currentFeatureId"
       :project-id="project.id || ''"
       @update="handleNewStory"
+    />
+    <story-removal-modal
+      id="story-removal-modal"
+      :target-story-id="removeTargetId"
+      :project="project"
+      @update="$emit('update')"
     />
     <task-creation-modal
       id="task-creation-modal"
@@ -56,6 +72,12 @@
       :initial-story="!isSandbox ? currentStoryId : sandboxData.currentStoryId"
       :project-id="project.id || ''"
       @update="handleNewTask"
+    />
+    <task-removal-modal
+      id="task-removal-modal"
+      :target-task-id="removeTargetId"
+      :project="project"
+      @update="$emit('update')"
     />
 
     <div class="column sixteen wide">
@@ -74,6 +96,8 @@
         :features="project.features"
         :stories="project.stories"
         :tasks="project.tasks"
+        :project-id="project.id"
+        @update="$emit('update')"
         @changestory="handleStoryChange"
         @changefeature="handleFeatureChange"
       />
@@ -88,6 +112,8 @@
         :stories="project.stories"
         :tasks="project.tasks"
         :initial-sprint="currentSprintId"
+        :project-id="project.id"
+        @update="$emit('update')"
         @changestory="handleStoryChange"
         @changesprint="handleSprintChange"
       />
@@ -95,6 +121,7 @@
     <div class="column sixteen wide">
       <backlog-viewer
         @showmodal="showSandboxModal"
+        @update="$emit('update')"
         @changefeature="handleFeatureChange($event, true)"
         @changestory="handleStoryChange($event, true)"
         :project="project"/>
@@ -107,17 +134,21 @@ import BacklogViewer from '@/components/Projects/BacklogViewer'
 
 import ReleaseCreationModal from '@/components/Projects/Releases/ReleaseCreationModal'
 import ReleaseSelector from '@/components/Projects/Releases/ReleaseSelector'
+import ReleaseRemovalModal from '@/components/Projects/Releases/ReleaseRemovalModal'
 
 import FeatureCreationModal from '@/components/Projects/Features/FeatureCreationModal'
 import FeatureListing from '@/components/Projects/Features/FeatureListing'
+import FeatureRemovalModal from '@/components/Projects/Features/FeatureRemovalModal'
 
 import SprintCreationModal from '@/components/Projects/Sprints/SprintCreationModal'
 import SprintViewer from '@/components/Projects/Sprints/SprintViewer'
 import SprintRemovalModal from '@/components/Projects/Sprints/SprintRemovalModal'
 
 import StoryCreationModal from '@/components/Projects/Stories/StoryCreationModal'
+import StoryRemovalModal from '@/components/Projects/Stories/StoryRemovalModal'
 
 import TaskCreationModal from '@/components/Projects/Tasks/TaskCreationModal'
+import TaskRemovalModal from '@/components/Projects/Tasks/TaskRemovalModal'
 
 /* global $ */
 export default {
@@ -125,13 +156,17 @@ export default {
     'backlog-viewer': BacklogViewer,
     'release-creation-modal': ReleaseCreationModal,
     'release-selector': ReleaseSelector,
+    'release-removal-modal': ReleaseRemovalModal,
     'feature-creation-modal': FeatureCreationModal,
     'feature-listing': FeatureListing,
+    'feature-removal-modal': FeatureRemovalModal,
     'sprint-creation-modal': SprintCreationModal,
     'sprint-viewer': SprintViewer,
     'sprint-removal-modal': SprintRemovalModal,
     'story-creation-modal': StoryCreationModal,
-    'task-creation-modal': TaskCreationModal
+    'story-removal-modal': StoryRemovalModal,
+    'task-creation-modal': TaskCreationModal,
+    'task-removal-modal': TaskRemovalModal
   },
   props: {
     project: {
@@ -162,29 +197,29 @@ export default {
     }
   },
   mounted () {
-    this.modals['sprint-create'] = $(this.$el).find('#sprint-creation-modal')
-      .modal('setting', 'closable', false)
-      .modal('hide')
+    const modalMapping = {
+      'release-create': '#release-creation-modal',
+      'release-remove': '#release-removal-modal',
+      'feature-create': '#feature-creation-modal',
+      'feature-remove': '#feature-removal-modal',
+      'sprint-create': '#sprint-creation-modal',
+      'sprint-remove': '#sprint-removal-modal',
+      'story-create': '#story-creation-modal',
+      'story-remove': '#story-removal-modal',
+      'task-create': '#task-creation-modal',
+      'task-remove': '#task-removal-modal'
+    }
 
-    this.modals['sprint-remove'] = $(this.$el).find('#sprint-removal-modal')
-      .modal('setting', 'closable', false)
-      .modal('hide')
-
-    this.modals['feature-create'] = $(this.$el).find('#feature-creation-modal')
-      .modal('setting', 'closable', false)
-      .modal('hide')
-
-    this.modals['release-create'] = $(this.$el).find('#release-creation-modal')
-      .modal('setting', 'closable', false)
-      .modal('hide')
-
-    this.modals['story-create'] = $(this.$el).find('#story-creation-modal')
-      .modal('setting', 'closable', false)
-      .modal('hide')
-
-    this.modals['task-create'] = $(this.$el).find('#task-creation-modal')
-      .modal('setting', 'closable', false)
-      .modal('hide')
+    Object.keys(modalMapping)
+      .forEach(modalType => {
+        this.modals[modalType] = $(this.$el).find(modalMapping[modalType])
+          .modal({
+            closable: false,
+            onVisible () {
+              $(this).modal('refresh')
+            }
+          }).modal('hide')
+      })
   },
   methods: {
     handleReleaseChange (releaseId, isSandbox = false) {

@@ -7,22 +7,24 @@
       id="tasks-progress"
       class="content">
       <p class="ui sub header">Tasks</p>
-      <div class="ui green progress">
-        <div class="bar finished"/>
-      </div>
+      <progress-bar
+        :done-count="finishedTasks.length"
+        :in-progress-count="inProgressTasks.length"
+        :total-count="allTasks.length"/>
       <p class="ui sub header aligned right">
-        {{ tasksFinished }}/{{ numTasks }} Completed
+        {{ finishedTasks.length }}/{{ allTasks.length }} Completed
       </p>
     </div>
     <div
       id="stories-progress"
       class="content">
       <p class="ui sub header">Stories</p>
-      <div class="ui green progress">
-        <div class="bar finished"/>
-      </div>
+      <progress-bar
+        :done-count="finishedStories.length"
+        :in-progress-count="inProgressStories.length"
+        :total-count="allStories.length"/>
       <p class="ui sub header aligned right">
-        {{ storiesFinished }}/{{ numStories }} Completed
+        {{ finishedStories.length }}/{{ allStories.length }} Completed
       </p>
     </div>
     <div
@@ -32,10 +34,10 @@
       <table class="ui very basic celled table">
         <tbody>
           <tr
-            v-for="(percent, name) in features"
-            :key="name">
-            <td>{{ name }}</td>
-            <td>{{ percent }}%</td>
+            v-for="feature in featureProgress"
+            :key="feature.id">
+            <td>{{ feature.name }}</td>
+            <td>{{ feature.percent }}</td>
           </tr>
         </tbody>
       </table>
@@ -44,64 +46,88 @@
 </template>
 
 <script>
+import ProgressBar from '@/components/Projects/ProgressBar'
 
 /* global $ */
 export default {
+  components: {
+    'progress-bar': ProgressBar
+  },
   props: {
     project: {
       required: true,
       type: Object
     }
   },
-  data () {
-    return {
-      numTasks: 0,
-      tasksFinished: 0,
-      numStories: 0,
-      storiesFinished: 0,
-      features: {
-        'Homepage': 80,
-        'User Support': 53,
-        'Security': 13
-      }
+  computed: {
+    allTasks () {
+      return Object.values(this.project.tasks)
+    },
+    inProgressTasks () {
+      return this.allTasks.filter(t => t.status === 'in-progress')
+    },
+    finishedTasks () {
+      return this.allTasks.filter(t => t.status === 'done')
+    },
+    allStories () {
+      return Object.values(this.project.stories)
+    },
+    inProgressStories () {
+      return this.allStories.filter(s => s.status === 'in-progress')
+    },
+    finishedStories () {
+      return this.allStories.filter(s => s.status === 'done')
+    },
+    allFeatures () {
+      return Object.values(this.project.features)
+    },
+    featureProgress () {
+      return this.allFeatures.map(f => {
+        const stories = f.stories.map(id => this.project.stories[id])
+        const finishedStories = stories.filter(s => s.status === 'done')
+
+        const tasks = f.tasks.map(id => this.project.tasks[id])
+        const finishedTasks = tasks.filter(t => t.status === 'done')
+
+        const progress = ((finishedStories.length + finishedTasks.length) / (stories.length + tasks.length)) * 100
+        return {
+          name: f.name || f.id,
+          percent: !isNaN(progress) ? `${progress.toFixed(2)}%` : 'N/A'
+        }
+      })
     }
   },
   watch: {
-    numTasks () {
+    allTasks () {
       this.updateTasksProgress()
     },
-    tasksFinished () {
+    finishedTasks () {
       this.updateTasksProgress()
     },
-    numStories () {
+    allStories () {
       this.updateStoriesProgress()
     },
-    storiesFinished () {
+    finishedStories () {
       this.updateStoriesProgress()
     }
   },
   mounted () {
-    this.updateProgress()
+    this.updateTasksProgress()
+    this.updateStoriesProgress()
   },
   methods: {
-    updateProgress () {
-      this.numTasks = 20
-      this.tasksFinished = 17
-      this.numStories = 7
-      this.storiesFinished = 5
-    },
     updateTasksProgress () {
       let tasksProgress = $('#tasks-progress .progress')
       tasksProgress.progress({
-        total: this.numTasks /* tasks.length */,
-        value: this.tasksFinished /* numFinished() */,
+        total: this.allTasks.length,
+        value: this.finishedTasks.length,
         showActivity: false})
     },
     updateStoriesProgress () {
       let storiesProgress = $('#stories-progress .progress')
       storiesProgress.progress({
-        total: this.numStories,
-        value: this.storiesFinished,
+        total: this.allStories.length,
+        value: this.finishedStories.length,
         showActivity: false
       })
     }

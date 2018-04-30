@@ -91,7 +91,7 @@
                 <div
                   id="toggle-btn"
                   @click="toggleTask(task.id)"
-                  class="ui fluid button checkbox">
+                  class="ui fluid button task-toggle-btn checkbox">
                   <input
                     type="checkbox"
                     :value="task.id"
@@ -225,13 +225,14 @@ export default {
         .each(function () {
           const button = $(this)
           const label = button.find('label')
+          const isTaskButton = button.hasClass('task-toggle-btn')
 
           if (button.hasClass('checked')) {
             button.addClass('red inverted')
-            label.text('Remove from feature')
+            label.text(`Remove from ${isTaskButton ? 'story' : 'feature'}`)
           } else {
             button.removeClass('red inverted')
-            label.text('Add to feature')
+            label.text(`Add to ${isTaskButton ? 'story' : 'feature'}`)
           }
         })
     },

@@ -1,23 +1,22 @@
 <template>
   <accordion-item
-    :id="`feature-list-${feature.id}`"
+    :id="`sprint-accordion-${sprint.id}`"
     @toggle-accordion-state="toggleAccordionState"
-    :name="`feature-list-${feature.id}`"
-    @click.native="$emit('changefeature', feature.id)"
-    :showing-boolean="activeAccordion === `feature-list-${feature.id}`">
+    :name="`sprint-accordion-${sprint.id}`"
+    :showing-boolean="activeAccordion === `sprint-accordion-${sprint.id}`">
     <section slot="title">
       <i class="dropdown icon"/>
-      <span>{{ feature.name }}</span>
+      <span>{{ sprint.name }}</span>
       <div
         v-if="showButtons"
         class="ui buttons right floated compact">
         <button
-          @click.stop="featureEditHandler"
+          @click.stop="sprintEditHandler"
           class="ui inverted violet icon button">
           <i class="icon edit"/>
         </button>
         <button
-          @click.stop="featureRemoveHandler"
+          @click.stop="sprintRemoveHandler"
           class="ui inverted red icon button">
           <i class="icon trash"/>
         </button>
@@ -25,7 +24,22 @@
     </section>
 
     <section slot="content">
-      {{ feature.description }}
+      <div class="ui center aligned grid">
+        <div class="eight wide column">
+          <p v-html="dateRangeMessage"/>
+        </div>
+        <div class="eight wide column">
+          <div class="ui tiny horizontal statistic">
+            <div class="value">{{ finishedTasks }} / {{ totalTasks }}</div>
+            <div class="label">Extra Tasks Completed</div>
+          </div>
+          <br>
+          <div class="ui tiny horizontal statistic">
+            <div class="value">{{ finishedStories.length }} / {{ sprintStories.length }}</div>
+            <div class="label">Stories Completed</div>
+          </div>
+        </div>
+      </div>
       <hr>
       <div
         id="task-story-listing"
@@ -42,28 +56,28 @@
         </div>
         <div>
           <extra-tasks-accordion-item
-            :name="`${feature.id}-extra-tasks`"
-            :showing-boolean="activeSubAccordion === `${feature.id}-extra-tasks`"
-            :assigned-task-list="feature.tasks"
+            :name="`${sprint.id}-extra-tasks`"
+            :showing-boolean="activeSubAccordion === `${sprint.id}-extra-tasks`"
+            :assigned-task-list="sprint.tasks"
             :all-tasks="tasks"
             :show-buttons="showButtons"
             :project-id="projectId"
+            @update="$emit('update')"
             @toggle-accordion-state="toggleAccordionSubState"
             @showmodal="showModal"
-            @update="$emit('update')"
           />
           <story-accordion-item
-            v-for="story in featureStories"
+            v-for="story in sprintStories"
             :key="story.id"
             @toggle-accordion-state="toggleAccordionSubState"
-            :name="`${feature.id}-list-${story.id}`"
+            :name="`${sprint.id}-list-${story.id}`"
             :story="story"
             :tasks="tasks"
             :show-buttons="showButtons"
             :project-id="projectId"
-            :showing-boolean="activeSubAccordion === `${feature.id}-list-${story.id}`"
-            @showmodal="showModal"
             @update="$emit('update')"
+            :showing-boolean="activeSubAccordion === `${sprint.id}-list-${story.id}`"
+            @showmodal="showModal"
             @changestory="changeStory"
           />
         </div>
@@ -73,6 +87,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import StoryAccordionItem from '@/components/Projects/Stories/StoryAccordionItem'
 import ExtraTasksAccordionItem from '@/components/Projects/Tasks/ExtraTasksAccordionItem'
 import SegmentAccordionItem from '@/components/Projects/SegmentAccordionItem'
@@ -84,7 +99,7 @@ export default {
     'accordion-item': SegmentAccordionItem
   },
   props: {
-    feature: {
+    sprint: {
       required: true,
       type: Object
     },
@@ -117,16 +132,48 @@ export default {
     }
   },
   computed: {
-    featureTasks () {
-      return this.feature.tasks
+    ...mapGetters(['dateFunctions']),
+    sprintTasks () {
+      return this.sprint.tasks
         .map(id => this.tasks[id])
     },
-    numUnfinishedTasks () {
-      return this.featureTasks.filter(task => task.status !== 'done').length
+    finishedTasks () {
+      return this.sprintTasks.filter(task => task.status === 'done').length
     },
-    featureStories () {
-      return this.feature.stories
+    totalTasks () {
+      return this.sprintTasks.length
+    },
+    sprintStories () {
+      return this.sprint.stories
         .map(id => this.stories[id])
+    },
+    finishedStories () {
+      return this.sprintStories.filter(s => s.status === 'done')
+    },
+    dateRangeMessage () {
+      if (!this.sprint) {
+        return ''
+      }
+      const startDate = new Date(this.sprint.startDate)
+      const endDate = new Date(this.sprint.endDate)
+      const currentDate = new Date()
+      const dateRange = this.dateFunctions.getDateRange(startDate, endDate)
+        // bold the dates
+        .split(' to ').map(d => `<b>${d}</b>`).join(' to ')
+      const dateDifference = this.dateFunctions.getDateDifferenceMessage(startDate, endDate)
+      let relativeDifferenceMessage
+      if (currentDate < startDate) {
+        const relativeDifference = this.dateFunctions.getRelativeDateDifferenceMessage(startDate, ['millisecond', 'second'])
+        relativeDifferenceMessage = `starts ${relativeDifference}`
+      } else {
+        const relativeDifference = this.dateFunctions.getRelativeDateDifferenceMessage(endDate, ['millisecond', 'second'])
+        if (currentDate < endDate) {
+          relativeDifferenceMessage = `ends ${relativeDifference}`
+        } else {
+          relativeDifferenceMessage = `ended ${relativeDifference}`
+        }
+      }
+      return `${dateRange}<br>(${dateDifference} long, ${relativeDifferenceMessage})`
     }
   },
   watch: {
@@ -143,12 +190,12 @@ export default {
         console.warn('no project id specified')
       }
     },
-    featureEditHandler () {
-      console.debug('Clicked edit for', this.feature.id)
+    sprintEditHandler () {
+      console.debug('Clicked edit for', this.sprint.id)
     },
-    featureRemoveHandler () {
-      console.debug('Clicked remove for', this.feature.id)
-      this.$emit('showmodal', `feature-remove|${this.feature.id}`)
+    sprintRemoveHandler () {
+      console.debug('Clicked remove for', this.sprint.id)
+      this.$emit('showmodal', `sprint-remove|${this.sprint.id}`)
     },
     toggleAccordionState (name) {
       this.$emit('toggle-accordion-state', name)
@@ -161,7 +208,7 @@ export default {
       }
     },
     showModal (data) {
-      this.$emit('changefeature', this.feature.id)
+      this.$emit('changesprint', this.sprint.id)
       this.$emit('showmodal', data)
     },
     changeStory (data) {
@@ -170,9 +217,3 @@ export default {
   }
 }
 </script>
-
-<style>
-#task-story-listing>.header {
-  margin-bottom: 1rem;
-}
-</style>
